@@ -550,7 +550,7 @@ function renderPlayers() {
             container.innerHTML = html;
         }
 
-function renderRoundResults() {
+        function renderRoundResults() {
             const container = document.getElementById('rounds-content');
             
             // Group matchups by round number
@@ -564,9 +564,9 @@ function renderRoundResults() {
 
             const rounds = Object.keys(matchupsByRound).sort((a, b) => a - b);
             
-            let subTabsHtml = '<div class="mb-4 flex space-x-2 border-b overflow-x-auto pb-1">'; // 탭이 많아질 경우를 대비해 탭에도 가로 스크롤 추가
+            let subTabsHtml = '<div class="mb-4 flex space-x-2 border-b">';
             rounds.forEach((roundNum, index) => {
-                subTabsHtml += `<button data-round="${roundNum}" class="sub-tab py-2 px-4 text-sm font-medium rounded-t-lg whitespace-nowrap ${index === 0 ? 'active' : ''}">${roundNum}라운드</button>`;
+                subTabsHtml += `<button data-round="${roundNum}" class="sub-tab py-2 px-4 text-sm font-medium rounded-t-lg ${index === 0 ? 'active' : ''}">${roundNum}라운드</button>`;
             });
             subTabsHtml += '</div>';
 
@@ -592,22 +592,21 @@ function renderRoundResults() {
 
 
                     roundPanesHtml += `
-                    <div class="bg-gray-800 shadow-lg rounded-lg p-4 md:p-6">
-                        <div class="flex justify-between items-center mb-6 px-0 md:px-4">
-                            <div class="text-center md:text-left flex-1 team-logo-bg p-4 md:p-8" style="background-image: url('${TEAM_LOGOS[team1.id]}')">
-                                <h4 class="text-2xl md:text-3xl font-black ${team1NameColor} w-full">${team1.name}</h4>
+                    <div class="bg-gray-800 shadow-lg rounded-lg p-6">
+                        <div class="flex justify-between items-center mb-6 px-4">
+                            <div class="text-left flex-1 team-logo-bg p-8" style="background-image: url('${TEAM_LOGOS[team1.id]}')">
+                                <h4 class="text-3xl font-black ${team1NameColor} w-full">${team1.name}</h4>
                             </div>
-                            <div class="text-5xl font-bold mx-2 md:mx-6">
+                            <div class="text-5xl font-bold mx-6">
                                <span class="${team1ScoreColor}">${team1Score}</span>
-                               <span class="text-white mx-1 md:mx-2">:</span>
+                               <span class="text-white mx-2">:</span>
                                <span class="${team2ScoreColor}">${team2Score}</span>
                             </div>
-                            <div class="text-center md:text-right flex-1 team-logo-bg p-4 md:p-8" style="background-image: url('${TEAM_LOGOS[team2.id]}')">
-                                <h4 class="text-2xl md:text-3xl font-black ${team2NameColor} w-full">${team2.name}</h4>
+                            <div class="text-right flex-1 team-logo-bg p-8" style="background-image: url('${TEAM_LOGOS[team2.id]}')">
+                                <h4 class="text-3xl font-black ${team2NameColor} w-full">${team2.name}</h4>
                             </div>
                         </div>
-                        
-                        <div class="space-y-2 overflow-x-auto">
+                        <div class="space-y-2">
                     `;
 
                     roundup.matches.sort((a, b) => a.matchNum - b.matchNum).forEach(match => {
@@ -623,9 +622,8 @@ function renderRoundResults() {
                         const t1Winner = match.winner === 1 ? 'font-bold text-green-400' : 'text-gray-400';
                         const t2Winner = match.winner === 2 ? 'font-bold text-green-400' : 'text-gray-400';
 
-                        // 각 경기 결과 div에 최소 너비를 지정하여 모바일에서 레이아웃이 깨지지 않게 함
                         roundPanesHtml += `
-                            <div class="grid grid-cols-11 gap-2 items-center text-center bg-gray-700 p-2 rounded text-white" style="min-width: 600px;">
+                            <div class="grid grid-cols-11 gap-2 items-center text-center bg-gray-700 p-2 rounded text-white">
                                 <div class="col-span-4 text-right ${t1Winner}">${t1PlayersHtml}</div>
                                 <div class="col-span-1 ${t1Winner}">${match.winner === 1 ? 'W' : ''}</div>
                                 <div class="col-span-1 text-xs text-gray-300">
@@ -639,7 +637,7 @@ function renderRoundResults() {
                     });
 
                     roundPanesHtml += '</div></div>';
-                    // });
+                });
 
                 roundPanesHtml += '</div>'; // close round-pane
             });
@@ -731,36 +729,31 @@ function renderRoundResults() {
             container.innerHTML = html;
         }
 
-function renderMapMatchupTable(map, stats) {
+        function renderMapMatchupTable(map, stats) {
             const races = ['T', 'P', 'Z'];
             const getWinRate = (w, l) => (w + l > 0) ? Math.round(w / (w + l) * 100) : -1;
             const getRateColor = (rate) => rate > 50 ? 'text-green-600' : rate < 50 && rate !== -1 ? 'text-red-600' : '';
 
-            // --- 여기부터 수정 ---
             let tableHtml = `
                 <div class="bg-white p-4 rounded-lg shadow">
                     <h4 class="font-bold text-lg mb-3">${map}</h4>
-                    <div class="overflow-x-auto">
-                        <table class="w-full min-w-[700px] text-center text-sm border-collapse">
-            `; // --- 여기까지 수정 ---
-            
-            tableHtml += `
-                            <thead class="bg-gray-100">
-                                <tr class="text-xs">
-                                    <th class="p-2 border" rowspan="2">종족</th>
-                                    <th class="p-2 border" colspan="3">전체(동족전 제외)</th>
-                                    <th class="p-2 border" colspan="3">vs Terran</th>
-                                    <th class="p-2 border" colspan="3">vs Protoss</th>
-                                    <th class="p-2 border" colspan="3">vs Zerg</th>
-                                </tr>
-                                <tr class="bg-gray-100 text-xs">
-                                    <th class="p-1 border">승</th><th class="p-1 border">패</th><th class="p-1 border">승률</th>
-                                    <th class="p-1 border">승</th><th class="p-1 border">패</th><th class="p-1 border">승률</th>
-                                    <th class="p-1 border">승</th><th class="p-1 border">패</th><th class="p-1 border">승률</th>
-                                    <th class="p-1 border">승</th><th class="p-1 border">패</th><th class="p-1 border">승률</th>
-                                </tr>
-                            </thead>
-                            <tbody>`;
+                    <table class="w-full text-center text-sm border-collapse">
+                        <thead class="bg-gray-100">
+                            <tr class="text-xs">
+                                <th class="p-2 border" rowspan="2">종족</th>
+                                <th class="p-2 border" colspan="3">전체(동족전 제외)</th>
+                                <th class="p-2 border" colspan="3">vs Terran</th>
+                                <th class="p-2 border" colspan="3">vs Protoss</th>
+                                <th class="p-2 border" colspan="3">vs Zerg</th>
+                            </tr>
+                            <tr class="bg-gray-100 text-xs">
+                                <th class="p-1 border">승</th><th class="p-1 border">패</th><th class="p-1 border">승률</th>
+                                <th class="p-1 border">승</th><th class="p-1 border">패</th><th class="p-1 border">승률</th>
+                                <th class="p-1 border">승</th><th class="p-1 border">패</th><th class="p-1 border">승률</th>
+                                <th class="p-1 border">승</th><th class="p-1 border">패</th><th class="p-1 border">승률</th>
+                            </tr>
+                        </thead>
+                        <tbody>`;
             
             races.forEach(race => {
                 const s = stats[race];
@@ -770,21 +763,19 @@ function renderMapMatchupTable(map, stats) {
                 const vsZ_Rate = getWinRate(s.vsZ?.w, s.vsZ?.l);
 
                 tableHtml += `
-                        <tr>
-                            <td class="p-2 border font-bold">${race}</td>
-                            <td class="p-2 border">${s.total.w}</td>
-                            <td class="p-2 border">${s.total.l}</td>
-                            <td class="p-2 border font-bold ${getRateColor(totalRate)}">${totalRate !== -1 ? totalRate + '%' : '-'}</td>
-                            ${race === 'T' ? '<td class="p-2 border bg-gray-200" colspan="3"></td>' : `<td class="p-2 border">${s.vsT.w}</td><td class="p-2 border">${s.vsT.l}</td><td class="p-2 border font-bold ${getRateColor(vsT_Rate)}">${vsT_Rate !== -1 ? vsT_Rate + '%' : '-'}</td>`}
-                            ${race === 'P' ? '<td class="p-2 border bg-gray-200" colspan="3"></td>' : `<td class="p-2 border">${s.vsP.w}</td><td class="p-2 border">${s.vsP.l}</td><td class="p-2 border font-bold ${getRateColor(vsP_Rate)}">${vsP_Rate !== -1 ? vsP_Rate + '%' : '-'}</td>`}
-                            ${race === 'Z' ? '<td class="p-2 border bg-gray-200" colspan="3"></td>' : `<td class="p-2 border">${s.vsZ.w}</td><td class="p-2 border">${s.vsZ.l}</td><td class="p-2 border font-bold ${getRateColor(vsZ_Rate)}">${vsZ_Rate !== -1 ? vsZ_Rate + '%' : '-'}</td>`}
-                        </tr>
+                    <tr>
+                        <td class="p-2 border font-bold">${race}</td>
+                        <td class="p-2 border">${s.total.w}</td>
+                        <td class="p-2 border">${s.total.l}</td>
+                        <td class="p-2 border font-bold ${getRateColor(totalRate)}">${totalRate !== -1 ? totalRate + '%' : '-'}</td>
+                        ${race === 'T' ? '<td class="p-2 border bg-gray-200" colspan="3"></td>' : `<td class="p-2 border">${s.vsT.w}</td><td class="p-2 border">${s.vsT.l}</td><td class="p-2 border font-bold ${getRateColor(vsT_Rate)}">${vsT_Rate !== -1 ? vsT_Rate + '%' : '-'}</td>`}
+                        ${race === 'P' ? '<td class="p-2 border bg-gray-200" colspan="3"></td>' : `<td class="p-2 border">${s.vsP.w}</td><td class="p-2 border">${s.vsP.l}</td><td class="p-2 border font-bold ${getRateColor(vsP_Rate)}">${vsP_Rate !== -1 ? vsP_Rate + '%' : '-'}</td>`}
+                        ${race === 'Z' ? '<td class="p-2 border bg-gray-200" colspan="3"></td>' : `<td class="p-2 border">${s.vsZ.w}</td><td class="p-2 border">${s.vsZ.l}</td><td class="p-2 border font-bold ${getRateColor(vsZ_Rate)}">${vsZ_Rate !== -1 ? vsZ_Rate + '%' : '-'}</td>`}
+                    </tr>
                 `;
             });
 
-            // --- 여기부터 수정 ---
-            tableHtml += '</tbody></table></div></div>';
-            // --- 여기까지 수정 ---
+            tableHtml += '</tbody></table></div>';
             return tableHtml;
         }
         
@@ -926,5 +917,3 @@ function renderMapMatchupTable(map, stats) {
     </script>
 </body>
 </html>
-
-
