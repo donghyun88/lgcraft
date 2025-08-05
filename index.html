@@ -412,28 +412,29 @@
             container.innerHTML = html;
         }
 
-        function renderPlayers() {
+function renderPlayers() {
             const container = document.getElementById('players-content');
             const sortedPlayers = Object.values(playersData).sort((a,b) => b.elo - a.elo);
             
+            // --- 데스크탑용 테이블 헤더 ---
             let html = `
                 <div class="bg-white shadow-md rounded-lg overflow-hidden">
-                    <table class="min-w-full divide-y divide-gray-200 table-sortable" id="player-table">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">랭킹</th>
-                                <th data-sort="이름" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">이름</th>
-                                <th data-sort="팀" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">팀</th>
-                                <th data-sort="종족" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">종족</th>
-                                <th data-sort="티어" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">티어</th>
-                                <th data-sort-numeric="stats.total" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">전체</th>
-                                <th data-sort-numeric="stats.개인전" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">개인전</th>
-                                <th data-sort-numeric="stats.팀전" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">팀전</th>
-                                <th data-sort-numeric="elo" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ELO</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">`;
+                    <div class="hidden md:block">
+                        <table class="min-w-full divide-y divide-gray-200 table-sortable" id="player-table">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">랭킹</th>
+                                    <th data-sort="이름" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">이름</th>
+                                    <th data-sort="팀" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">팀</th>
+                                    <th data-sort="종족" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">종족</th>
+                                    <th data-sort="티어" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">티어</th>
+                                    <th data-sort-numeric="stats.total" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">전체</th>
+                                    <th data-sort-numeric="elo" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ELO</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">`;
             
+            // --- 데스크탑용 테이블 Body 렌더링 ---
             let rank = 0;
             let lastElo = -1;
             sortedPlayers.forEach((p, index) => {
@@ -442,21 +443,69 @@
                     lastElo = p.elo;
                 }
                 html += `
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${rank}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                            <a href="#" class="player-link text-indigo-600 hover:text-indigo-800" data-player-id="${p.id}">${p.이름} (${p.id})</a>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${TEAM_NAMES[p.팀] || p.팀}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${getRaceIcon(p.종족)} ${p.종족}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${p.티어}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${p.stats.total.w}승 ${p.stats.total.l}패</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${p.stats.개인전.w}승 ${p.stats.개인전.l}패</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${p.stats.팀전.w}승 ${p.stats.팀전.l}패</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-700">${p.elo}</td>
-                    </tr>`;
+                        <tr class="hover:bg-gray-50">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${rank}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                <a href="#" class="player-link text-indigo-600 hover:text-indigo-800" data-player-id="${p.id}">${p.이름} (${p.id})</a>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${TEAM_NAMES[p.팀] || p.팀}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${getRaceIcon(p.종족)} ${p.종족}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${p.티어}</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${p.stats.total.w}승 ${p.stats.total.l}패</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-700">${p.elo}</td>
+                        </tr>`;
             });
             html += `</tbody></table></div>`;
+
+            // --- 모바일용 카드 리스트 ---
+            html += `<div class="md:hidden space-y-3 p-2">`;
+            rank = 0;
+            lastElo = -1;
+            sortedPlayers.forEach((p, index) => {
+                if (p.elo !== lastElo) {
+                    rank = index + 1;
+                    lastElo = p.elo;
+                }
+                const totalWinRate = p.stats.total.w + p.stats.total.l > 0 ? Math.round(p.stats.total.w / (p.stats.total.w + p.stats.total.l) * 100) : 0;
+                html += `
+                <div class="bg-white p-3 rounded-lg shadow hover:shadow-md">
+                    <div class="flex justify-between items-start">
+                        <div class="flex-grow">
+                            <div class="flex items-center space-x-2">
+                                <span class="text-sm font-bold text-gray-500 w-6 text-center">${rank}</span>
+                                <span class="font-bold text-lg">
+                                     <a href="#" class="player-link text-indigo-600 hover:text-indigo-800" data-player-id="${p.id}">${p.이름}</a>
+                                </span>
+                                <span class="text-sm text-gray-600">(${p.id})</span>
+                            </div>
+                            <div class="text-sm text-gray-600 ml-8">
+                                ${getRaceIcon(p.종족)} ${p.티어}티어 | ${TEAM_NAMES[p.팀]}
+                            </div>
+                        </div>
+                        <div class="text-right flex-shrink-0">
+                            <div class="font-bold text-indigo-700 text-lg">${p.elo}</div>
+                            <div class="text-xs text-gray-500">ELO</div>
+                        </div>
+                    </div>
+                    <div class="mt-2 border-t pt-2 text-xs text-center grid grid-cols-3 gap-1">
+                        <div>
+                            <span class="font-semibold">${p.stats.total.w}승 ${p.stats.total.l}패</span>
+                            <span class="text-gray-500">(${totalWinRate}%)</span>
+                            <div class="text-gray-400">전체</div>
+                        </div>
+                         <div>
+                            <span class="font-semibold">${p.stats.개인전.w}승 ${p.stats.개인전.l}패</span>
+                            <div class="text-gray-400">개인전</div>
+                        </div>
+                         <div>
+                            <span class="font-semibold">${p.stats.팀전.w}승 ${p.stats.팀전.l}패</span>
+                            <div class="text-gray-400">팀전</div>
+                        </div>
+                    </div>
+                </div>`;
+            });
+            html += `</div></div>`; // container 닫기
+            
             container.innerHTML = html;
         }
         
@@ -561,31 +610,36 @@
                     `;
 
                     roundup.matches.sort((a, b) => a.matchNum - b.matchNum).forEach(match => {
-                        const t1PlayersHtml = match.team1.playerInfo.map(info => {
-                            const jongbyunIndicator = info.isJongbyun ? ' <span class="text-xs text-red-400">(종변)</span>' : '';
-                            return `${getRaceIcon(info.race)}${info.name}${jongbyunIndicator}`;
-                        }).join(', ');
-                        const t2PlayersHtml = match.team2.playerInfo.map(info => {
-                            const jongbyunIndicator = info.isJongbyun ? ' <span class="text-xs text-red-400">(종변)</span>' : '';
-                            return `${getRaceIcon(info.race)}${info.name}${jongbyunIndicator}`;
-                        }).join(', ');
-                        
-                        const t1Winner = match.winner === 1 ? 'font-bold text-green-400' : 'text-gray-400';
-                        const t2Winner = match.winner === 2 ? 'font-bold text-green-400' : 'text-gray-400';
+    const t1PlayersHtml = match.team1.playerInfo.map(info => {
+        const jongbyunIndicator = info.isJongbyun ? ' <span class="text-xs text-red-400">(종변)</span>' : '';
+        return `${getRaceIcon(info.race)}${info.name}${jongbyunIndicator}`;
+    }).join(', ');
+    const t2PlayersHtml = match.team2.playerInfo.map(info => {
+        const jongbyunIndicator = info.isJongbyun ? ' <span class="text-xs text-red-400">(종변)</span>' : '';
+        return `${getRaceIcon(info.race)}${info.name}${jongbyunIndicator}`;
+    }).join(', ');
+    
+    const t1Winner = match.winner === 1 ? 'font-bold text-green-400' : 'text-gray-400';
+    const t2Winner = match.winner === 2 ? 'font-bold text-green-400' : 'text-gray-400';
 
-                        roundPanesHtml += `
-                            <div class="grid grid-cols-11 gap-2 items-center text-center bg-gray-700 p-2 rounded text-white">
-                                <div class="col-span-4 text-right ${t1Winner}">${t1PlayersHtml}</div>
-                                <div class="col-span-1 ${t1Winner}">${match.winner === 1 ? 'W' : ''}</div>
-                                <div class="col-span-1 text-xs text-gray-300">
-                                    <div>${match.matchNum}세트 (${match.tier})</div>
-                                    <div>${match.map}</div>
-                                </div>
-                                <div class="col-span-1 ${t2Winner}">${match.winner === 2 ? 'W' : ''}</div>
-                                <div class="col-span-4 text-left ${t2Winner}">${t2PlayersHtml}</div>
-                            </div>
-                        `;
-                    });
+    roundPanesHtml += `
+        <div class="bg-gray-700 p-2 rounded text-white flex flex-col md:grid md:grid-cols-11 md:gap-2 items-center text-center">
+            <div class="w-full md:col-span-5 text-center md:text-right ${t1Winner}">
+                ${t1PlayersHtml} ${match.winner === 1 ? '<span class="md:hidden">(승)</span>' : ''}
+            </div>
+
+            <div class="w-full my-1 md:my-0 md:col-span-1 text-xs text-gray-300 order-first md:order-none">
+                <div class="font-bold text-base text-white">${match.winner === 1 ? '승' : ''} 1 : ${match.winner === 2 ? '1' : '0'} ${match.winner === 2 ? '승' : ''}</div>
+                <div>${match.matchNum}세트 (${match.tier})</div>
+                <div>${match.map}</div>
+            </div>
+
+            <div class="w-full md:col-span-5 text-center md:text-left ${t2Winner}">
+                 ${t2PlayersHtml} ${match.winner === 2 ? '<span class="md:hidden">(승)</span>' : ''}
+            </div>
+        </div>
+    `;
+});
 
                     roundPanesHtml += '</div></div>';
                 });
@@ -680,31 +734,36 @@
             container.innerHTML = html;
         }
 
-        function renderMapMatchupTable(map, stats) {
+function renderMapMatchupTable(map, stats) {
             const races = ['T', 'P', 'Z'];
             const getWinRate = (w, l) => (w + l > 0) ? Math.round(w / (w + l) * 100) : -1;
             const getRateColor = (rate) => rate > 50 ? 'text-green-600' : rate < 50 && rate !== -1 ? 'text-red-600' : '';
 
+            // --- 여기부터 수정 ---
             let tableHtml = `
                 <div class="bg-white p-4 rounded-lg shadow">
                     <h4 class="font-bold text-lg mb-3">${map}</h4>
-                    <table class="w-full text-center text-sm border-collapse">
-                        <thead class="bg-gray-100">
-                            <tr class="text-xs">
-                                <th class="p-2 border" rowspan="2">종족</th>
-                                <th class="p-2 border" colspan="3">전체(동족전 제외)</th>
-                                <th class="p-2 border" colspan="3">vs Terran</th>
-                                <th class="p-2 border" colspan="3">vs Protoss</th>
-                                <th class="p-2 border" colspan="3">vs Zerg</th>
-                            </tr>
-                            <tr class="bg-gray-100 text-xs">
-                                <th class="p-1 border">승</th><th class="p-1 border">패</th><th class="p-1 border">승률</th>
-                                <th class="p-1 border">승</th><th class="p-1 border">패</th><th class="p-1 border">승률</th>
-                                <th class="p-1 border">승</th><th class="p-1 border">패</th><th class="p-1 border">승률</th>
-                                <th class="p-1 border">승</th><th class="p-1 border">패</th><th class="p-1 border">승률</th>
-                            </tr>
-                        </thead>
-                        <tbody>`;
+                    <div class="overflow-x-auto">
+                        <table class="w-full min-w-[700px] text-center text-sm border-collapse">
+            `; // --- 여기까지 수정 ---
+            
+            tableHtml += `
+                            <thead class="bg-gray-100">
+                                <tr class="text-xs">
+                                    <th class="p-2 border" rowspan="2">종족</th>
+                                    <th class="p-2 border" colspan="3">전체(동족전 제외)</th>
+                                    <th class="p-2 border" colspan="3">vs Terran</th>
+                                    <th class="p-2 border" colspan="3">vs Protoss</th>
+                                    <th class="p-2 border" colspan="3">vs Zerg</th>
+                                </tr>
+                                <tr class="bg-gray-100 text-xs">
+                                    <th class="p-1 border">승</th><th class="p-1 border">패</th><th class="p-1 border">승률</th>
+                                    <th class="p-1 border">승</th><th class="p-1 border">패</th><th class="p-1 border">승률</th>
+                                    <th class="p-1 border">승</th><th class="p-1 border">패</th><th class="p-1 border">승률</th>
+                                    <th class="p-1 border">승</th><th class="p-1 border">패</th><th class="p-1 border">승률</th>
+                                </tr>
+                            </thead>
+                            <tbody>`;
             
             races.forEach(race => {
                 const s = stats[race];
@@ -714,19 +773,21 @@
                 const vsZ_Rate = getWinRate(s.vsZ?.w, s.vsZ?.l);
 
                 tableHtml += `
-                    <tr>
-                        <td class="p-2 border font-bold">${race}</td>
-                        <td class="p-2 border">${s.total.w}</td>
-                        <td class="p-2 border">${s.total.l}</td>
-                        <td class="p-2 border font-bold ${getRateColor(totalRate)}">${totalRate !== -1 ? totalRate + '%' : '-'}</td>
-                        ${race === 'T' ? '<td class="p-2 border bg-gray-200" colspan="3"></td>' : `<td class="p-2 border">${s.vsT.w}</td><td class="p-2 border">${s.vsT.l}</td><td class="p-2 border font-bold ${getRateColor(vsT_Rate)}">${vsT_Rate !== -1 ? vsT_Rate + '%' : '-'}</td>`}
-                        ${race === 'P' ? '<td class="p-2 border bg-gray-200" colspan="3"></td>' : `<td class="p-2 border">${s.vsP.w}</td><td class="p-2 border">${s.vsP.l}</td><td class="p-2 border font-bold ${getRateColor(vsP_Rate)}">${vsP_Rate !== -1 ? vsP_Rate + '%' : '-'}</td>`}
-                        ${race === 'Z' ? '<td class="p-2 border bg-gray-200" colspan="3"></td>' : `<td class="p-2 border">${s.vsZ.w}</td><td class="p-2 border">${s.vsZ.l}</td><td class="p-2 border font-bold ${getRateColor(vsZ_Rate)}">${vsZ_Rate !== -1 ? vsZ_Rate + '%' : '-'}</td>`}
-                    </tr>
+                        <tr>
+                            <td class="p-2 border font-bold">${race}</td>
+                            <td class="p-2 border">${s.total.w}</td>
+                            <td class="p-2 border">${s.total.l}</td>
+                            <td class="p-2 border font-bold ${getRateColor(totalRate)}">${totalRate !== -1 ? totalRate + '%' : '-'}</td>
+                            ${race === 'T' ? '<td class="p-2 border bg-gray-200" colspan="3"></td>' : `<td class="p-2 border">${s.vsT.w}</td><td class="p-2 border">${s.vsT.l}</td><td class="p-2 border font-bold ${getRateColor(vsT_Rate)}">${vsT_Rate !== -1 ? vsT_Rate + '%' : '-'}</td>`}
+                            ${race === 'P' ? '<td class="p-2 border bg-gray-200" colspan="3"></td>' : `<td class="p-2 border">${s.vsP.w}</td><td class="p-2 border">${s.vsP.l}</td><td class="p-2 border font-bold ${getRateColor(vsP_Rate)}">${vsP_Rate !== -1 ? vsP_Rate + '%' : '-'}</td>`}
+                            ${race === 'Z' ? '<td class="p-2 border bg-gray-200" colspan="3"></td>' : `<td class="p-2 border">${s.vsZ.w}</td><td class="p-2 border">${s.vsZ.l}</td><td class="p-2 border font-bold ${getRateColor(vsZ_Rate)}">${vsZ_Rate !== -1 ? vsZ_Rate + '%' : '-'}</td>`}
+                        </tr>
                 `;
             });
 
-            tableHtml += '</tbody></table></div>';
+            // --- 여기부터 수정 ---
+            tableHtml += '</tbody></table></div></div>';
+            // --- 여기까지 수정 ---
             return tableHtml;
         }
         
@@ -868,3 +929,4 @@
     </script>
 </body>
 </html>
+
