@@ -550,7 +550,7 @@ function renderPlayers() {
             container.innerHTML = html;
         }
 
-        function renderRoundResults() {
+function renderRoundResults() {
             const container = document.getElementById('rounds-content');
             
             // Group matchups by round number
@@ -564,9 +564,9 @@ function renderPlayers() {
 
             const rounds = Object.keys(matchupsByRound).sort((a, b) => a - b);
             
-            let subTabsHtml = '<div class="mb-4 flex space-x-2 border-b">';
+            let subTabsHtml = '<div class="mb-4 flex space-x-2 border-b overflow-x-auto pb-1">'; // 탭이 많아질 경우를 대비해 탭에도 가로 스크롤 추가
             rounds.forEach((roundNum, index) => {
-                subTabsHtml += `<button data-round="${roundNum}" class="sub-tab py-2 px-4 text-sm font-medium rounded-t-lg ${index === 0 ? 'active' : ''}">${roundNum}라운드</button>`;
+                subTabsHtml += `<button data-round="${roundNum}" class="sub-tab py-2 px-4 text-sm font-medium rounded-t-lg whitespace-nowrap ${index === 0 ? 'active' : ''}">${roundNum}라운드</button>`;
             });
             subTabsHtml += '</div>';
 
@@ -592,57 +592,54 @@ function renderPlayers() {
 
 
                     roundPanesHtml += `
-                    <div class="bg-gray-800 shadow-lg rounded-lg p-6">
-                        <div class="flex justify-between items-center mb-6 px-4">
-                            <div class="text-left flex-1 team-logo-bg p-8" style="background-image: url('${TEAM_LOGOS[team1.id]}')">
-                                <h4 class="text-3xl font-black ${team1NameColor} w-full">${team1.name}</h4>
+                    <div class="bg-gray-800 shadow-lg rounded-lg p-4 md:p-6">
+                        <div class="flex justify-between items-center mb-6 px-0 md:px-4">
+                            <div class="text-center md:text-left flex-1 team-logo-bg p-4 md:p-8" style="background-image: url('${TEAM_LOGOS[team1.id]}')">
+                                <h4 class="text-2xl md:text-3xl font-black ${team1NameColor} w-full">${team1.name}</h4>
                             </div>
-                            <div class="text-5xl font-bold mx-6">
+                            <div class="text-5xl font-bold mx-2 md:mx-6">
                                <span class="${team1ScoreColor}">${team1Score}</span>
-                               <span class="text-white mx-2">:</span>
+                               <span class="text-white mx-1 md:mx-2">:</span>
                                <span class="${team2ScoreColor}">${team2Score}</span>
                             </div>
-                            <div class="text-right flex-1 team-logo-bg p-8" style="background-image: url('${TEAM_LOGOS[team2.id]}')">
-                                <h4 class="text-3xl font-black ${team2NameColor} w-full">${team2.name}</h4>
+                            <div class="text-center md:text-right flex-1 team-logo-bg p-4 md:p-8" style="background-image: url('${TEAM_LOGOS[team2.id]}')">
+                                <h4 class="text-2xl md:text-3xl font-black ${team2NameColor} w-full">${team2.name}</h4>
                             </div>
                         </div>
-                        <div class="space-y-2">
+                        
+                        <div class="space-y-2 overflow-x-auto">
                     `;
 
                     roundup.matches.sort((a, b) => a.matchNum - b.matchNum).forEach(match => {
-    const t1PlayersHtml = match.team1.playerInfo.map(info => {
-        const jongbyunIndicator = info.isJongbyun ? ' <span class="text-xs text-red-400">(종변)</span>' : '';
-        return `${getRaceIcon(info.race)}${info.name}${jongbyunIndicator}`;
-    }).join(', ');
-    const t2PlayersHtml = match.team2.playerInfo.map(info => {
-        const jongbyunIndicator = info.isJongbyun ? ' <span class="text-xs text-red-400">(종변)</span>' : '';
-        return `${getRaceIcon(info.race)}${info.name}${jongbyunIndicator}`;
-    }).join(', ');
-    
-    const t1Winner = match.winner === 1 ? 'font-bold text-green-400' : 'text-gray-400';
-    const t2Winner = match.winner === 2 ? 'font-bold text-green-400' : 'text-gray-400';
+                        const t1PlayersHtml = match.team1.playerInfo.map(info => {
+                            const jongbyunIndicator = info.isJongbyun ? ' <span class="text-xs text-red-400">(종변)</span>' : '';
+                            return `${getRaceIcon(info.race)}${info.name}${jongbyunIndicator}`;
+                        }).join(', ');
+                        const t2PlayersHtml = match.team2.playerInfo.map(info => {
+                            const jongbyunIndicator = info.isJongbyun ? ' <span class="text-xs text-red-400">(종변)</span>' : '';
+                            return `${getRaceIcon(info.race)}${info.name}${jongbyunIndicator}`;
+                        }).join(', ');
+                        
+                        const t1Winner = match.winner === 1 ? 'font-bold text-green-400' : 'text-gray-400';
+                        const t2Winner = match.winner === 2 ? 'font-bold text-green-400' : 'text-gray-400';
 
-    roundPanesHtml += `
-        <div class="bg-gray-700 p-2 rounded text-white flex flex-col md:grid md:grid-cols-11 md:gap-2 items-center text-center">
-            <div class="w-full md:col-span-5 text-center md:text-right ${t1Winner}">
-                ${t1PlayersHtml} ${match.winner === 1 ? '<span class="md:hidden">(승)</span>' : ''}
-            </div>
-
-            <div class="w-full my-1 md:my-0 md:col-span-1 text-xs text-gray-300 order-first md:order-none">
-                <div class="font-bold text-base text-white">${match.winner === 1 ? '승' : ''} 1 : ${match.winner === 2 ? '1' : '0'} ${match.winner === 2 ? '승' : ''}</div>
-                <div>${match.matchNum}세트 (${match.tier})</div>
-                <div>${match.map}</div>
-            </div>
-
-            <div class="w-full md:col-span-5 text-center md:text-left ${t2Winner}">
-                 ${t2PlayersHtml} ${match.winner === 2 ? '<span class="md:hidden">(승)</span>' : ''}
-            </div>
-        </div>
-    `;
-});
+                        // 각 경기 결과 div에 최소 너비를 지정하여 모바일에서 레이아웃이 깨지지 않게 함
+                        roundPanesHtml += `
+                            <div class="grid grid-cols-11 gap-2 items-center text-center bg-gray-700 p-2 rounded text-white" style="min-width: 600px;">
+                                <div class="col-span-4 text-right ${t1Winner}">${t1PlayersHtml}</div>
+                                <div class="col-span-1 ${t1Winner}">${match.winner === 1 ? 'W' : ''}</div>
+                                <div class="col-span-1 text-xs text-gray-300">
+                                    <div>${match.matchNum}세트 (${match.tier})</div>
+                                    <div>${match.map}</div>
+                                </div>
+                                <div class="col-span-1 ${t2Winner}">${match.winner === 2 ? 'W' : ''}</div>
+                                <div class="col-span-4 text-left ${t2Winner}">${t2PlayersHtml}</div>
+                            </div>
+                        `;
+                    });
 
                     roundPanesHtml += '</div></div>';
-                });
+                    // });
 
                 roundPanesHtml += '</div>'; // close round-pane
             });
@@ -929,4 +926,5 @@ function renderMapMatchupTable(map, stats) {
     </script>
 </body>
 </html>
+
 
