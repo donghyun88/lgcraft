@@ -50,7 +50,6 @@
             <p class="text-gray-600 mt-2">모든 경기의 데이터를 한눈에 확인하세요.</p>
         </header>
 
-        <!-- Loading Indicator -->
         <div id="loading" class="text-center py-16">
             <svg class="animate-spin h-8 w-8 text-indigo-600 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -60,7 +59,6 @@
         </div>
 
         <main id="main-content" class="hidden">
-            <!-- Tabs -->
             <div class="border-b border-gray-200 mb-6">
                 <nav class="-mb-px flex space-x-6" id="tabs">
                     <button data-tab="teams" class="tab active whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">팀 순위</button>
@@ -71,7 +69,6 @@
                 </nav>
             </div>
 
-            <!-- Content Panes -->
             <div id="tab-content">
                 <div id="teams-content" class="tab-pane"></div>
                 <div id="players-content" class="tab-pane hidden"></div>
@@ -82,7 +79,6 @@
         </main>
     </div>
 
-    <!-- Player Modal -->
     <div id="playerModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
         <div class="relative top-20 mx-auto p-5 border w-full max-w-3xl shadow-lg rounded-md bg-white">
             <div class="flex justify-between items-center pb-3 border-b">
@@ -128,6 +124,7 @@
         let mapMatchupStats = {};
         let chartInstances = {};
         let roundMatchups = {};
+        let forcedResults = {}; // For forced match results
 
         // --- CORE LOGIC ---
         document.addEventListener('DOMContentLoaded', async () => {
@@ -163,15 +160,17 @@
             mapMatchupStats = {};
             nameToIdMap = {};
             roundMatchups = {};
+            forcedResults = {};
+
             PLAYERS_META.forEach(p => {
                 playersData[p.id] = {
                     ...p, elo: 1000, history: [],
                     stats: { total: { w: 0, l: 0 }, 개인전: { w: 0, l: 0 }, 팀전: { w: 0, l: 0 }, '22': { w: 0, l: 0 }, '33': { w: 0, l: 0 } }
                 };
                 nameToIdMap[p.이름] = p.id;
-                if (!teamsData[p.팀]) {
-                    teamsData[p.팀] = { id: p.팀, name: TEAM_NAMES[p.팀] || `Team ${p.팀}`, matches: 0, wins: 0, losses: 0, setWins: 0, setLosses: 0, recentForm: [] };
-                }
+            });
+            Object.keys(TEAM_NAMES).forEach(teamId => {
+                 teamsData[teamId] = { id: parseInt(teamId), name: TEAM_NAMES[teamId], matches: 0, wins: 0, losses: 0, setWins: 0, setLosses: 0, recentForm: [] };
             });
 
             const lines = csvText.trim().split('\n').slice(1);
@@ -180,7 +179,7 @@
                 if (!line) return;
                 
                 const columns = parseCsvLine(line);
-                const [round, matchNum, type, tier, map, team1Id, team1PlayersStr, team2Id, team2PlayersStr, winnerStr] = columns;
+                const [round, matchNum, type, tier, map, team1Id, team1PlayersStr, team2Id, team2PlayersStr, winnerStr, resultStr] = columns;
                 
                 const parsePlayerStr = (str) => {
                     const parts = str.split(':');
@@ -252,36 +251,80 @@
                     });
                 }
                 matchesData.push(match);
-
-                const team1 = teamsData[team1Id];
-                const team2 = teamsData[team2Id];
-                if (team1 && team2) {
-                    if (winnerTeam === 1) { team1.setWins++; team2.setLosses++; } 
-                    else { team2.setWins++; team1.setLosses++; }
-                    
-                    const roundKey = `R${round}-${[team1Id, team2Id].sort().join('-')}`;
-                    if (!roundMatchups[roundKey]) {
-                        roundMatchups[roundKey] = { round: parseInt(round), team1Id: parseInt(team1Id), team2Id: parseInt(team2Id), team1SetWins: 0, team2SetWins: 0, matches: [] };
-                    }
-                    roundMatchups[roundKey].matches.push(match);
-                    if (parseInt(team1Id) === roundMatchups[roundKey].team1Id) {
-                        if (winnerTeam === 1) roundMatchups[roundKey].team1SetWins++; else roundMatchups[roundKey].team2SetWins++;
-                    } else {
-                        if (winnerTeam === 1) roundMatchups[roundKey].team2SetWins++; else roundMatchups[roundKey].team1SetWins++;
-                    }
+                
+                const roundKey = `R${round}-${[team1Id, team2Id].sort().join('-')}`;
+                if (!roundMatchups[roundKey]) {
+                    roundMatchups[roundKey] = { round: parseInt(round), team1Id: parseInt(team1Id), team2Id: parseInt(team2Id), team1SetWins: 0, team2SetWins: 0, matches: [] };
+                }
+                roundMatchups[roundKey].matches.push(match);
+                if (parseInt(team1Id) === roundMatchups[roundKey].team1Id) {
+                    if (winnerTeam === 1) roundMatchups[roundKey].team1SetWins++; else roundMatchups[roundKey].team2SetWins++;
+                } else {
+                    if (winnerTeam === 1) roundMatchups[roundKey].team2SetWins++; else roundMatchups[roundKey].team1SetWins++;
+                }
+                if (resultStr && resultStr.includes(':')) {
+                    forcedResults[roundKey] = resultStr;
                 }
             });
 
             Object.values(roundMatchups).forEach(roundResult => {
                 const team1 = teamsData[roundResult.team1Id];
                 const team2 = teamsData[roundResult.team2Id];
-                if (team1 && team2) {
-                    team1.matches++; team2.matches++;
-                    if (roundResult.team1SetWins > roundResult.team2SetWins) {
-                        team1.wins++; team2.losses++; team1.recentForm.push('W'); team2.recentForm.push('L');
-                    } else if (roundResult.team2SetWins > roundResult.team1SetWins) {
-                        team2.wins++; team1.losses++; team2.recentForm.push('W'); team1.recentForm.push('L');
+                if (!team1 || !team2) return;
+
+                team1.matches++;
+                team2.matches++;
+
+                let matchupSetWins1, matchupSetLosses1, matchupSetWins2, matchupSetLosses2;
+                let team1WonMatch, team2WonMatch;
+
+                const roundKey = `R${roundResult.round}-${[roundResult.team1Id, roundResult.team2Id].sort().join('-')}`;
+                const forcedResult = forcedResults[roundKey];
+
+                if (forcedResult) {
+                    const [score1Str, score2Str] = forcedResult.split(':');
+                    const sortedTeamIds = [roundResult.team1Id, roundResult.team2Id].sort((a,b)=>a-b);
+                    const scoreForSortedTeam1 = parseInt(score1Str, 10);
+                    const scoreForSortedTeam2 = parseInt(score2Str, 10);
+
+                    if (roundResult.team1Id === sortedTeamIds[0]) {
+                        matchupSetWins1 = scoreForSortedTeam1;
+                        matchupSetLosses1 = scoreForSortedTeam2;
+                        matchupSetWins2 = scoreForSortedTeam2;
+                        matchupSetLosses2 = scoreForSortedTeam1;
+                    } else {
+                        matchupSetWins1 = scoreForSortedTeam2;
+                        matchupSetLosses1 = scoreForSortedTeam1;
+                        matchupSetWins2 = scoreForSortedTeam1;
+                        matchupSetLosses2 = scoreForSortedTeam2;
                     }
+                    team1WonMatch = matchupSetWins1 > matchupSetLosses1;
+                    team2WonMatch = matchupSetWins2 > matchupSetLosses2;
+                } else {
+                    matchupSetWins1 = roundResult.team1SetWins;
+                    matchupSetLosses1 = roundResult.team2SetWins;
+                    matchupSetWins2 = roundResult.team2SetWins;
+                    matchupSetLosses2 = roundResult.team1SetWins;
+
+                    team1WonMatch = roundResult.team1SetWins > roundResult.team2SetWins;
+                    team2WonMatch = roundResult.team2SetWins > roundResult.team1SetWins;
+                }
+                
+                team1.setWins += matchupSetWins1;
+                team1.setLosses += matchupSetLosses1;
+                team2.setWins += matchupSetWins2;
+                team2.setLosses += matchupSetLosses2;
+                
+                if (team1WonMatch) {
+                    team1.wins++;
+                    team2.losses++;
+                    team1.recentForm.push('W');
+                    team2.recentForm.push('L');
+                } else if (team2WonMatch) {
+                    team2.wins++;
+                    team1.losses++;
+                    team2.recentForm.push('W');
+                    team1.recentForm.push('L');
                 }
             });
         }
