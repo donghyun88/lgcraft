@@ -143,14 +143,23 @@
             }
         });
         
-        function parseCsvLine(line) {
+                function parseCsvLine(line) {
             const columns = [];
-            const regex = /(".*?"|[^",]+)(?=\s*,|\s*$)/g;
-            let match;
-            while ((match = regex.exec(line))) {
-                columns.push(match[0].replace(/"/g, '').trim());
+            let field = '';
+            let inQuotes = false;
+            for (let i = 0; i < line.length; i++) {
+                const char = line[i];
+                if (char === '"') {
+                    inQuotes = !inQuotes;
+                } else if (char === ',' && !inQuotes) {
+                    columns.push(field);
+                    field = '';
+                } else {
+                    field += char;
+                }
             }
-            return columns;
+            columns.push(field);
+            return columns.map(f => f.trim().replace(/^"|"$/g, ''));
         }
 
         function processAllData(csvText) {
@@ -176,12 +185,13 @@
             const lines = csvText.trim().split('\n').slice(1);
             
             lines.forEach((line, index) => {
-                if (!line) return;
+                if (!line) return; 
                 
                 const columns = parseCsvLine(line);
-                const [round, matchNum, type, tier, map, team1Id, team1PlayersStr, team2Id, team2PlayersStr, winnerStr, resultStr] = columns;
+                const [round, matchNum, type, tier, map, team1Id, team1PlayersStr, team2Id, team2PlayersStr, winnerStr, resultStr, result_team] = columns;
                 
                 const parsePlayerStr = (str) => {
+                    if (!str) return { id: null, name: 'N/A', race: null, isJongbyun: false };
                     const parts = str.split(':');
                     const name = parts[0].trim();
                     const id = nameToIdMap[name];
@@ -265,6 +275,9 @@
                 if (resultStr && resultStr.includes(':')) {
                     forcedResults[roundKey] = resultStr;
                 }
+                if (result_team && !roundMatchups[roundKey].result_team) {
+                    roundMatchups[roundKey].result_team = parseInt(result_team);
+                }
             });
 
             Object.values(roundMatchups).forEach(roundResult => {
@@ -280,8 +293,16 @@
 
                 const roundKey = `R${roundResult.round}-${[roundResult.team1Id, roundResult.team2Id].sort().join('-')}`;
                 const forcedResult = forcedResults[roundKey];
+                const forcedWinnerTeam = roundResult.result_team;
 
-                if (forcedResult) {
+                if (forcedWinnerTeam) {
+                    team1WonMatch = roundResult.team1Id === forcedWinnerTeam;
+                    team2WonMatch = roundResult.team2Id === forcedWinnerTeam;
+                    matchupSetWins1 = roundResult.team1SetWins;
+                    matchupSetLosses1 = roundResult.team2SetWins;
+                    matchupSetWins2 = roundResult.team2SetWins;
+                    matchupSetLosses2 = roundResult.team1SetWins;
+                } else if (forcedResult) {
                     const [score1Str, score2Str] = forcedResult.split(':');
                     const sortedTeamIds = [roundResult.team1Id, roundResult.team2Id].sort((a,b)=>a-b);
                     const scoreForSortedTeam1 = parseInt(score1Str, 10);
@@ -455,7 +476,7 @@
             container.innerHTML = html;
         }
 
-function renderPlayers() {
+        function renderPlayers() {
             const container = document.getElementById('players-content');
             const sortedPlayers = Object.values(playersData).sort((a,b) => b.elo - a.elo);
             
@@ -822,7 +843,7 @@ function renderPlayers() {
             return tableHtml;
         }
         
-        // --- EVENT LISTENERS ---
+       // --- EVENT LISTENERS ---
         function setupEventListeners() {
             // Tabs
             const tabs = document.querySelectorAll('.tab');
