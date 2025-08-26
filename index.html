@@ -642,11 +642,35 @@
                 matchups.forEach(roundup => {
                     const team1 = teamsData[roundup.team1Id];
                     const team2 = teamsData[roundup.team2Id];
-                    const team1Score = roundup.team1SetWins;
-                    const team2Score = roundup.team2SetWins;
-                    
-                    const team1Won = team1Score > team2Score;
-                    const team2Won = team2Score > team1Score;
+                    let team1Score = roundup.team1SetWins;
+                    let team2Score = roundup.team2SetWins;
+
+                    const roundKey = `R${roundup.round}-${[roundup.team1Id, roundup.team2Id].sort().join('-')}`;
+                    const forcedResult = forcedResults[roundKey];
+                    const forcedWinnerTeam = roundup.result_team;
+
+                    let team1Won = team1Score > team2Score;
+                    let team2Won = team2Score > team1Score;
+
+                    if (forcedWinnerTeam) {
+                        team1Won = roundup.team1Id === forcedWinnerTeam;
+                        team2Won = roundup.team2Id === forcedWinnerTeam;
+                    } else if (forcedResult) {
+                        const [score1Str, score2Str] = forcedResult.split(':');
+                        const sortedTeamIds = [roundup.team1Id, roundup.team2Id].sort((a,b)=>a-b);
+                        const scoreForSortedTeam1 = parseInt(score1Str, 10);
+                        const scoreForSortedTeam2 = parseInt(score2Str, 10);
+
+                        if (roundup.team1Id === sortedTeamIds[0]) {
+                            team1Score = scoreForSortedTeam1;
+                            team2Score = scoreForSortedTeam2;
+                        } else {
+                            team1Score = scoreForSortedTeam2;
+                            team2Score = scoreForSortedTeam1;
+                        }
+                        team1Won = team1Score > team2Score;
+                        team2Won = team2Score > team1Score;
+                    }
 
                     const team1NameColor = team1Won ? 'text-white' : 'text-gray-400';
                     const team2NameColor = team2Won ? 'text-white' : 'text-gray-400';
