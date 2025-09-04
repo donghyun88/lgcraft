@@ -649,13 +649,7 @@
                     const forcedResult = forcedResults[roundKey];
                     const forcedWinnerTeam = roundup.result_team;
 
-                    let team1Won = team1Score > team2Score;
-                    let team2Won = team2Score > team1Score;
-
-                    if (forcedWinnerTeam) {
-                        team1Won = roundup.team1Id === forcedWinnerTeam;
-                        team2Won = roundup.team2Id === forcedWinnerTeam;
-                    } else if (forcedResult) {
+                    if (forcedResult) {
                         const [score1Str, score2Str] = forcedResult.split(':');
                         const sortedTeamIds = [roundup.team1Id, roundup.team2Id].sort((a,b)=>a-b);
                         const scoreForSortedTeam1 = parseInt(score1Str, 10);
@@ -668,8 +662,15 @@
                             team1Score = scoreForSortedTeam2;
                             team2Score = scoreForSortedTeam1;
                         }
+                    }
+
+                    let team1Won, team2Won;
+                    if (forcedWinnerTeam) {
+                        team1Won = roundup.team1Id === forcedWinnerTeam;
+                        team2Won = roundup.team2Id === forcedWinnerTeam;
+                    } else {
                         team1Won = team1Score > team2Score;
-                        team2Won = team2Score > team1Score;                   
+                        team2Won = team2Score > team1Score;
                     }
 
                     const team1NameColor = team1Won ? 'text-white' : 'text-gray-400';
