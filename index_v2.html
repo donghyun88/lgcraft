@@ -174,7 +174,14 @@
             PLAYERS_META.forEach(p => {
                 playersData[p.id] = {
                     ...p, elo: 1000, history: [],
-                    stats: { total: { w: 0, l: 0 }, 개인전: { w: 0, l: 0 }, 팀전: { w: 0, l: 0 }, '22': { w: 0, l: 0 }, '33': { w: 0, l: 0 } }
+                    stats: { 
+                        total: { w: 0, l: 0 }, 개인전: { w: 0, l: 0 }, 팀전: { w: 0, l: 0 }, 
+                        '22': { w: 0, l: 0 }, '33': { w: 0, l: 0 },
+                        firstHalf_individual_games: 0,
+                        firstHalf_team_games: 0,
+                        secondHalf_individual_games: 0,
+                        secondHalf_team_games: 0
+                    }
                 };
                 nameToIdMap[p.이름] = p.id;
             });
@@ -478,45 +485,16 @@
 
         function renderPlayers() {
             const container = document.getElementById('players-content');
-            const sortedPlayers = Object.values(playersData).sort((a, b) => b.elo - a.elo);
-
-            const teamOptions = Object.keys(TEAM_NAMES).map(id => 
-                `<option value="${TEAM_NAMES[id]}">${TEAM_NAMES[id]}</option>`
-            ).join('');
-
-            const uniqueRaces = [...new Set(Object.values(playersData).map(p => p.종족))].sort();
-            const raceOptions = uniqueRaces.map(race => `<option value="${race}">${race}</option>`).join('');
-
-            const uniqueTiers = [...new Set(Object.values(playersData).map(p => p.티어))].sort();
-            const tierOptions = uniqueTiers.map(tier => `<option value="${tier}">${tier}</option>`).join('');
-
-            // Mobile filters
-            const mobileFilters = `
-                <div class="md:hidden p-4 bg-white rounded-lg shadow-md mb-4 flex flex-col items-center space-y-2">
-                    <input type="text" id="player-name-filter-mobile" placeholder="이름 또는 ID로 검색..." class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                    <select id="player-team-filter-mobile" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                        <option value="all">모든 팀</option>
-                        ${teamOptions}
-                    </select>
-                    <select id="player-race-filter-mobile" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                        <option value="all">모든 종족</option>
-                        ${raceOptions}
-                    </select>
-                    <select id="player-tier-filter-mobile" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                        <option value="all">모든 티어</option>
-                        ${tierOptions}
-                    </select>
-                </div>
-            `;
-
+            const sortedPlayers = Object.values(playersData).sort((a,b) => b.elo - a.elo);
+            
+            // --- 데스크탑용 테이블 헤더 ---
             let html = `
-                ${mobileFilters}
                 <div class="bg-white shadow-md rounded-lg overflow-hidden">
                     <div class="hidden md:block">
                         <table class="min-w-full divide-y divide-gray-200 table-sortable" id="player-table">
                             <thead class="bg-gray-50">
                                 <tr>
-                                    <th data-sort-numeric="rank" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">랭킹</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">랭킹</th>
                                     <th data-sort="이름" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">이름</th>
                                     <th data-sort="팀" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">팀</th>
                                     <th data-sort="종족" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">종족</th>
@@ -524,33 +502,10 @@
                                     <th data-sort-numeric="stats.total" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">전체</th>
                                     <th data-sort-numeric="elo" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ELO</th>
                                 </tr>
-                                <tr class="bg-gray-100">
-                                    <th class="px-2 py-1"></th>
-                                    <th class="px-2 py-1"><input type="text" id="player-name-filter" placeholder="이름/ID 검색..." class="w-full px-2 py-1 border border-gray-300 rounded-md text-sm"></th>
-                                    <th class="px-2 py-1">
-                                        <select id="player-team-filter" class="w-full px-2 py-1 border border-gray-300 rounded-md text-sm">
-                                            <option value="all">모든 팀</option>
-                                            ${teamOptions}
-                                        </select>
-                                    </th>
-                                    <th class="px-2 py-1">
-                                        <select id="player-race-filter" class="w-full px-2 py-1 border border-gray-300 rounded-md text-sm">
-                                            <option value="all">모든 종족</option>
-                                            ${raceOptions}
-                                        </select>
-                                    </th>
-                                    <th class="px-2 py-1">
-                                        <select id="player-tier-filter" class="w-full px-2 py-1 border border-gray-300 rounded-md text-sm">
-                                            <option value="all">모든 티어</option>
-                                            ${tierOptions}
-                                        </select>
-                                    </th>
-                                    <th class="px-2 py-1"></th>
-                                    <th class="px-2 py-1"></th>
-                                </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">`;
             
+            // --- 데스크탑용 테이블 Body 렌더링 ---
             let rank = 0;
             let lastElo = -1;
             sortedPlayers.forEach((p, index) => {
@@ -559,7 +514,7 @@
                     lastElo = p.elo;
                 }
                 html += `
-                        <tr class="player-row hover:bg-gray-50" data-name="${p.이름.toLowerCase()}" data-id="${p.id.toLowerCase()}" data-team="${TEAM_NAMES[p.팀] || ''}" data-race="${p.종족}" data-tier="${p.티어}">
+                        <tr class="hover:bg-gray-50">
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${rank}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                 <a href="#" class="player-link text-indigo-600 hover:text-indigo-800" data-player-id="${p.id}">${p.이름} (${p.id})</a>
@@ -573,6 +528,7 @@
             });
             html += `</tbody></table></div>`;
 
+            // --- 모바일용 카드 리스트 ---
             html += `<div class="md:hidden space-y-3 p-2">`;
             rank = 0;
             lastElo = -1;
@@ -583,7 +539,7 @@
                 }
                 const totalWinRate = p.stats.total.w + p.stats.total.l > 0 ? Math.round(p.stats.total.w / (p.stats.total.w + p.stats.total.l) * 100) : 0;
                 html += `
-                <div class="player-card bg-white p-3 rounded-lg shadow hover:shadow-md" data-name="${p.이름.toLowerCase()}" data-id="${p.id.toLowerCase()}" data-team="${TEAM_NAMES[p.팀] || ''}" data-race="${p.종족}" data-tier="${p.티어}">
+                <div class="bg-white p-3 rounded-lg shadow hover:shadow-md">
                     <div class="flex justify-between items-start">
                         <div class="flex-grow">
                             <div class="flex items-center space-x-2">
@@ -619,64 +575,9 @@
                     </div>
                 </div>`;
             });
-            html += `</div></div>`;
+            html += `</div></div>`; // container 닫기
             
             container.innerHTML = html;
-        }
-
-        function applyPlayerFilters() {
-            const nameFilterDesktop = document.getElementById('player-name-filter').value.toLowerCase();
-            const teamFilterDesktop = document.getElementById('player-team-filter').value;
-            const raceFilterDesktop = document.getElementById('player-race-filter').value;
-            const tierFilterDesktop = document.getElementById('player-tier-filter').value;
-
-            const nameFilterMobile = document.getElementById('player-name-filter-mobile').value.toLowerCase();
-            const teamFilterMobile = document.getElementById('player-team-filter-mobile').value;
-            const raceFilterMobile = document.getElementById('player-race-filter-mobile').value;
-            const tierFilterMobile = document.getElementById('player-tier-filter-mobile').value;
-
-            const isMobile = window.innerWidth < 768;
-            const currentName = isMobile ? nameFilterMobile : nameFilterDesktop;
-            const currentTeam = isMobile ? teamFilterMobile : teamFilterDesktop;
-            const currentRace = isMobile ? raceFilterMobile : raceFilterDesktop;
-            const currentTier = isMobile ? tierFilterMobile : tierFilterDesktop;
-
-            // Sync filter values
-            if (isMobile) {
-                document.getElementById('player-name-filter').value = currentName;
-                document.getElementById('player-team-filter').value = currentTeam;
-                document.getElementById('player-race-filter').value = currentRace;
-                document.getElementById('player-tier-filter').value = currentTier;
-            } else {
-                document.getElementById('player-name-filter-mobile').value = currentName;
-                document.getElementById('player-team-filter-mobile').value = currentTeam;
-                document.getElementById('player-race-filter-mobile').value = currentRace;
-                document.getElementById('player-tier-filter-mobile').value = currentTier;
-            }
-
-            const filterItems = (selector) => {
-                document.querySelectorAll(selector).forEach(item => {
-                    const name = item.dataset.name;
-                    const id = item.dataset.id;
-                    const team = item.dataset.team;
-                    const race = item.dataset.race;
-                    const tier = item.dataset.tier;
-
-                    const nameMatch = name.includes(currentName) || id.includes(currentName);
-                    const teamMatch = currentTeam === 'all' || team === currentTeam;
-                    const raceMatch = currentRace === 'all' || race === currentRace;
-                    const tierMatch = currentTier === 'all' || tier === currentTier;
-
-                    if (nameMatch && teamMatch && raceMatch && tierMatch) {
-                        item.style.display = '';
-                    } else {
-                        item.style.display = 'none';
-                    }
-                });
-            };
-
-            filterItems('#player-table .player-row');
-            filterItems('#players-content .player-card');
         }
         
         function renderMatches() {
@@ -988,15 +889,8 @@
                     if (tab.dataset.tab === 'charts') {
                         renderCharts();
                     }
-                    // Re-attach player filter listeners if players tab is selected
-                    if (tab.dataset.tab === 'players') {
-                        attachPlayerFilterListeners();
-                    }
                 });
             });
-
-            // Initial setup for player filters
-            attachPlayerFilterListeners();
 
             // Player links for modal
             document.body.addEventListener('click', e => {
@@ -1013,54 +907,19 @@
             });
             
             // Table sorting
-            document.body.addEventListener('click', e => {
-                const headerCell = e.target.closest('.table-sortable th[data-sort], .table-sortable th[data-sort-numeric]');
-                if (headerCell) {
-                    // Stop propagation if the click is on a filter element inside the header
-                    if (e.target.closest('input, select')) {
-                        return;
-                    }
+            document.querySelectorAll('.table-sortable th').forEach(headerCell => {
+                headerCell.addEventListener('click', () => {
                     const tableElement = headerCell.closest('table');
                     const headerIndex = Array.prototype.indexOf.call(headerCell.parentElement.children, headerCell);
                     const currentIsAsc = headerCell.classList.contains('sorted-asc');
                     
-                    tableElement.querySelectorAll('th[data-sort]').forEach(th => th.classList.remove('sorted-asc', 'sorted-desc'));
+                    document.querySelectorAll('.table-sortable th').forEach(th => th.classList.remove('sorted-asc', 'sorted-desc'));
                     headerCell.classList.toggle('sorted-asc', !currentIsAsc);
                     headerCell.classList.toggle('sorted-desc', currentIsAsc);
 
                     sortTableByColumn(tableElement, headerIndex, !currentIsAsc, headerCell.hasAttribute('data-sort-numeric'));
-                }
-            });
-        }
-
-        function attachPlayerFilterListeners() {
-            // Desktop filters
-            const nameFilter = document.getElementById('player-name-filter');
-            const teamFilter = document.getElementById('player-team-filter');
-            const raceFilter = document.getElementById('player-race-filter');
-            const tierFilter = document.getElementById('player-tier-filter');
-            if (nameFilter && teamFilter && raceFilter && tierFilter) {
-                nameFilter.addEventListener('input', applyPlayerFilters);
-                teamFilter.addEventListener('change', applyPlayerFilters);
-                raceFilter.addEventListener('change', applyPlayerFilters);
-                tierFilter.addEventListener('change', applyPlayerFilters);
-                // Prevent sorting when clicking on filters in header
-                [nameFilter, teamFilter, raceFilter, tierFilter].forEach(el => {
-                    el.addEventListener('click', e => e.stopPropagation());
                 });
-            }
-
-            // Mobile filters
-            const nameFilterMobile = document.getElementById('player-name-filter-mobile');
-            const teamFilterMobile = document.getElementById('player-team-filter-mobile');
-            const raceFilterMobile = document.getElementById('player-race-filter-mobile');
-            const tierFilterMobile = document.getElementById('player-tier-filter-mobile');
-            if (nameFilterMobile && teamFilterMobile && raceFilterMobile && tierFilterMobile) {
-                nameFilterMobile.addEventListener('input', applyPlayerFilters);
-                teamFilterMobile.addEventListener('change', applyPlayerFilters);
-                raceFilterMobile.addEventListener('change', applyPlayerFilters);
-                tierFilterMobile.addEventListener('change', applyPlayerFilters);
-            }
+            });
         }
 
         function openPlayerModal(playerId) {
@@ -1072,7 +931,7 @@
             
             const stats = player.stats;
             let html = `
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                     <div class="bg-gray-50 p-4 rounded-lg">
                         <h4 class="font-bold text-lg mb-2">기본 정보</h4>
                         <p><strong>팀:</strong> ${TEAM_NAMES[player.팀] || `Team ${player.팀}`}</p>
@@ -1087,6 +946,13 @@
                         <p><strong>팀전:</strong> ${stats.팀전.w}승 ${stats.팀전.l}패</p>
                         <p><strong>2v2:</strong> ${stats['22'].w}승 ${stats['22'].l}패</p>
                         <p><strong>3v3:</strong> ${stats['33'].w}승 ${stats['33'].l}패</p>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <h4 class="font-bold text-lg mb-2">출전 기록</h4>
+                        <p><strong>전반기 개인전:</strong> ${stats.firstHalf_individual_games}회</p>
+                        <p><strong>전반기 팀전:</strong> ${stats.firstHalf_team_games}회</p>
+                        <p><strong>하반기 개인전:</strong> ${stats.secondHalf_individual_games}회</p>
+                        <p><strong>하반기 팀전:</strong> ${stats.secondHalf_team_games}회</p>
                     </div>
                 </div>
                 <div class="mt-4">
