@@ -16,6 +16,9 @@ PLAYERS_META = [
     {"id": "Ruin", "이름": "황찬종", "팀": 2, "종족": "Z", "티어": "아"}, {"id": "bass", "이름": "정종현", "팀": 3, "종족": "P", "티어": "갓"}, {"id": "Jogak", "이름": "권오선", "팀": 4, "종족": "Z", "티어": "애"}, {"id": "zergking", "이름": "김도현", "팀": 5, "종족": "Z", "티어": "휴"}
 ]
 
+# 상위종족출전 예외처리
+SUPERIOR_RACE_PLAYERS = {"강구산": 1, "김주한": 2}
+
 # 분석할 파일 및 라운드 설정
 script_dir = os.path.dirname(os.path.abspath(__file__))
 FILE_NAME = os.path.join(script_dir, 'input.csv')
@@ -81,7 +84,8 @@ def analyze_player_appearances(file_name, min_round, players_meta):
         if col in merged_df.columns:
             merged_df[col] = merged_df[col].fillna(0).astype(int)
 
-    merged_df['개인전 코인'] = merged_df['개인전_출전_횟수'] - merged_df['에이스_출전_횟수']
+    merged_df['상위종족출전'] = merged_df['선수명'].map(SUPERIOR_RACE_PLAYERS).fillna(0).astype(int)
+    merged_df['개인전 코인'] = merged_df['개인전_출전_횟수'] - merged_df['에이스_출전_횟수'] - merged_df['상위종족출전']
 
     merged_df['총_출전_횟수'] = merged_df['개인전_출전_횟수'] + merged_df['팀전 코인']
     merged_df = merged_df.sort_values(by=['총_출전_횟수', '선수명'], ascending=[False, True]).drop(columns=['총_출전_횟수'])
@@ -89,16 +93,16 @@ def analyze_player_appearances(file_name, min_round, players_meta):
     return merged_df
 
 def generate_html_report(df, output_path):
-    """DataFrame을 기반으로 검색 및 하이라이트 기능이 있는 HTML 보고서를 생성합니다."""
+    """DataFrame을 기반으로 검색, 정렬, 하이라이트 기능이 있는 HTML 보고서를 생성합니다."""
     if df is None:
         print("분석 데이터가 없어 HTML 보고서를 생성할 수 없습니다.")
         return
         
-    df = df[['선수명', 'id', '팀', '종족', '티어', '개인전_출전_횟수', '에이스_출전_횟수', '개인전 코인', '팀전 코인']]
+    df = df[['선수명', 'id', '팀', '종족', '티어', '개인전_출전_횟수', '에이스_출전_횟수', '상위종족출전', '개인전 코인', '팀전 코인']]
 
     header_html = '<tr>'
     for i, col in enumerate(df.columns):
-        header_html += f'<th>{col}<br><input type="text" id="search-{i}" onkeyup="filterTable()" placeholder="검색..."></th>'
+        header_html += f'<th class="sortable" onclick="sortTable({i})">{col} <span class="sort-arrow"></span><br><input type="text" id="search-{i}" onkeyup="filterTable()" placeholder="검색..." onClick="event.stopPropagation()"></th>'
     header_html += '</tr>'
 
     body_html = ''
@@ -141,6 +145,9 @@ def generate_html_report(df, output_path):
             table {{ width: 100%; border-collapse: collapse; margin-top: 20px; }}
             th, td {{ border: 1px solid #ddd; padding: 8px; text-align: left; }}
             th {{ background-color: #f2f2f2; position: sticky; top: 0; }}
+            th.sortable {{ cursor: pointer; }}
+            th.sortable:hover {{ background-color: #e2e2e2; }}
+            .sort-arrow {{ float: right; }}
             input[type="text"] {{ width: 95%; padding: 5px; margin-top: 5px; }}
             .highlight-red {{ background-color: #ffcdd2; }} /* 연한 빨강 */
             .highlight-orange {{ background-color: #ffcc80; }} /* 연한 주황 */
@@ -153,6 +160,63 @@ def generate_html_report(df, output_path):
             <tbody>{body_html}</tbody>
         </table>
         <script>
+            let sortDirections = [];
+
+            function sortTable(columnIndex) {{
+                const table = document.getElementById("reportTable");
+                const tbody = table.tBodies[0];
+                const rows = Array.from(tbody.getElementsByTagName("tr"));
+                const ths = table.getElementsByTagName("th");
+
+                // Initialize sort directions if not already
+                if (sortDirections.length === 0) {{
+                    for(let i = 0; i < ths.length; i++) {{
+                        sortDirections.push('');
+                    }}
+                }}
+
+                const currentDirection = sortDirections[columnIndex];
+                const newDirection = currentDirection === 'asc' ? 'desc' : 'asc';
+
+                // Reset all arrows and directions
+                for(let i = 0; i < ths.length; i++) {{
+                    ths[i].querySelector('.sort-arrow').innerHTML = '';
+                    sortDirections[i] = '';
+                }}
+
+                // Set new direction and arrow for the clicked column
+                sortDirections[columnIndex] = newDirection;
+                ths[columnIndex].querySelector('.sort-arrow').innerHTML = newDirection === 'asc' ? ' ▲' : ' ▼';
+
+                rows.sort((a, b) => {{
+                    const aText = a.cells[columnIndex].textContent.trim();
+                    const bText = b.cells[columnIndex].textContent.trim();
+
+                    const aNum = parseFloat(aText);
+                    const bNum = parseFloat(bText);
+
+                    let valA, valB;
+
+                    if (!isNaN(aNum) && !isNaN(bNum)) {{
+                        valA = aNum;
+                        valB = bNum;
+                    }} else {{
+                        valA = aText.toLowerCase();
+                        valB = bText.toLowerCase();
+                    }}
+
+                    if (valA < valB) {{
+                        return newDirection === 'asc' ? -1 : 1;
+                    }}
+                    if (valA > valB) {{
+                        return newDirection === 'asc' ? 1 : -1;
+                    }}
+                    return 0;
+                }});
+
+                rows.forEach(row => tbody.appendChild(row));
+            }}
+
             function filterTable() {{
                 let inputs = [];
                 let table = document.getElementById("reportTable");
