@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>멸망전 시즌11 통계 차트</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="s11-site-header.css" />
+  <style>
+    body { font-family: Inter, sans-serif; }
+    .race-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.25rem;
+      height: 1.25rem;
+      border-radius: 9999px;
+      font-size: 0.65rem;
+      font-weight: 800;
+      color: #fff;
+      margin-right: 0.25rem;
+      vertical-align: middle;
+      flex-shrink: 0;
+    }
+    .race-Z { background: linear-gradient(145deg, #9f1239, #881337); }
+    .race-T { background: linear-gradient(145deg, #0c4a6e, #0369a1); }
+    .race-P { background: linear-gradient(145deg, #a16207, #ca8a04); }
+    .race-R { background: linear-gradient(145deg, #44403c, #1c1917); }
+    .race-ZP, .race-PT { background: #57534e; }
+    .chart-box { height: 280px; position: relative; }
+    @media (min-width: 768px) {
+      .chart-box { height: 320px; }
+    }
+  </style>
+</head>
+<body class="bg-zinc-100 text-zinc-800 min-h-screen text-sm antialiased">
+  <div class="max-w-6xl mx-auto px-4 py-8">
+    <header class="s11-site-header" role="banner">
+      <div class="s11-site-header-accent" aria-hidden="true"></div>
+      <div class="s11-site-header-panel">
+        <div class="s11-site-header-body">
+          <div class="s11-site-header-top">
+            <div class="s11-site-header-brand">
+              <div class="lg-craft-lockup lg-craft-lockup--hero" title="LG Craft">
+                <img src="LG_symbol.svg.png" alt="" class="lg-craft-hero-img mx-auto w-auto max-w-full object-contain" decoding="async" />
+                <div class="lg-craft-wordmark" lang="en"><span class="lg-red">LG</span> Craft</div>
+              </div>
+            </div>
+            <div class="s11-site-header-series" aria-label="멸망전 시즌 11">
+              <span class="s11-site-header-series-ko" lang="ko">멸망전</span>
+              <span class="s11-site-header-series-en" lang="en">Season 11</span>
+            </div>
+          </div>
+          <h1 class="s11-site-header-page-title">통계 차트</h1>
+        </div>
+      </div>
+    </header>
+    <nav class="s11-site-nav mb-8 border-b border-zinc-200 pb-3" aria-label="시즌11">
+      <a href="index.html" class="s11-site-nav-link">팀 순위 및 경기 일정</a>
+      <a href="s11-roster.html" class="s11-site-nav-link">로스터</a>
+      <a href="s11-rounds.html" class="s11-site-nav-link">라운드 결과</a>
+      <a href="s11-players.html" class="s11-site-nav-link">선수 기록</a>
+      <span class="s11-site-nav-current">통계 차트</span>
+    </nav>
+
+    <p id="load-err" class="hidden rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 mb-4"></p>
+
+    <div id="loading" class="rounded-xl border border-zinc-200 bg-white p-12 text-center text-zinc-500 shadow-sm">
+      <svg class="animate-spin h-9 w-9 text-indigo-600 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      <p class="mt-4 font-medium text-zinc-700">불러오는 중…</p>
+    </div>
+
+    <main id="main-content" class="hidden space-y-8 pb-8">
+      <section class="rounded-xl border border-zinc-200 bg-white p-5 sm:p-6 shadow-sm">
+        <h2 class="text-lg font-bold text-zinc-900 mb-4">리더보드</h2>
+        <div id="leaderboard-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4"></div>
+      </section>
+
+      <section class="rounded-xl border border-zinc-200 bg-white p-5 sm:p-6 shadow-sm">
+        <h2 class="text-lg font-bold text-zinc-900 mb-4">차트</h2>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div>
+            <h3 class="text-sm font-semibold text-zinc-700 mb-2">팀 세트 승·패 (누적)</h3>
+            <div class="chart-box"><canvas id="chart-team-setwl"></canvas></div>
+          </div>
+          <div>
+            <h3 class="text-sm font-semibold text-zinc-700 mb-2">리그 이종족 승률 (PvT / TvZ / ZvP)</h3>
+            <div class="chart-box"><canvas id="chart-mirror-mu"></canvas></div>
+          </div>
+          <div>
+            <h3 class="text-sm font-semibold text-zinc-700 mb-2">1:1 승률 상위 (4경기 이상)</h3>
+            <div class="chart-box"><canvas id="chart-11-wr"></canvas></div>
+          </div>
+          <div>
+            <h3 class="text-sm font-semibold text-zinc-700 mb-2">ELO 순증감 상위 (시작 1000 대비)</h3>
+            <div class="chart-box"><canvas id="chart-elo-net"></canvas></div>
+          </div>
+          <div class="lg:col-span-2">
+            <h3 class="text-sm font-semibold text-zinc-700 mb-2">선수 ELO 상위 15</h3>
+            <div class="chart-box" style="height: 420px;"><canvas id="chart-top-elo"></canvas></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="rounded-xl border border-zinc-200 bg-white p-5 sm:p-6 shadow-sm">
+        <h2 class="text-lg font-bold text-zinc-900 mb-4">맵별 종족 통계 (1:1)</h2>
+        <div id="map-stats-grid" class="space-y-6"></div>
+      </section>
+    </main>
+  </div>
+
+  <script type="module" src="js/s11-stats-app.mjs"></script>
+</body>
+</html>

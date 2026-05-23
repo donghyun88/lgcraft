@@ -1,0 +1,20 @@
+{
+  "tierLines": [
+    { "id": "아메바", "points": 1 },
+    { "id": "애니멀", "points": 2 },
+    { "id": "휴먼", "points": 3 },
+    { "id": "킹", "points": 4 },
+    { "id": "갓", "points": 5 }
+  ],
+  "teamPlayCaps": {
+    "2v2": { "label": "2v2 팀플", "maxPointsPerTeam": 7, "note": "라운드별 상한은 fixtures.rounds[].slotPlan[slot=3].pointCapPerTeam (예: 4~8)." },
+    "3v3": { "label": "3v3 팀플", "maxPointsPerTeam": 8, "note": "라운드별 상한은 fixtures … slot=6 … (예: 7~11)." }
+  },  "raceLetters": ["T", "Z", "P"],
+  "raceNotes": {
+    "omitMeans": "선수 등록 정보의 raceDefault 사용",
+    "examples": [
+      "{ \"displayName\": \"홍길동\", \"race\": null }",
+      "{ \"displayName\": \"홍길동\", \"race\": \"Z\" }"
+    ]
+  }
+}

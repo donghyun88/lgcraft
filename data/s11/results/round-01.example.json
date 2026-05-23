@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "season": 11,
+  "phase": "first_half",
+  "round": 1,
+  "recordedAt": "2026-05-16",
+  "author": "기록 담당",
+  "notes": "예시: r01-m1(t1 vs t2) 매치업 일부만 채운 상태입니다.",
+  "matchups": [
+    {
+      "fixtureId": "s11-r01-m1",
+      "series": {
+        "winnerTeamIndex": 1,
+        "setScoreTeamA": 4,
+        "setScoreTeamB": 3,
+        "decidedBy": "sets",
+        "notes": ""
+      },
+      "playedOrder": null,
+      "_playedOrderExplain": "실제 진행 순서가 규칙 슬롯 순서와 다르면 [3,1,2,4,5,6,7] 같이 적습니다. 통계는 slot 번호 기준입니다.",
+      "slots": [
+        {
+          "slot": 1,
+          "winnerTeamIndex": 1,
+          "teamA": [{ "displayName": "예시선수A", "race": null }],
+          "teamB": [{ "displayName": "예시선수B", "race": "Z" }],
+          "_explain": "displayName 은 players.json 의 표기명과 동일해야 검증·통계에 쓸 수 있습니다. null 종족 = 등록종족."
+        },
+        {
+          "slot": 2,
+          "winnerTeamIndex": 2,
+          "teamA": [{ "displayName": "", "race": null }],
+          "teamB": [{ "displayName": "", "race": null }]
+        },
+        {
+          "slot": 3,
+          "winnerTeamIndex": 1,
+          "teamA": [
+            { "displayName": "예시선수A", "race": "T" },
+            { "displayName": "예시선수C", "race": "Z" }
+          ],
+          "teamB": [
+            { "displayName": "예시선수B", "race": "P" },
+            { "displayName": "예시선수D", "race": "Z" }
+          ],
+          "_tierBudgetReminder": "팀A 포인트 4+1=5 ≤ 7, 팀B 포인트 5+1=6 ≤ 7"
+        },
+        {
+          "slot": 4,
+          "winnerTeamIndex": null,
+          "teamA": [{ "displayName": "", "race": null }],
+          "teamB": [{ "displayName": "", "race": null }]
+        },
+        {
+          "slot": 5,
+          "winnerTeamIndex": null,
+          "teamA": [{ "displayName": "", "race": null }],
+          "teamB": [{ "displayName": "", "race": null }]
+        },
+        {
+          "slot": 6,
+          "winnerTeamIndex": null,
+          "teamA": [
+            { "displayName": "", "race": "P" },
+            { "displayName": "", "race": "Z" },
+            { "displayName": "", "race": "T" }
+          ],
+          "teamB": [
+            { "displayName": "", "race": "Z" },
+            { "displayName": "", "race": "P" },
+            { "displayName": "", "race": "T" }
+          ]
+        },
+        {
+          "slot": 7,
+          "winnerTeamIndex": null,
+          "teamA": [{ "displayName": "", "race": null }],
+          "teamB": [{ "displayName": "", "race": null }]
+        }
+      ]
+    }
+  ]
+}

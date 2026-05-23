@@ -1,1156 +1,1194 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>멸망전 시즌10 기록실</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-        .tab.active { border-color: #4f46e5; color: #4f46e5; }
-        .sub-tab.active { background-color: #4f46e5; color: white; }
-        .table-sortable th { cursor: pointer; }
-        .table-sortable th:hover { background-color: #eef2ff; }
-        .race-icon { display: inline-block; width: 20px; height: 20px; border-radius: 50%; text-align: center; line-height: 20px; font-weight: bold; color: white; vertical-align: middle; margin-right: 4px; }
-        .race-Z { background-color: #9f1239; } /* Zerg */
-        .race-T { background-color: #0c4a6e; } /* Terran */
-        .race-P { background-color: #a16207; } /* Protoss */
-        .race-R, .race-ZP, .race-PT { background-color: #44403c; } /* Random etc. */
-        .team-logo-bg {
-            background-size: contain;
-            background-position: center;
-            background-repeat: no-repeat;
-            position: relative;
-            min-height: 120px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 0.5rem;
-        }
-        .team-logo-bg::before {
-            content: '';
-            position: absolute;
-            top: 0; right: 0; bottom: 0; left: 0;
-            background-color: rgba(0, 0, 0, 0.5);
-            border-radius: 0.5rem;
-        }
-        .team-logo-bg > * {
-            position: relative;
-            z-index: 10;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>멸망전 시즌11 · 팀 순위 및 경기 일정</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="s11-site-header.css" />
+  <style>
+    body { font-family: Inter, sans-serif; }
+    .standings-wrap { box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+    .standings-row:nth-child(even) { background: rgba(250, 250, 250, 0.85); }
+    .standings-row:hover { background: rgba(238, 242, 255, 0.65); }
+    /* 정규시즌 상위 4 = 플레이오프권 — 은은한 보라 그라데이션 */
+    .standings-row.standings-row--po {
+      background: linear-gradient(90deg, rgba(99, 102, 241, 0.075) 0%, rgba(255, 255, 255, 0) 65%);
+    }
+    .standings-row.standings-row--po:nth-child(even) {
+      background: linear-gradient(90deg, rgba(79, 70, 229, 0.08) 0%, rgba(248, 250, 252, 0.95) 52%, rgba(255, 255, 255, 0) 68%);
+    }
+    .standings-row.standings-row--po:hover {
+      background: linear-gradient(90deg, rgba(129, 140, 248, 0.14) 0%, rgba(238, 242, 255, 0.9) 48%, rgba(255, 255, 255, 0) 70%) !important;
+    }
+    .standings-row.standings-row--po td:first-child {
+      box-shadow: inset 2.5px 0 0 0 rgba(99, 102, 241, 0.28);
+    }
+    .spark-poly { fill: none; stroke: #6366f1; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+    .spark-dot { fill: #6366f1; }
+    .form-w { color: #fff; background: linear-gradient(145deg, #059669, #047857); }
+    .form-l { color: #fff; background: linear-gradient(145deg, #dc2626, #b91c1c); }
+    .form-empty { background: #e4e4e7; color: #a1a1aa; }
+    /* 순위표 팀/다음대전 로고: 원형 마스크 + cover로 포스터형도 얼굴·심볼이 잘 보이게 */
+    .standings-logo-frame {
+      overflow: hidden;
+      border-radius: 9999px;
+      flex-shrink: 0;
+      background: linear-gradient(180deg, #fafafa 0%, #f4f4f5 100%);
+      box-shadow: 0 0 0 1px rgba(228, 228, 231, 0.95), 0 1px 3px rgba(0, 0, 0, 0.06);
+    }
+    .standings-logo-img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center center;
+    }
+    .standings-logo-frame--team {
+      width: 3rem;
+      height: 3rem;
+    }
+    @media (min-width: 640px) {
+      .standings-logo-frame--team {
+        width: 3.25rem;
+        height: 3.25rem;
+      }
+    }
+    .standings-logo-frame--next {
+      width: 2.875rem;
+      height: 2.875rem;
+    }
+    @media (min-width: 640px) {
+      .standings-logo-frame--next {
+        width: 3rem;
+        height: 3rem;
+      }
+    }
+    .standings-logo-frame--schedule {
+      width: 3rem;
+      height: 3rem;
+    }
+    @media (min-width: 640px) {
+      .standings-logo-frame--schedule {
+        width: 3.375rem;
+        height: 3.375rem;
+      }
+    }
+    .schedule-matchup {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      width: 100%;
+    }
+    @media (min-width: 640px) {
+      .schedule-matchup {
+        gap: 0.75rem;
+      }
+    }
+    .schedule-matchup-team {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.35rem;
+      min-width: 0;
+      flex: 1 1 0;
+    }
+    .schedule-matchup-meta {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 0.2rem 0.25rem;
+      font-size: 11px;
+      line-height: 1.35;
+      color: #18181b;
+    }
+    @media (min-width: 640px) {
+      .schedule-matchup-meta {
+        font-size: 12px;
+      }
+    }
+    .schedule-matchup-vs {
+      flex-shrink: 0;
+      font-size: 11px;
+      font-weight: 500;
+      color: #a1a1aa;
+      padding: 0 0.1rem;
+    }
+    /* 경기 일정: 카드형(세트맵 1 + 대전별) */
+    .schedule-chunk h3 {
+      letter-spacing: -0.02em;
+      text-align: center;
+    }
+    .schedule-round-shell {
+      border-radius: 0.75rem;
+      border: 1px solid rgba(228, 228, 231, 0.95);
+      background: linear-gradient(180deg, #fafafa 0%, #fff 42%);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+    .schedule-card {
+      border-radius: 0.75rem;
+      border: 1px solid rgba(228, 228, 231, 0.95);
+      background: #fff;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    }
+    .schedule-card--maps .schedule-slot-line {
+      border-bottom: 1px solid rgba(244, 244, 245, 0.95);
+    }
+    .schedule-card--maps .schedule-slot-line:last-child {
+      border-bottom: 0;
+    }
+    /* 세트맵: 3열(순서·티어·맵) — 눈에 띄지 않는 세로 구분 */
+    .schedule-slot-grid {
+      display: grid;
+      grid-template-columns: 2.25rem minmax(0, 1fr) minmax(0, 1.12fr);
+      column-gap: 0;
+      align-items: center;
+      justify-items: stretch;
+    }
+    .schedule-slot-grid--head {
+      background: rgba(250, 250, 250, 0.85);
+      border-bottom: 1px solid rgba(228, 228, 231, 0.75);
+    }
+    .schedule-slot-grid--row .schedule-slot-cell--seq {
+      box-shadow: 1px 0 0 0 rgba(228, 228, 231, 0.45);
+    }
+    .schedule-slot-grid--row .schedule-slot-cell--tier {
+      box-shadow: 1px 0 0 0 rgba(228, 228, 231, 0.45);
+    }
+    .schedule-slot-grid--head .schedule-slot-cell--seq {
+      box-shadow: 1px 0 0 0 rgba(228, 228, 231, 0.5);
+    }
+    .schedule-slot-grid--head .schedule-slot-cell--tier {
+      box-shadow: 1px 0 0 0 rgba(228, 228, 231, 0.5);
+    }
+    .schedule-slot-cell {
+      min-width: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 0.45rem 0.35rem;
+      font-size: 11px;
+      line-height: 1.35;
+      word-break: keep-all;
+      overflow-wrap: anywhere;
+    }
+    @media (min-width: 640px) {
+      .schedule-slot-cell {
+        font-size: 12px;
+        padding-left: 0.4rem;
+        padding-right: 0.4rem;
+      }
+    }
+    .schedule-slot-grid--head .schedule-slot-cell {
+      padding-top: 0.35rem;
+      padding-bottom: 0.4rem;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: #a1a1aa;
+    }
+    .schedule-rank-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 1.125rem;
+      height: 1.125rem;
+      padding: 0 0.2rem;
+      border-radius: 0.25rem;
+      font-size: 9px;
+      font-weight: 800;
+      line-height: 1;
+      flex-shrink: 0;
+      background: #e0e7ff;
+      color: #312e81;
+      box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.2);
+    }
+    .schedule-rank-badge--1 {
+      background: linear-gradient(145deg, #fcd34d, #f59e0b);
+      color: #422006;
+      box-shadow: 0 0 0 1px rgba(180, 83, 9, 0.25);
+    }
+    .schedule-rank-badge--2 {
+      background: linear-gradient(145deg, #e4e4e7, #a1a1aa);
+      color: #18181b;
+      box-shadow: 0 0 0 1px rgba(113, 113, 122, 0.35);
+    }
+    .schedule-rank-badge--3 {
+      background: linear-gradient(145deg, #fdba74, #ea580c);
+      color: #431407;
+      box-shadow: 0 0 0 1px rgba(194, 65, 12, 0.25);
+    }
+    /* 모바일 팀 순위 카드 (md 미만) */
+    .standings-mobile-card {
+      border-radius: 0.875rem;
+      border: 1px solid rgba(228, 228, 231, 0.95);
+      background: #fff;
+      padding: 0.875rem 1rem;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+    .standings-mobile-card--po {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.07) 0%, #fff 52%);
+      border-color: rgba(199, 210, 254, 0.9);
+      box-shadow:
+        inset 3px 0 0 0 rgba(99, 102, 241, 0.32),
+        0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+    .standings-mobile-stat {
+      text-align: center;
+      padding: 0.45rem 0.25rem;
+      border-radius: 0.5rem;
+      background: rgba(250, 250, 250, 0.9);
+      border: 1px solid rgba(244, 244, 245, 0.95);
+    }
+    .standings-mobile-stat-label {
+      display: block;
+      font-size: 0.625rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: #71717a;
+      margin-bottom: 0.2rem;
+    }
+    .standings-mobile-next {
+      display: flex;
+      align-items: center;
+      gap: 0.625rem;
+      min-width: 0;
+      padding: 0.5rem 0.625rem;
+      border-radius: 0.625rem;
+      background: rgba(250, 250, 250, 0.95);
+      border: 1px solid rgba(244, 244, 245, 0.95);
+    }
+  </style>
 </head>
-<body class="bg-gray-50 text-gray-800">
-
-    <div class="container mx-auto p-4 md:p-8">
-        <header class="text-center mb-8">
-            <h1 class="text-4xl font-bold text-gray-900">멸망전 시즌10 기록실</h1>
-            <p class="text-gray-600 mt-2">모든 경기의 데이터를 한눈에 확인하세요.</p>
-        </header>
-
-        <div id="loading" class="text-center py-16">
-            <svg class="animate-spin h-8 w-8 text-indigo-600 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            <p class="mt-4 text-lg font-medium text-gray-700">데이터를 불러오고 분석하는 중입니다...</p>
+<body class="bg-zinc-100 text-zinc-800 min-h-screen text-sm">
+  <div class="max-w-6xl mx-auto px-4 py-8">
+    <header class="s11-site-header" role="banner">
+      <div class="s11-site-header-accent" aria-hidden="true"></div>
+      <div class="s11-site-header-panel">
+        <div class="s11-site-header-body">
+          <div class="s11-site-header-top">
+            <div class="s11-site-header-brand">
+              <div class="lg-craft-lockup lg-craft-lockup--hero" title="LG Craft">
+                <img src="LG_symbol.svg.png" alt="" class="lg-craft-hero-img mx-auto w-auto max-w-full object-contain" decoding="async" />
+                <div class="lg-craft-wordmark" lang="en"><span class="lg-red">LG</span> Craft</div>
+              </div>
+            </div>
+            <div class="s11-site-header-series" aria-label="멸망전 시즌 11">
+              <span class="s11-site-header-series-ko" lang="ko">멸망전</span>
+              <span class="s11-site-header-series-en" lang="en">Season 11</span>
+            </div>
+          </div>
+          <h1 id="pageTitle" class="s11-site-header-page-title">팀 순위 및 경기 일정</h1>
         </div>
+      </div>
+    </header>
 
-        <main id="main-content" class="hidden">
-            <div class="border-b border-gray-200 mb-6">
-                <nav class="-mb-px flex space-x-6" id="tabs">
-                    <button data-tab="teams" class="tab active whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">팀 순위</button>
-                    <button data-tab="players" class="tab whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">선수 기록</button>
-                    <button data-tab="matches" class="tab whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">경기 기록</button>
-                    <button data-tab="rounds" class="tab whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">라운드별 결과</button>
-                    <button data-tab="charts" class="tab whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm">통계 차트</button>
-                </nav>
-            </div>
+    <nav class="s11-site-nav mb-8 border-b border-zinc-200 pb-3" aria-label="시즌11">
+      <span class="s11-site-nav-current">팀 순위 및 경기 일정</span>
+      <a href="s11-roster.html" class="s11-site-nav-link">로스터</a>
+      <a href="s11-rounds.html" class="s11-site-nav-link">라운드 결과</a>
+      <a href="s11-players.html" class="s11-site-nav-link">선수 기록</a>
+      <a href="s11-stats.html" class="s11-site-nav-link">통계 차트</a>
+    </nav>
 
-            <div id="tab-content">
-                <div id="teams-content" class="tab-pane"></div>
-                <div id="players-content" class="tab-pane hidden"></div>
-                <div id="matches-content" class="tab-pane hidden"></div>
-                <div id="rounds-content" class="tab-pane hidden"></div>
-                <div id="charts-content" class="tab-pane hidden"></div>
-            </div>
-        </main>
-    </div>
+    <!-- 팀 순위 -->
+    <section id="standings" class="mb-10 scroll-mt-8">
+      <h2 class="text-base font-semibold text-zinc-900 mb-2">팀 순위</h2>
+      <div class="hidden md:block standings-wrap bg-white rounded-xl border border-zinc-200/90 overflow-x-auto">
+        <table class="min-w-[700px] w-full text-xs sm:text-sm">
+          <thead>
+            <tr class="bg-gradient-to-b from-zinc-100 to-zinc-50/95 text-left text-zinc-600 text-[11px] sm:text-xs font-semibold uppercase tracking-wide border-b border-zinc-200/90">
+              <th class="px-2 sm:px-3 py-2.5 w-9 text-center" rowspan="2" valign="bottom">#</th>
+              <th class="px-2 sm:px-3 py-2.5 min-w-[11.5rem]" rowspan="2" valign="bottom">팀</th>
+              <th class="px-2 sm:px-3 py-1.5 text-center border-b border-indigo-100/80 text-indigo-800/90 normal-case" colspan="3" title="라운드에서 팀 vs 팀으로 치른 한 번(예: 3대전 1회)">대전</th>
+              <th class="px-2 sm:px-3 py-2.5 text-center text-violet-800/90 normal-case min-w-[5.5rem]" rowspan="2" valign="middle" title="세트 승·패">세트</th>
+              <th class="px-2 sm:px-3 py-2.5 text-right whitespace-nowrap" rowspan="2" valign="bottom" title="세트 득실">득실</th>
+              <th class="px-2 sm:px-3 py-2.5 text-center" rowspan="2" valign="bottom" title="최근 대전 결과 (과거→최근)">최근</th>
+              <th class="px-2 sm:px-3 py-2.5 text-center min-w-[6.25rem]" rowspan="2" valign="bottom" title="일정상 다음 팀 대전 상대 (미종료 대전 중 가장 빠른 일정)">다음 대전</th>
+              <th class="px-2 sm:px-3 py-2.5 text-center min-w-[4.75rem]" rowspan="2" valign="bottom" title="라운드별 순위 추이">순위</th>
+            </tr>
+            <tr class="bg-zinc-50/95 text-zinc-500 text-[10px] sm:text-[11px] font-semibold border-b border-zinc-200/90">
+              <th class="px-2 sm:px-3 py-1.5 text-center tabular-nums" title="치른 대전 수 (승+패)">경기</th>
+              <th class="px-2 sm:px-3 py-1.5 text-center tabular-nums" title="대전 승">승</th>
+              <th class="px-2 sm:px-3 py-1.5 text-center tabular-nums" title="대전 패">패</th>
+            </tr>
+          </thead>
+          <tbody id="standingsBody"></tbody>
+        </table>
+      </div>
+      <div id="standingsMobile" class="md:hidden space-y-2.5" aria-label="팀 순위 (모바일)"></div>
+    </section>
 
-    <div id="playerModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-50">
-        <div class="relative top-20 mx-auto p-5 border w-full max-w-3xl shadow-lg rounded-md bg-white">
-            <div class="flex justify-between items-center pb-3 border-b">
-                <h3 class="text-2xl font-bold" id="modalPlayerName"></h3>
-                <button id="playerModalClose" class="text-gray-400 hover:text-gray-600">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
-            </div>
-            <div id="playerModalContent" class="mt-4"></div>
-        </div>
-    </div>
+    <!-- 경기 일정 -->
+    <section id="schedule" class="mb-10 scroll-mt-8">
+      <h2 class="text-base font-semibold text-zinc-900 mb-2">경기 일정</h2>
+      <div id="scheduleRoot"></div>
+    </section>
+  </div>
 
-    <script>
-        // --- DATA ---
-        const TEAM_NAMES = {
-            1: "강1랜드",
-            2: "2Cc",
-            3: "학씨",
-            4: "최강4팀",
-            5: "리셋",
-            6: "6sashimi"
-        };
-        const TEAM_LOGOS = {
-            1: "1팀.jpg",
-            2: "2팀.jpg",
-            3: "3팀.jpg",
-            4: "4팀.jpg",
-            5: "5팀.jpg",
-            6: "6팀.jpg"
-        };
-        const PLAYERS_META = [
-            {"id": "Tana", "이름": "이대연", "팀": 1, "종족": "Z", "티어": "갓"}, {"id": "Sword", "이름": "김연섭", "팀": 1, "종족": "T", "티어": "갓"}, {"id": "Cain", "이름": "김태훈", "팀": 1, "종족": "P", "티어": "갓"}, {"id": "WoongD", "이름": "구선웅", "팀": 1, "종족": "T", "티어": "휴"}, {"id": "HKK", "이름": "전성민", "팀": 1, "종족": "Z", "티어": "휴"}, {"id": "MiMiMong", "이름": "이창언", "팀": 1, "종족": "Z", "티어": "휴"}, {"id": "KuSan", "이름": "강구산", "팀": 1, "종족": "Z", "티어": "애"}, {"id": "ziLLeKi", "이름": "최성진", "팀": 1, "종족": "P", "티어": "애"}, {"id": "Nucleus", "이름": "김기현", "팀": 1, "종족": "T", "티어": "애"}, {"id": "jjabTana", "이름": "김현기", "팀": 1, "종족": "Z", "티어": "애"}, {"id": "HD", "이름": "조항용", "팀": 1, "종족": "P", "티어": "애"}, {"id": "Toast", "이름": "설재근", "팀": 1, "종족": "P", "티어": "아"}, {"id": "Kensay", "이름": "이경성", "팀": 1, "종족": "Z", "티어": "아"}, {"id": "Hillock", "이름": "강응선", "팀": 2, "종족": "P", "티어": "갓"}, {"id": "sEpI", "이름": "김경식", "팀": 2, "종족": "T", "티어": "갓"}, {"id": "Jenny", "이름": "박진욱", "팀": 2, "종족": "Z", "티어": "휴"}, {"id": "rOdeO", "이름": "김재현", "팀": 2, "종족": "Z", "티어": "휴"}, {"id": "beat", "이름": "이동규", "팀": 2, "종족": "Z", "티어": "휴"}, {"id": "KJJ", "이름": "경제진", "팀": 2, "종족": "T", "티어": "휴"}, {"id": "Twin", "이름": "유윤실", "팀": 2, "종족": "P", "티어": "애"}, {"id": "Asada", "이름": "공동현", "팀": 2, "종족": "Z", "티어": "애"}, {"id": "StyLe", "이름": "한규호", "팀": 2, "종족": "P", "티어": "애"}, {"id": "ZirubAk", "이름": "방호석", "팀": 2, "종족": "Z", "티어": "애"}, {"id": "SandbaG", "이름": "염규상", "팀": 2, "종족": "P", "티어": "애"}, {"id": "Tori", "이름": "양시찬", "팀": 2, "종족": "P", "티어": "아"}, {"id": "zoa", "이름": "서승일", "팀": 2, "종족": "Z", "티어": "아"}, {"id": "MansaeGii", "이름": "문명훈", "팀": 3, "종족": "P", "티어": "갓"}, {"id": "Nolg", "이름": "채원식", "팀": 3, "종족": "Z", "티어": "갓"}, {"id": "Pooooker", "이름": "전은후", "팀": 3, "종족": "P", "티어": "휴"}, {"id": "SSangBak", "이름": "이종열", "팀": 3, "종족": "T", "티어": "휴"}, {"id": "wassub", "이름": "이형섭", "팀": 3, "종족": "P", "티어": "휴"}, {"id": "Evicu", "이름": "변진황", "팀": 3, "종족": "P", "티어": "휴"}, {"id": "G9in", "이름": "정명열", "팀": 3, "종족": "P", "티어": "애"}, {"id": "PerfecT", "이름": "손정곤", "팀": 3, "종족": "T", "티어": "애"}, {"id": "CibalBattle", "이름": "정현우", "팀": 3, "종족": "Z", "티어": "애"}, {"id": "tRalala", "이름": "박지훈", "팀": 3, "종족": "Z", "티어": "애"}, {"id": "Hjvita", "이름": "양현철", "팀": 3, "종족": "P", "티어": "아"}, {"id": "catcat", "이름": "권노흠", "팀": 3, "종족": "Z", "티어": "아"}, {"id": "benpro", "이름": "임병헌", "팀": 3, "종족": "PT", "티어": "아"}, {"id": "ShaDOw", "이름": "박재창", "팀": 4, "종족": "T", "티어": "갓"}, {"id": "Bullfrog", "이름": "오택삼", "팀": 4, "종족": "Z", "티어": "갓"}, {"id": "Alive", "이름": "이윤종", "팀": 4, "종족": "T", "티어": "갓"}, {"id": "sky9898", "이름": "최상균", "팀": 4, "종족": "ZP", "티어": "휴"}, {"id": "Sign1666", "이름": "김주한", "팀": 4, "종족": "P", "티어": "휴"}, {"id": "Naldo", "이름": "김이헌", "팀": 4, "종족": "Z", "티어": "휴"}, {"id": "TheMan", "이름": "조현용", "팀": 4, "종족": "P", "티어": "휴"}, {"id": "No-Gi", "이름": "유태욱", "팀": 4, "종족": "Z", "티어": "애"}, {"id": "Pixel", "이름": "임호진", "팀": 4, "종족": "T", "티어": "애"}, {"id": "Goat", "이름": "김동환", "팀": 4, "종족": "P", "티어": "애"}, {"id": "Tiempo", "이름": "이태경", "팀": 4, "종족": "T", "티어": "애"}, {"id": "GR", "이름": "박가람", "팀": 4, "종족": "P", "티어": "아"}, {"id": "Kakaru", "이름": "정주오", "팀": 4, "종족": "P", "티어": "아"}, {"id": "ZZAKSSON", "이름": "김재우", "팀": 4, "종족": "P", "티어": "아"}, {"id": "Raon", "이름": "예의현", "팀": 5, "종족": "P", "티어": "갓"}, {"id": "HON", "이름": "장민수", "팀": 5, "종족": "Z", "티어": "갓"}, {"id": "King", "이름": "변정식", "팀": 5, "종족": "Z", "티어": "휴"}, {"id": "dOngkim!", "이름": "김동현", "팀": 5, "종족": "P", "티어": "휴"}, {"id": "berrykim", "이름": "주효진", "팀": 5, "종족": "Z", "티어": "휴"}, {"id": "Freeman", "이름": "박정진", "팀": 5, "종족": "P", "티어": "애"}, {"id": "home", "이름": "우병진", "팀": 5, "종족": "Z", "티어": "애"}, {"id": "gunstory", "이름": "공동건", "팀": 5, "종족": "Z", "티어": "애"}, {"id": "casino", "이름": "이정훈", "팀": 5, "종족": "PT", "티어": "애"}, {"id": "Xellos", "이름": "최화용", "팀": 5, "종족": "T", "티어": "애"}, {"id": "STeVe", "이름": "최수명", "팀": 5, "종족": "P", "티어": "아"}, {"id": "Valc", "이름": "이재혁", "팀": 5, "종족": "P", "티어": "아"}, {"id": "hahaha", "이름": "이윤호", "팀": 5, "종족": "Z", "티어": "아"}, {"id": "Castle", "이름": "김종성", "팀": 6, "종족": "T", "티어": "갓"}, {"id": "ggamak", "이름": "정용석", "팀": 6, "종족": "Z", "티어": "갓"}, {"id": "Nope", "이름": "안태영", "팀": 6, "종족": "Z", "티어": "갓"}, {"id": "Atta", "이름": "이봉철", "팀": 6, "종족": "Z", "티어": "휴"}, {"id": "Panya", "이름": "조승일", "팀": 6, "종족": "P", "티어": "휴"}, {"id": "BMC", "이름": "장승룡", "팀": 6, "종족": "P", "티어": "휴"}, {"id": "JH", "이름": "손재현", "팀": 6, "종족": "Z", "티어": "휴"}, {"id": "sAviOr", "이름": "권혁준", "팀": 6, "종족": "R", "티어": "애"}, {"id": "JY", "이름": "황진영", "팀": 6, "종족": "Z", "티어": "애"}, {"id": "SeaSee", "이름": "김태준", "팀": 6, "종족": "P", "티어": "애"}, {"id": "glory", "이름": "황정동", "팀": 6, "종족": "R", "티어": "아"}, {"id": "Eco", "이름": "박지호", "팀": 6, "종족": "P", "티어": "아"}, {"id": "bradsk", "이름": "오석현", "팀": 6, "종족": "Z", "티어": "아"},{"id": "Ruin", "이름": "황찬종", "팀": 2, "종족": "Z", "티어": "아"},{"id": "bass", "이름": "정종현", "팀": 3, "종족": "P", "티어": "갓"},{"id": "Jogak", "이름": "권오선", "팀": 4, "종족": "Z", "티어": "애"},{"id": "zergking", "이름": "김도현", "팀": 5, "종족": "Z", "티어": "휴"}
-        ];
+  <script>
+    const PLAYOFF_SPOTS = 4;
+    /** fixtures `matchups[].date` 가 "M/D" 일 때 사용하는 연도(요일 계산) */
+    const SCHEDULE_DATE_YEAR = 2026;
+    const SCHEDULE_WEEKDAY_KO = ['일', '월', '화', '수', '목', '금', '토'];
 
-        const K_VALUES = { "개인전": 32, "22": 24, "33": 16 };
-        const INPUT_CSV_URL = 'input.csv';
+    async function loadJson(path) {
+      const res = await fetch(path);
+      if (!res.ok) throw new Error(path + ' ' + res.status);
+      return res.json();
+    }
 
-        // --- GLOBAL STATE ---
-        let playersData = {};
-        let teamsData = {};
-        let matchesData = [];
-        let nameToIdMap = {};
-        let mapMatchupStats = {};
-        let chartInstances = {};
-        let roundMatchups = {};
-        let forcedResults = {}; // For forced match results
+    function teamName(meta, id) {
+      const t = meta.teams.find((x) => x.id === id);
+      return t ? t.name : id;
+    }
 
-        // --- CORE LOGIC ---
-        document.addEventListener('DOMContentLoaded', async () => {
-            try {
-                const response = await fetch(INPUT_CSV_URL);
-                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                const csvText = await response.text();
-                processAllData(csvText);
-                renderAll();
-            } catch (error) {
-                console.error("Error loading or processing data:", error);
-                document.getElementById('loading').innerHTML = `<p class="text-red-500">데이터 로딩 실패: ${error.message}<br>input.csv 파일이 올바른 경로에 있는지 확인하세요.</p>`;
-            } finally {
-                document.getElementById('loading').classList.add('hidden');
-                document.getElementById('main-content').classList.remove('hidden');
-            }
-        });
-        
-                function parseCsvLine(line) {
-            const columns = [];
-            let field = '';
-            let inQuotes = false;
-            for (let i = 0; i < line.length; i++) {
-                const char = line[i];
-                if (char === '"') {
-                    inQuotes = !inQuotes;
-                } else if (char === ',' && !inQuotes) {
-                    columns.push(field);
-                    field = '';
-                } else {
-                    field += char;
-                }
-            }
-            columns.push(field);
-            return columns.map(f => f.trim().replace(/^"|"$/g, ''));
+    function isSeriesDecided(mu) {
+      if (!mu) return false;
+      const sw = mu.series && mu.series.winnerTeamIndex;
+      return sw === 1 || sw === 2;
+    }
+
+    /** 해당 라운드 일정의 모든 대전이 시리즈 승패까지 확정됐는지 */
+    function isRoundAllSeriesDecided(rd, doc) {
+      if (!rd || !(rd.matchups || []).length) return false;
+      if (!doc) return false;
+      const byFixture = new Map((doc.matchups || []).map((mu) => [mu.fixtureId, mu]));
+      for (const fm of rd.matchups) {
+        if (!isSeriesDecided(byFixture.get(fm.id))) return false;
+      }
+      return true;
+    }
+
+    /** fixtures에 있는 1~through 라운드 각각: 일정이 있으면 결과 문서가 있고, 모든 대전 시리즈가 끝난 경우만 true */
+    function allScheduledRoundsSeriesCompleteThrough(fixtures, roundDocs, throughRound) {
+      if (throughRound < 1) return false;
+      const byRound = new Map();
+      for (const d of roundDocs || []) {
+        if (d && d.round != null) byRound.set(d.round, d);
+      }
+      for (let rn = 1; rn <= throughRound; rn++) {
+        const rd = (fixtures.rounds || []).find((x) => x.round === rn);
+        if (!rd) return false;
+        if (!isRoundAllSeriesDecided(rd, byRound.get(rn))) return false;
+      }
+      return true;
+    }
+
+    /** 시리즈 승 상대 전적 누적: wins[winnerId][loserId] = 횟수 */
+    function recordSeriesWinH2h(wins, winnerId, loserId) {
+      if (!winnerId || !loserId) return;
+      if (!wins[winnerId]) wins[winnerId] = {};
+      wins[winnerId][loserId] = (wins[winnerId][loserId] || 0) + 1;
+    }
+
+    /**
+     * 라운드 번호가 beforeRound 미만인 대전만 집계(해당 라 카드에 쓸 ‘직전까지’ 상대 전적).
+     * @returns {Record<string, Record<string, number>>}
+     */
+    function buildSeriesHeadToHeadBeforeRound(fixtures, roundDocs, beforeRound) {
+      const wins = {};
+      const byRound = new Map();
+      for (const d of roundDocs || []) {
+        if (d && d.round != null) byRound.set(d.round, d);
+      }
+      const rounds = [...(fixtures.rounds || [])].sort((a, b) => (a.round || 0) - (b.round || 0));
+      for (const rd of rounds) {
+        if (rd.round >= beforeRound) break;
+        const doc = byRound.get(rd.round);
+        if (!doc) continue;
+        const byFixture = new Map((doc.matchups || []).map((mu) => [mu.fixtureId, mu]));
+        for (const fm of rd.matchups || []) {
+          const mu = byFixture.get(fm.id);
+          if (!isSeriesDecided(mu)) continue;
+          const [tA, tB] = fm.teamIds || [];
+          if (!tA || !tB) continue;
+          const sw = mu.series && mu.series.winnerTeamIndex;
+          if (sw === 1) recordSeriesWinH2h(wins, tA, tB);
+          else if (sw === 2) recordSeriesWinH2h(wins, tB, tA);
         }
+      }
+      return wins;
+    }
 
-        function processAllData(csvText) {
-            // 1. Initialize data structures
-            playersData = {};
-            teamsData = {};
-            mapMatchupStats = {};
-            nameToIdMap = {};
-            roundMatchups = {};
-            forcedResults = {};
+    /** 카드에 적힌 팀 순서 기준 시즌 대전 승–승. 없으면 빈 문자열 */
+    function formatScheduleHeadToHeadHtml(meta, tidFront, tidBack, wins) {
+      if (!tidFront || !tidBack || !wins) return '';
+      const wf = wins[tidFront] && wins[tidFront][tidBack] != null ? wins[tidFront][tidBack] : 0;
+      const wb = wins[tidBack] && wins[tidBack][tidFront] != null ? wins[tidBack][tidFront] : 0;
+      if (wf + wb === 0) return '';
+      const nameF = teamName(meta, tidFront);
+      const nameB = teamName(meta, tidBack);
+      const tip = escapeHtml(`${nameF} ${wf}승 · ${nameB} ${wb}승 (시즌 대전, 직전 라까지)`);
+      return `<div class="mt-1.5 text-[10px] leading-snug text-zinc-500" title="${tip}">시즌 상대 <span class="tabular-nums font-semibold text-zinc-600">${wf}</span>–<span class="tabular-nums font-semibold text-zinc-600">${wb}</span></div>`;
+    }
 
-            PLAYERS_META.forEach(p => {
-                playersData[p.id] = {
-                    ...p, elo: 1000, history: [],
-                    stats: { total: { w: 0, l: 0 }, 개인전: { w: 0, l: 0 }, 팀전: { w: 0, l: 0 }, '22': { w: 0, l: 0 }, '33': { w: 0, l: 0 } }
-                };
-                nameToIdMap[p.이름] = p.id;
-            });
-            Object.keys(TEAM_NAMES).forEach(teamId => {
-                 teamsData[teamId] = { id: parseInt(teamId), name: TEAM_NAMES[teamId], matches: 0, wins: 0, losses: 0, setWins: 0, setLosses: 0, recentForm: [] };
-            });
-
-            const lines = csvText.trim().split('\n').slice(1);
-            
-            lines.forEach((line, index) => {
-                if (!line) return; 
-                
-                const columns = parseCsvLine(line);
-                const [round, matchNum, type, tier, map, team1Id, team1PlayersStr, team2Id, team2PlayersStr, winnerStr, resultStr, result_team] = columns;
-                
-                const parsePlayerStr = (str) => {
-                    if (!str) return { id: null, name: 'N/A', race: null, isJongbyun: false };
-                    const parts = str.split(':');
-                    const name = parts[0].trim();
-                    const id = nameToIdMap[name];
-                    const race = (parts[1] && parts[1].trim()) ? parts[1].trim().toUpperCase() : (playersData[id] ? playersData[id].종족 : null);
-                    const isJongbyun = parts[2] ? parts[2].trim().toUpperCase() === 'J' : false;
-                    return { id, name, race, isJongbyun };
-                };
-
-                const team1PlayerInfo = team1PlayersStr.split(',').map(parsePlayerStr);
-                const team1Players = team1PlayerInfo.map(p => p.id).filter(Boolean);
-                const team2PlayerInfo = team2PlayersStr.split(',').map(parsePlayerStr);
-                const team2Players = team2PlayerInfo.map(p => p.id).filter(Boolean);
-
-                if (team1Players.length !== team1PlayerInfo.length || team2Players.length !== team2PlayerInfo.length) {
-                    console.warn("Could not find ID for all players in line:", line);
-                }
-
-                const winnerTeam = parseInt(winnerStr);
-
-                const match = {
-                    id: index, round: parseInt(round), matchNum: parseInt(matchNum), type, tier, map,
-                    team1: { id: parseInt(team1Id), players: team1Players, playerInfo: team1PlayerInfo },
-                    team2: { id: parseInt(team2Id), players: team2Players, playerInfo: team2PlayerInfo },
-                    winner: winnerTeam, eloChanges: []
-                };
-
-                const k = K_VALUES[type === '팀전' ? tier : '개인전'] || 32;
-                if (type === '개인전') {
-                    const p1 = playersData[team1Players[0]];
-                    const p2 = playersData[team2Players[0]];
-                    if (p1 && p2) {
-                        const eloChange = updateElo(p1, p2, winnerTeam === 1 ? 1 : 0, k);
-                        match.eloChanges.push({ player: p1.id, from: p1.elo - eloChange, to: p1.elo, change: eloChange });
-                        match.eloChanges.push({ player: p2.id, from: p2.elo + eloChange, to: p2.elo, change: -eloChange });
-                        updatePlayerStats(p1.id, p2.id, winnerTeam === 1, type);
-                        p1.history.push(match.id);
-                        p2.history.push(match.id);
-                        
-                        const p1Race = team1PlayerInfo[0].race;
-                        const p2Race = team2PlayerInfo[0].race;
-                        updateMapMatchupStats(map, p1Race, p2Race, winnerTeam === 1);
-                    }
-                } else { // Team match
-                    const team1Elo = team1Players.reduce((sum, pid) => sum + (playersData[pid]?.elo || 1000), 0) / team1Players.length;
-                    const team2Elo = team2Players.reduce((sum, pid) => sum + (playersData[pid]?.elo || 1000), 0) / team2Players.length;
-                    const expected = 1 / (1 + 10 ** ((team2Elo - team1Elo) / 400));
-                    const actual = winnerTeam === 1 ? 1 : 0;
-                    const delta = Math.round(k * (actual - expected));
-
-                    team1Players.forEach(pid => {
-                        const p = playersData[pid];
-                        if(p) {
-                            match.eloChanges.push({ player: pid, from: p.elo, to: p.elo + delta, change: delta });
-                            p.elo += delta;
-                            updatePlayerStats(pid, null, winnerTeam === 1, type, tier);
-                            p.history.push(match.id);
-                        }
-                    });
-                    team2Players.forEach(pid => {
-                        const p = playersData[pid];
-                        if(p) {
-                            match.eloChanges.push({ player: pid, from: p.elo, to: p.elo - delta, change: -delta });
-                            p.elo -= delta;
-                            updatePlayerStats(pid, null, winnerTeam === 2, type, tier);
-                            p.history.push(match.id);
-                        }
-                    });
-                }
-                matchesData.push(match);
-                
-                const roundKey = `R${round}-${[team1Id, team2Id].sort().join('-')}`;
-                if (!roundMatchups[roundKey]) {
-                    roundMatchups[roundKey] = { round: parseInt(round), team1Id: parseInt(team1Id), team2Id: parseInt(team2Id), team1SetWins: 0, team2SetWins: 0, matches: [] };
-                }
-                roundMatchups[roundKey].matches.push(match);
-                if (parseInt(team1Id) === roundMatchups[roundKey].team1Id) {
-                    if (winnerTeam === 1) roundMatchups[roundKey].team1SetWins++; else roundMatchups[roundKey].team2SetWins++;
-                } else {
-                    if (winnerTeam === 1) roundMatchups[roundKey].team2SetWins++; else roundMatchups[roundKey].team1SetWins++;
-                }
-                if (resultStr && resultStr.includes(':')) {
-                    forcedResults[roundKey] = resultStr;
-                }
-                if (result_team && !roundMatchups[roundKey].result_team) {
-                    roundMatchups[roundKey].result_team = parseInt(result_team);
-                }
-            });
-
-            Object.values(roundMatchups).forEach(roundResult => {
-                const team1 = teamsData[roundResult.team1Id];
-                const team2 = teamsData[roundResult.team2Id];
-                if (!team1 || !team2) return;
-
-                team1.matches++;
-                team2.matches++;
-
-                let matchupSetWins1, matchupSetLosses1, matchupSetWins2, matchupSetLosses2;
-                let team1WonMatch, team2WonMatch;
-
-                const roundKey = `R${roundResult.round}-${[roundResult.team1Id, roundResult.team2Id].sort().join('-')}`;
-                const forcedResult = forcedResults[roundKey];
-                const forcedWinnerTeam = roundResult.result_team;
-
-                if (forcedWinnerTeam) {
-                    team1WonMatch = roundResult.team1Id === forcedWinnerTeam;
-                    team2WonMatch = roundResult.team2Id === forcedWinnerTeam;
-                    matchupSetWins1 = roundResult.team1SetWins;
-                    matchupSetLosses1 = roundResult.team2SetWins;
-                    matchupSetWins2 = roundResult.team2SetWins;
-                    matchupSetLosses2 = roundResult.team1SetWins;
-                } else if (forcedResult) {
-                    const [score1Str, score2Str] = forcedResult.split(':');
-                    const sortedTeamIds = [roundResult.team1Id, roundResult.team2Id].sort((a,b)=>a-b);
-                    const scoreForSortedTeam1 = parseInt(score1Str, 10);
-                    const scoreForSortedTeam2 = parseInt(score2Str, 10);
-
-                    if (roundResult.team1Id === sortedTeamIds[0]) {
-                        matchupSetWins1 = scoreForSortedTeam1;
-                        matchupSetLosses1 = scoreForSortedTeam2;
-                        matchupSetWins2 = scoreForSortedTeam2;
-                        matchupSetLosses2 = scoreForSortedTeam1;
-                    } else {
-                        matchupSetWins1 = scoreForSortedTeam2;
-                        matchupSetLosses1 = scoreForSortedTeam1;
-                        matchupSetWins2 = scoreForSortedTeam1;
-                        matchupSetLosses2 = scoreForSortedTeam2;
-                    }
-                    team1WonMatch = matchupSetWins1 > matchupSetLosses1;
-                    team2WonMatch = matchupSetWins2 > matchupSetLosses2;
-                } else {
-                    matchupSetWins1 = roundResult.team1SetWins;
-                    matchupSetLosses1 = roundResult.team2SetWins;
-                    matchupSetWins2 = roundResult.team2SetWins;
-                    matchupSetLosses2 = roundResult.team1SetWins;
-
-                    team1WonMatch = roundResult.team1SetWins > roundResult.team2SetWins;
-                    team2WonMatch = roundResult.team2SetWins > roundResult.team1SetWins;
-                }
-                
-                team1.setWins += matchupSetWins1;
-                team1.setLosses += matchupSetLosses1;
-                team2.setWins += matchupSetWins2;
-                team2.setLosses += matchupSetLosses2;
-                
-                if (team1WonMatch) {
-                    team1.wins++;
-                    team2.losses++;
-                    team1.recentForm.push('W');
-                    team2.recentForm.push('L');
-                } else if (team2WonMatch) {
-                    team2.wins++;
-                    team1.losses++;
-                    team2.recentForm.push('W');
-                    team1.recentForm.push('L');
-                }
-            });
-        }
-
-        function updateMapMatchupStats(map, p1Race, p2Race, p1Won) {
-            const validRaces = ['P', 'T', 'Z'];
-            if (!validRaces.includes(p1Race) || !validRaces.includes(p2Race)) return;
-
-            if (!mapMatchupStats[map]) {
-                mapMatchupStats[map] = {
-                    P: { total: {w: 0, l: 0}, vsT: {w: 0, l: 0}, vsZ: {w: 0, l: 0} },
-                    T: { total: {w: 0, l: 0}, vsP: {w: 0, l: 0}, vsZ: {w: 0, l: 0} },
-                    Z: { total: {w: 0, l: 0}, vsP: {w: 0, l: 0}, vsT: {w: 0, l: 0} }
-                };
-            }
-            
-            if (p1Race !== p2Race) {
-                mapMatchupStats[map][p1Race].total.w += p1Won ? 1 : 0;
-                mapMatchupStats[map][p1Race].total.l += p1Won ? 0 : 1;
-                mapMatchupStats[map][p2Race].total.w += p1Won ? 0 : 1;
-                mapMatchupStats[map][p2Race].total.l += p1Won ? 1 : 0;
-
-                mapMatchupStats[map][p1Race][`vs${p2Race}`].w += p1Won ? 1 : 0;
-                mapMatchupStats[map][p1Race][`vs${p2Race}`].l += p1Won ? 0 : 1;
-                mapMatchupStats[map][p2Race][`vs${p1Race}`].w += p1Won ? 0 : 1;
-                mapMatchupStats[map][p2Race][`vs${p1Race}`].l += p1Won ? 1 : 0;
-            }
-        }
-
-        function updateElo(p1, p2, result, k) {
-            const expected = 1 / (1 + 10 ** ((p2.elo - p1.elo) / 400));
-            const delta = Math.round(k * (result - expected));
-            p1.elo += delta;
-            p2.elo -= delta;
-            return delta;
-        }
-
-        function updatePlayerStats(p1Id, p2Id, p1Won, type, tier = null) {
-            const p1 = playersData[p1Id];
-            if(!p1) return;
-            if (p1Won) { p1.stats.total.w++; p1.stats[type].w++; if (tier) p1.stats[tier].w++; } 
-            else { p1.stats.total.l++; p1.stats[type].l++; if (tier) p1.stats[tier].l++; }
-            if (p2Id) {
-                const p2 = playersData[p2Id];
-                if(!p2) return;
-                if (!p1Won) { p2.stats.total.w++; p2.stats[type].w++; } 
-                else { p2.stats.total.l++; p2.stats[type].l++; }
-            }
-        }
-
-        // --- RENDERING ---
-        function renderAll() {
-            renderTeams();
-            renderPlayers();
-            renderMatches();
-            renderRoundResults();
-            renderCharts();
-            setupEventListeners();
-        }
-        
-        function getRaceIcon(race) {
-            if (!race) return '';
-            return `<span class="race-icon race-${race}">${race.charAt(0)}</span>`;
-        }
-
-        function renderTeams() {
-            const container = document.getElementById('teams-content');
-            const sortedTeams = Object.values(teamsData).sort((a, b) => {
-                if (a.wins !== b.wins) return b.wins - a.wins;
-                const aDiff = a.setWins - a.setLosses;
-                const bDiff = b.setWins - b.setLosses;
-                if (aDiff !== bDiff) return bDiff - aDiff;
-                return b.setWins - a.setWins; // Tie-breaker: more set wins
-            });
-
-            let html = `
-                <div class="bg-white shadow-md rounded-lg overflow-hidden">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">순위</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">팀</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">매치</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">승</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">패</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">세트득실</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">세트차</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">최근 전적</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">`;
-            
-            let rank = 0;
-            let lastTeamStats = { wins: -1, setDiff: -Infinity, setWins: -Infinity };
-            sortedTeams.forEach((team, index) => {
-                const setDiff = team.setWins - team.setLosses;
-                if (team.wins !== lastTeamStats.wins || setDiff !== lastTeamStats.setDiff || team.setWins !== lastTeamStats.setWins) {
-                    rank = index + 1;
-                }
-                lastTeamStats = { wins: team.wins, setDiff, setWins: team.setWins };
-
-                const formHtml = team.recentForm.slice(-5).map(result => {
-                    const isWin = result === 'W';
-                    const textColor = isWin ? 'text-green-600' : 'text-blue-600';
-                    const borderColor = isWin ? 'border-green-500' : 'border-blue-500';
-                    const bgColor = isWin ? 'bg-green-100' : 'bg-blue-100';
-                    const text = isWin ? '승' : '패';
-                    return `<span class="inline-block border ${borderColor} ${textColor} ${bgColor} px-2 py-0.5 rounded text-xs font-semibold">${text}</span>`;
-                }).join(' ');
-
-                html += `
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${rank}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900">
-                           <img src="${TEAM_LOGOS[team.id]}" alt="${team.name} 로고" class="h-6 w-6 inline-block mr-2 rounded-full">
-                           <span class="align-middle">${team.name}</span>
-                        </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${team.matches}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-green-600 font-medium">${team.wins}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-red-600 font-medium">${team.losses}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${team.setWins}승 ${team.setLosses}패</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium ${setDiff > 0 ? 'text-blue-600' : setDiff < 0 ? 'text-red-600' : 'text-gray-500'}">${setDiff > 0 ? '+' : ''}${setDiff}</td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm">${formHtml}</td>
-                    </tr>`;
-            });
-
-            html += `</tbody></table></div>`;
-            container.innerHTML = html;
-        }
-
-        function renderPlayers() {
-            const container = document.getElementById('players-content');
-            const sortedPlayers = Object.values(playersData).sort((a, b) => b.elo - a.elo);
-
-            const teamOptions = Object.keys(TEAM_NAMES).map(id => 
-                `<option value="${TEAM_NAMES[id]}">${TEAM_NAMES[id]}</option>`
-            ).join('');
-
-            const uniqueRaces = [...new Set(Object.values(playersData).map(p => p.종족))].sort();
-            const raceOptions = uniqueRaces.map(race => `<option value="${race}">${race}</option>`).join('');
-
-            const uniqueTiers = [...new Set(Object.values(playersData).map(p => p.티어))].sort();
-            const tierOptions = uniqueTiers.map(tier => `<option value="${tier}">${tier}</option>`).join('');
-
-            // Mobile filters
-            const mobileFilters = `
-                <div class="md:hidden p-4 bg-white rounded-lg shadow-md mb-4 flex flex-col items-center space-y-2">
-                    <input type="text" id="player-name-filter-mobile" placeholder="이름 또는 ID로 검색..." class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                    <select id="player-team-filter-mobile" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                        <option value="all">모든 팀</option>
-                        ${teamOptions}
-                    </select>
-                    <select id="player-race-filter-mobile" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                        <option value="all">모든 종족</option>
-                        ${raceOptions}
-                    </select>
-                    <select id="player-tier-filter-mobile" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
-                        <option value="all">모든 티어</option>
-                        ${tierOptions}
-                    </select>
-                </div>
-            `;
-
-            let html = `
-                ${mobileFilters}
-                <div class="bg-white shadow-md rounded-lg overflow-hidden">
-                    <div class="hidden md:block">
-                        <table class="min-w-full divide-y divide-gray-200 table-sortable" id="player-table">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th data-sort-numeric="rank" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">랭킹</th>
-                                    <th data-sort="이름" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">이름</th>
-                                    <th data-sort="팀" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">팀</th>
-                                    <th data-sort="종족" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">종족</th>
-                                    <th data-sort="티어" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">티어</th>
-                                    <th data-sort-numeric="stats.total" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">전체</th>
-                                    <th data-sort-numeric="elo" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ELO</th>
-                                </tr>
-                                <tr class="bg-gray-100">
-                                    <th class="px-2 py-1"></th>
-                                    <th class="px-2 py-1"><input type="text" id="player-name-filter" placeholder="이름/ID 검색..." class="w-full px-2 py-1 border border-gray-300 rounded-md text-sm"></th>
-                                    <th class="px-2 py-1">
-                                        <select id="player-team-filter" class="w-full px-2 py-1 border border-gray-300 rounded-md text-sm">
-                                            <option value="all">모든 팀</option>
-                                            ${teamOptions}
-                                        </select>
-                                    </th>
-                                    <th class="px-2 py-1">
-                                        <select id="player-race-filter" class="w-full px-2 py-1 border border-gray-300 rounded-md text-sm">
-                                            <option value="all">모든 종족</option>
-                                            ${raceOptions}
-                                        </select>
-                                    </th>
-                                    <th class="px-2 py-1">
-                                        <select id="player-tier-filter" class="w-full px-2 py-1 border border-gray-300 rounded-md text-sm">
-                                            <option value="all">모든 티어</option>
-                                            ${tierOptions}
-                                        </select>
-                                    </th>
-                                    <th class="px-2 py-1"></th>
-                                    <th class="px-2 py-1"></th>
-                                </tr>
-                            </thead>
-                            <tbody class="bg-white divide-y divide-gray-200">`;
-            
-            let rank = 0;
-            let lastElo = -1;
-            sortedPlayers.forEach((p, index) => {
-                if (p.elo !== lastElo) {
-                    rank = index + 1;
-                    lastElo = p.elo;
-                }
-                html += `
-                        <tr class="player-row hover:bg-gray-50" data-name="${p.이름.toLowerCase()}" data-id="${p.id.toLowerCase()}" data-team="${TEAM_NAMES[p.팀] || ''}" data-race="${p.종족}" data-tier="${p.티어}">
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${rank}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                <a href="#" class="player-link text-indigo-600 hover:text-indigo-800" data-player-id="${p.id}">${p.이름} (${p.id})</a>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${TEAM_NAMES[p.팀] || p.팀}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${getRaceIcon(p.종족)} ${p.종족}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${p.티어}</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${p.stats.total.w}승 ${p.stats.total.l}패</td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-700">${p.elo}</td>
-                        </tr>`;
-            });
-            html += `</tbody></table></div>`;
-
-            html += `<div class="md:hidden space-y-3 p-2">`;
-            rank = 0;
-            lastElo = -1;
-            sortedPlayers.forEach((p, index) => {
-                if (p.elo !== lastElo) {
-                    rank = index + 1;
-                    lastElo = p.elo;
-                }
-                const totalWinRate = p.stats.total.w + p.stats.total.l > 0 ? Math.round(p.stats.total.w / (p.stats.total.w + p.stats.total.l) * 100) : 0;
-                html += `
-                <div class="player-card bg-white p-3 rounded-lg shadow hover:shadow-md" data-name="${p.이름.toLowerCase()}" data-id="${p.id.toLowerCase()}" data-team="${TEAM_NAMES[p.팀] || ''}" data-race="${p.종족}" data-tier="${p.티어}">
-                    <div class="flex justify-between items-start">
-                        <div class="flex-grow">
-                            <div class="flex items-center space-x-2">
-                                <span class="text-sm font-bold text-gray-500 w-6 text-center">${rank}</span>
-                                <span class="font-bold text-lg">
-                                     <a href="#" class="player-link text-indigo-600 hover:text-indigo-800" data-player-id="${p.id}">${p.이름}</a>
-                                </span>
-                                <span class="text-sm text-gray-600">(${p.id})</span>
-                            </div>
-                            <div class="text-sm text-gray-600 ml-8">
-                                ${getRaceIcon(p.종족)} ${p.티어}티어 | ${TEAM_NAMES[p.팀]}
-                            </div>
-                        </div>
-                        <div class="text-right flex-shrink-0">
-                            <div class="font-bold text-indigo-700 text-lg">${p.elo}</div>
-                            <div class="text-xs text-gray-500">ELO</div>
-                        </div>
-                    </div>
-                    <div class="mt-2 border-t pt-2 text-xs text-center grid grid-cols-3 gap-1">
-                        <div>
-                            <span class="font-semibold">${p.stats.total.w}승 ${p.stats.total.l}패</span>
-                            <span class="text-gray-500">(${totalWinRate}%)</span>
-                            <div class="text-gray-400">전체</div>
-                        </div>
-                         <div>
-                            <span class="font-semibold">${p.stats.개인전.w}승 ${p.stats.개인전.l}패</span>
-                            <div class="text-gray-400">개인전</div>
-                        </div>
-                         <div>
-                            <span class="font-semibold">${p.stats.팀전.w}승 ${p.stats.팀전.l}패</span>
-                            <div class="text-gray-400">팀전</div>
-                        </div>
-                    </div>
-                </div>`;
-            });
-            html += `</div></div>`;
-            
-            container.innerHTML = html;
-        }
-
-        function applyPlayerFilters() {
-            const nameFilterDesktop = document.getElementById('player-name-filter').value.toLowerCase();
-            const teamFilterDesktop = document.getElementById('player-team-filter').value;
-            const raceFilterDesktop = document.getElementById('player-race-filter').value;
-            const tierFilterDesktop = document.getElementById('player-tier-filter').value;
-
-            const nameFilterMobile = document.getElementById('player-name-filter-mobile').value.toLowerCase();
-            const teamFilterMobile = document.getElementById('player-team-filter-mobile').value;
-            const raceFilterMobile = document.getElementById('player-race-filter-mobile').value;
-            const tierFilterMobile = document.getElementById('player-tier-filter-mobile').value;
-
-            const isMobile = window.innerWidth < 768;
-            const currentName = isMobile ? nameFilterMobile : nameFilterDesktop;
-            const currentTeam = isMobile ? teamFilterMobile : teamFilterDesktop;
-            const currentRace = isMobile ? raceFilterMobile : raceFilterDesktop;
-            const currentTier = isMobile ? tierFilterMobile : tierFilterDesktop;
-
-            // Sync filter values
-            if (isMobile) {
-                document.getElementById('player-name-filter').value = currentName;
-                document.getElementById('player-team-filter').value = currentTeam;
-                document.getElementById('player-race-filter').value = currentRace;
-                document.getElementById('player-tier-filter').value = currentTier;
-            } else {
-                document.getElementById('player-name-filter-mobile').value = currentName;
-                document.getElementById('player-team-filter-mobile').value = currentTeam;
-                document.getElementById('player-race-filter-mobile').value = currentRace;
-                document.getElementById('player-tier-filter-mobile').value = currentTier;
-            }
-
-            const filterItems = (selector) => {
-                document.querySelectorAll(selector).forEach(item => {
-                    const name = item.dataset.name;
-                    const id = item.dataset.id;
-                    const team = item.dataset.team;
-                    const race = item.dataset.race;
-                    const tier = item.dataset.tier;
-
-                    const nameMatch = name.includes(currentName) || id.includes(currentName);
-                    const teamMatch = currentTeam === 'all' || team === currentTeam;
-                    const raceMatch = currentRace === 'all' || race === currentRace;
-                    const tierMatch = currentTier === 'all' || tier === currentTier;
-
-                    if (nameMatch && teamMatch && raceMatch && tierMatch) {
-                        item.style.display = '';
-                    } else {
-                        item.style.display = 'none';
-                    }
-                });
+    function computeNextOpponents(meta, fixtures, roundDocs) {
+      const byRound = new Map();
+      for (const d of roundDocs || []) {
+        if (d && d.round != null) byRound.set(d.round, d);
+      }
+      const rounds = [...(fixtures.rounds || [])].sort((a, b) => (a.round || 0) - (b.round || 0));
+      const out = {};
+      for (const tm of meta.teams) {
+        let hit = null;
+        for (const rd of rounds) {
+          const doc = byRound.get(rd.round);
+          const byFixture = doc ? new Map((doc.matchups || []).map((m) => [m.fixtureId, m])) : new Map();
+          for (const fm of rd.matchups || []) {
+            const [x, y] = fm.teamIds || [];
+            if (x !== tm.id && y !== tm.id) continue;
+            const mu = byFixture.get(fm.id);
+            if (isSeriesDecided(mu)) continue;
+            const oppId = x === tm.id ? y : x;
+            const oppMeta = meta.teams.find((t) => t.id === oppId);
+            hit = {
+              opponentId: oppId,
+              round: rd.round,
+              fixtureId: fm.id,
+              name: teamName(meta, oppId),
+              short: (oppMeta && oppMeta.short) || teamName(meta, oppId),
             };
-
-            filterItems('#player-table .player-row');
-            filterItems('#players-content .player-card');
+            break;
+          }
+          if (hit) break;
         }
-        
-        function renderMatches() {
-            const container = document.getElementById('matches-content');
-            let html = `
-                <div class="bg-white shadow-md rounded-lg overflow-hidden">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">R/M</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">유형</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">맵</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Team 1</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Team 2</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">승자</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">`;
+        out[tm.id] = hit;
+      }
+      return out;
+    }
 
-            [...matchesData].reverse().forEach(m => {
-                const t1Name = teamsData[m.team1.id]?.name || `Team ${m.team1.id}`;
-                const t2Name = teamsData[m.team2.id]?.name || `Team ${m.team2.id}`;
-                
-                const t1PlayersHtml = m.team1.playerInfo.map(info => `${getRaceIcon(info.race)}${info.name}`).join(', ');
-                const t2PlayersHtml = m.team2.playerInfo.map(info => `${getRaceIcon(info.race)}${info.name}`).join(', ');
+    /** 한 라운드 문서: round-NN.json 또는 round-NN.sample.json */
+    async function loadRoundResultDoc(roundNum) {
+      const p = String(roundNum).padStart(2, '0');
+      const urls = [
+        `data/s11/results/round-${p}.json`,
+        `data/s11/results/round-${p}.sample.json`,
+      ];
+      for (const url of urls) {
+        const res = await fetch(url, { cache: 'no-store' });
+        if (res.ok) return res.json();
+      }
+      return null;
+    }
 
-                const winnerClass = 'font-bold text-green-600';
-                const winnerName = m.winner === 1 ? t1Name : t2Name;
+    async function fetchPerMatchResultDoc(fixtureId) {
+      const url = `data/s11/results/${fixtureId}.json`;
+      const res = await fetch(url, { cache: 'no-store' });
+      if (!res.ok) return null;
+      return res.json();
+    }
 
-                html += `
-                    <tr class="hover:bg-gray-50">
-                        <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">${m.round}R ${m.matchNum}M</td>
-                        <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">${m.type} (${m.tier})</td>
-                        <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">${m.map}</td>
-                        <td class="px-4 py-4 whitespace-nowrap text-sm ${m.winner === 1 ? winnerClass : ''}">${t1Name} (${t1PlayersHtml})</td>
-                        <td class="px-4 py-4 whitespace-nowrap text-sm ${m.winner === 2 ? winnerClass : ''}">${t2Name} (${t2PlayersHtml})</td>
-                        <td class="px-4 py-4 whitespace-nowrap text-sm font-semibold text-indigo-600">${winnerName}</td>
-                    </tr>`;
-            });
-            html += `</tbody></table></div>`;
-            container.innerHTML = html;
+    function matchupFromPerMatchDoc(doc, fixtureId) {
+      if (!doc || !Array.isArray(doc.matchups)) return null;
+      return doc.matchups.find((x) => x.fixtureId === fixtureId) || null;
+    }
+
+    async function mergePerMatchOverlaysIntoRoundDoc(baseDoc, roundNum, fixtures) {
+      const rd = (fixtures.rounds || []).find((x) => x.round === roundNum);
+      const fixtureIds = (rd && rd.matchups ? rd.matchups.map((m) => m.id).filter(Boolean) : []) || [];
+      const overlays = new Map();
+      await Promise.all(
+        fixtureIds.map(async (fid) => {
+          const pm = await fetchPerMatchResultDoc(fid);
+          const mu = matchupFromPerMatchDoc(pm, fid);
+          if (mu) overlays.set(fid, mu);
+        }),
+      );
+      if (!overlays.size && !baseDoc) return null;
+
+      const out = baseDoc
+        ? JSON.parse(JSON.stringify(baseDoc))
+        : {
+            schemaVersion: 1,
+            season: 11,
+            phase: fixtures.phase || 'first_half',
+            round: roundNum,
+            recordedAt: '',
+            author: '',
+            notes: '',
+            matchups: [],
+          };
+      if (!Array.isArray(out.matchups)) out.matchups = [];
+
+      if (baseDoc) {
+        for (const [fid, mu] of overlays) {
+          const idx = out.matchups.findIndex((x) => x.fixtureId === fid);
+          if (idx >= 0) out.matchups[idx] = mu;
+          else out.matchups.push(mu);
         }
-
-        function renderRoundResults() {
-            const container = document.getElementById('rounds-content');
-            
-            // Group matchups by round number
-            const matchupsByRound = {};
-            for (const matchup of Object.values(roundMatchups)) {
-                if (!matchupsByRound[matchup.round]) {
-                    matchupsByRound[matchup.round] = [];
-                }
-                matchupsByRound[matchup.round].push(matchup);
-            }
-
-            const rounds = Object.keys(matchupsByRound).sort((a, b) => a - b);
-            
-            let subTabsHtml = '<div class="mb-4 flex space-x-2 border-b">';
-            rounds.forEach((roundNum, index) => {
-                subTabsHtml += `<button data-round="${roundNum}" class="sub-tab py-2 px-4 text-sm font-medium rounded-t-lg ${index === 0 ? 'active' : ''}">${roundNum}라운드</button>`;
-            });
-            subTabsHtml += '</div>';
-
-            let roundPanesHtml = '';
-            rounds.forEach((roundNum, index) => {
-                const matchups = matchupsByRound[roundNum];
-                roundPanesHtml += `<div id="round-pane-${roundNum}" class="round-pane space-y-12 ${index > 0 ? 'hidden' : ''}">`;
-
-                matchups.forEach(roundup => {
-                    const team1 = teamsData[roundup.team1Id];
-                    const team2 = teamsData[roundup.team2Id];
-                    let team1Score = roundup.team1SetWins;
-                    let team2Score = roundup.team2SetWins;
-
-                    const roundKey = `R${roundup.round}-${[roundup.team1Id, roundup.team2Id].sort().join('-')}`;
-                    const forcedResult = forcedResults[roundKey];
-                    const forcedWinnerTeam = roundup.result_team;
-
-                    if (forcedResult) {
-                        const [score1Str, score2Str] = forcedResult.split(':');
-                        const sortedTeamIds = [roundup.team1Id, roundup.team2Id].sort((a,b)=>a-b);
-                        const scoreForSortedTeam1 = parseInt(score1Str, 10);
-                        const scoreForSortedTeam2 = parseInt(score2Str, 10);
-
-                        if (roundup.team1Id === sortedTeamIds[0]) {
-                            team1Score = scoreForSortedTeam1;
-                            team2Score = scoreForSortedTeam2;
-                        } else {
-                            team1Score = scoreForSortedTeam2;
-                            team2Score = scoreForSortedTeam1;
-                        }
-                    }
-
-                    let team1Won, team2Won;
-                    if (forcedWinnerTeam) {
-                        team1Won = roundup.team1Id === forcedWinnerTeam;
-                        team2Won = roundup.team2Id === forcedWinnerTeam;
-                    } else {
-                        team1Won = team1Score > team2Score;
-                        team2Won = team2Score > team1Score;
-                    }
-
-                    const team1NameColor = team1Won ? 'text-white' : 'text-gray-400';
-                    const team2NameColor = team2Won ? 'text-white' : 'text-gray-400';
-
-                    const team1ScoreColor = team1Won ? 'text-green-400' : 'text-white';
-                    const team2ScoreColor = team2Won ? 'text-green-400' : 'text-white';
-
-
-                    roundPanesHtml += `
-                    <div class="bg-gray-800 shadow-lg rounded-lg p-6">
-                        <div class="flex justify-between items-center mb-6 px-4">
-                            <div class="text-left flex-1 team-logo-bg p-8" style="background-image: url('${TEAM_LOGOS[team1.id]}')">
-                                <h4 class="text-3xl font-black ${team1NameColor} w-full">${team1.name}</h4>
-                            </div>
-                            <div class="text-5xl font-bold mx-6">
-                               <span class="${team1ScoreColor}">${team1Score}</span>
-                               <span class="text-white mx-2">:</span>
-                               <span class="${team2ScoreColor}">${team2Score}</span>
-                            </div>
-                            <div class="text-right flex-1 team-logo-bg p-8" style="background-image: url('${TEAM_LOGOS[team2.id]}')">
-                                <h4 class="text-3xl font-black ${team2NameColor} w-full">${team2.name}</h4>
-                            </div>
-                        </div>
-                        <div class="space-y-2">
-                    `;
-
-                    roundup.matches.sort((a, b) => a.matchNum - b.matchNum).forEach(match => {
-                        const t1PlayersHtml = match.team1.playerInfo.map(info => {
-                            const jongbyunIndicator = info.isJongbyun ? ' <span class="text-xs text-red-400">(종변)</span>' : '';
-                            return `${getRaceIcon(info.race)}${info.name}${jongbyunIndicator}`;
-                        }).join(', ');
-                        const t2PlayersHtml = match.team2.playerInfo.map(info => {
-                            const jongbyunIndicator = info.isJongbyun ? ' <span class="text-xs text-red-400">(종변)</span>' : '';
-                            return `${getRaceIcon(info.race)}${info.name}${jongbyunIndicator}`;
-                        }).join(', ');
-                        
-                        const t1Winner = match.winner === 1 ? 'font-bold text-green-400' : 'text-gray-400';
-                        const t2Winner = match.winner === 2 ? 'font-bold text-green-400' : 'text-gray-400';
-
-                        roundPanesHtml += `
-                            <div class="grid grid-cols-11 gap-2 items-center text-center bg-gray-700 p-2 rounded text-white">
-                                <div class="col-span-4 text-right ${t1Winner}">${t1PlayersHtml}</div>
-                                <div class="col-span-1 ${t1Winner}">${match.winner === 1 ? 'W' : ''}</div>
-                                <div class="col-span-1 text-xs text-gray-300">
-                                    <div>${match.matchNum}세트 (${match.tier})</div>
-                                    <div>${match.map}</div>
-                                </div>
-                                <div class="col-span-1 ${t2Winner}">${match.winner === 2 ? 'W' : ''}</div>
-                                <div class="col-span-4 text-left ${t2Winner}">${t2PlayersHtml}</div>
-                            </div>
-                        `;
-                    });
-
-                    roundPanesHtml += '</div></div>';
-                });
-
-                roundPanesHtml += '</div>'; // close round-pane
-            });
-            container.innerHTML = subTabsHtml + roundPanesHtml;
-            
-            // Add event listeners for sub-tabs
-            const subTabs = container.querySelectorAll('.sub-tab');
-            const roundPanes = container.querySelectorAll('.round-pane');
-            subTabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    subTabs.forEach(t => t.classList.remove('active'));
-                    roundPanes.forEach(p => p.classList.add('hidden'));
-                    tab.classList.add('active');
-                    container.querySelector(`#round-pane-${tab.dataset.round}`).classList.remove('hidden');
-                });
-            });
+      } else {
+        const ordered = [];
+        for (const fid of fixtureIds) {
+          const mu = overlays.get(fid);
+          if (mu) ordered.push(mu);
         }
+        out.matchups = ordered;
+      }
+      return out;
+    }
 
-        function renderCharts() {
-            const container = document.getElementById('charts-content');
-            container.innerHTML = `
-                <div class="space-y-12">
-                    <div>
-                        <h3 class="text-2xl font-bold mb-4">리더보드</h3>
-                        <div id="leaderboard-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"></div>
-                    </div>
-                    <div>
-                        <h3 class="text-2xl font-bold mb-4">맵별 종족 통계 (개인전)</h3>
-                        <div id="map-stats-grid" class="space-y-8"></div>
-                    </div>
-                </div>
-            `;
-            renderLeaderboards();
-            renderMapMatchupTables();
+    async function loadRoundResultDocMerged(roundNum, fixtures) {
+      const base = await loadRoundResultDoc(roundNum);
+      return mergePerMatchOverlaysIntoRoundDoc(base, roundNum, fixtures);
+    }
+
+    async function loadAllRoundResults(maxRound, fixtures) {
+      const docs = [];
+      for (let r = 1; r <= maxRound; r++) {
+        const doc = await loadRoundResultDocMerged(r, fixtures);
+        if (doc) docs.push(doc);
+      }
+      return docs;
+    }
+
+    function compareStandingRow(a, b) {
+      if (b.seriesW !== a.seriesW) return b.seriesW - a.seriesW;
+      if (b.setW !== a.setW) return b.setW - a.setW;
+      if (a.seriesL !== b.seriesL) return a.seriesL - b.seriesL;
+      return String(a.name || '').localeCompare(String(b.name || ''), 'ko');
+    }
+
+    function ranksFromAcc(acc, meta) {
+      const rows = meta.teams.map((tm) => {
+        const s = acc[tm.id];
+        return { teamId: tm.id, name: tm.name, seriesW: s.seriesW, seriesL: s.seriesL, setW: s.setW, setL: s.setL };
+      }).sort(compareStandingRow);
+      const map = {};
+      rows.forEach((r, i) => {
+        map[r.teamId] = i + 1;
+      });
+      return map;
+    }
+
+    /** 한 라운드 결과 문서를 누적 표에 반영 (순위표·일정 순위 공통) */
+    function applyRoundDocToAcc(acc, fixtures, doc, recent) {
+      const rd = (fixtures.rounds || []).find((x) => x.round === doc.round);
+      if (!rd) return;
+      const byFixture = new Map((doc.matchups || []).map((m) => [m.fixtureId, m]));
+      for (const fm of rd.matchups || []) {
+        const mu = byFixture.get(fm.id);
+        if (!mu) continue;
+        const [tA, tB] = fm.teamIds || [];
+        if (!tA || !tB) continue;
+        const sw = mu.series && mu.series.winnerTeamIndex;
+        if (sw === 1) {
+          acc[tA].seriesW++;
+          acc[tB].seriesL++;
+          if (recent) {
+            recent[tA].push('W');
+            recent[tB].push('L');
+          }
+        } else if (sw === 2) {
+          acc[tB].seriesW++;
+          acc[tA].seriesL++;
+          if (recent) {
+            recent[tB].push('W');
+            recent[tA].push('L');
+          }
         }
-
-        function renderLeaderboards() {
-            const container = document.getElementById('leaderboard-grid');
-            const tiers = ['갓', '휴', '애', '아'];
-            const races = { P: 'Protoss', T: 'Terran', Z: 'Zerg' };
-            
-            let leaderboardHtml = '';
-
-            tiers.forEach(tier => {
-                const players = Object.values(playersData).filter(p => p.티어 === tier).sort((a,b) => b.elo - a.elo).slice(0, 5);
-                leaderboardHtml += renderLeaderboardCard(`${tier} 티어 ELO`, players);
-            });
-
-            Object.keys(races).forEach(race => {
-                const players = Object.values(playersData).filter(p => p.종족 === race).sort((a,b) => b.elo - a.elo).slice(0, 5);
-                leaderboardHtml += renderLeaderboardCard(`${races[race]} ELO`, players);
-            });
-            
-            container.innerHTML = leaderboardHtml;
+        for (const sl of mu.slots || []) {
+          const w = sl.winnerTeamIndex;
+          if (w === 1) {
+            acc[tA].setW++;
+            acc[tB].setL++;
+          } else if (w === 2) {
+            acc[tB].setW++;
+            acc[tA].setL++;
+          }
         }
+      }
+    }
 
-        function renderLeaderboardCard(title, players) {
-            let cardHtml = `
-                <div class="bg-white p-4 rounded-lg shadow">
-                    <h4 class="font-bold text-lg mb-3 border-b pb-2">${title}</h4>
-                    <ul class="space-y-2">`;
-            
-            players.forEach((p, index) => {
-                cardHtml += `
-                    <li class="flex items-center justify-between text-sm">
-                        <span class="flex items-center">
-                            <span class="font-bold w-6 text-center">${index + 1}</span>
-                            ${getRaceIcon(p.종족)}
-                            <span>${p.이름}</span>
-                            <span class="text-gray-500 ml-1">(${TEAM_NAMES[p.팀]})</span>
-                        </span>
-                        <div class="text-right">
-                            <span class="font-bold text-indigo-600">${p.elo}</span>
-                            <div class="text-xs text-gray-500">${p.stats.total.w}승 ${p.stats.total.l}패</div>
-                        </div>
-                    </li>`;
-            });
+    /** throughRound 라운드까지 누적한 뒤 순위 맵 */
+    function standingsAfterThroughRound(meta, fixtures, roundDocs, throughRound) {
+      const acc = {};
+      for (const t of meta.teams) acc[t.id] = { teamId: t.id, seriesW: 0, seriesL: 0, setW: 0, setL: 0 };
+      const docs = [...(roundDocs || [])].filter((d) => d && d.round != null).sort((a, b) => a.round - b.round);
+      for (const doc of docs) {
+        if (doc.round > throughRound) break;
+        const rd = (fixtures.rounds || []).find((x) => x.round === doc.round);
+        if (!rd) continue;
+        applyRoundDocToAcc(acc, fixtures, doc, null);
+      }
+      return { rankMap: ranksFromAcc(acc, meta) };
+    }
 
-            cardHtml += '</ul></div>';
-            return cardHtml;
+    function buildStandingsAnalysis(meta, fixtures, roundDocs) {
+      const acc = {};
+      const recent = {};
+      const rankHist = {};
+      for (const t of meta.teams) {
+        acc[t.id] = { teamId: t.id, seriesW: 0, seriesL: 0, setW: 0, setL: 0 };
+        recent[t.id] = [];
+        rankHist[t.id] = [];
+      }
+      const pushRankSnapshot = () => {
+        const rmap = ranksFromAcc(acc, meta);
+        for (const t of meta.teams) rankHist[t.id].push(rmap[t.id]);
+      };
+      pushRankSnapshot();
+
+      const docs = [...(roundDocs || [])].filter((d) => d && d.round != null).sort((a, b) => a.round - b.round);
+      for (const doc of docs) {
+        const rd = (fixtures.rounds || []).find((x) => x.round === doc.round);
+        if (!rd) continue;
+        applyRoundDocToAcc(acc, fixtures, doc, recent);
+        pushRankSnapshot();
+      }
+      return { acc, recent, rankHist };
+    }
+
+    function formatSetDiffHtml(setW, setL) {
+      const d = setW - setL;
+      if (d > 0) return `<span class="text-emerald-700 font-semibold tabular-nums">+${d}</span>`;
+      if (d < 0) return `<span class="text-rose-600 font-semibold tabular-nums">${d}</span>`;
+      return '<span class="text-zinc-400 tabular-nums">0</span>';
+    }
+
+    function formatRecentSeriesHtml(seq) {
+      const last = (seq || []).slice(-5);
+      const pad = 5 - last.length;
+      const bits = [];
+      for (let i = 0; i < pad; i++) {
+        bits.push('<span class="inline-flex w-4 h-4 rounded-sm form-empty text-[8px] font-bold items-center justify-center select-none" title="—">·</span>');
+      }
+      for (const c of last) {
+        if (c === 'W') {
+          bits.push(
+            '<span class="inline-flex w-4 h-4 rounded-sm form-w text-[8px] font-extrabold items-center justify-center" title="대전 승">W</span>',
+          );
+        } else {
+          bits.push(
+            '<span class="inline-flex w-4 h-4 rounded-sm form-l text-[8px] font-extrabold items-center justify-center" title="대전 패">L</span>',
+          );
         }
+      }
+      return `<div class="inline-flex flex-wrap gap-0.5 justify-center">${bits.join('')}</div>`;
+    }
 
-        function renderMapMatchupTables() {
-            const container = document.getElementById('map-stats-grid');
-            let html = '';
-            for (const map in mapMatchupStats) {
-                html += renderMapMatchupTable(map, mapMatchupStats[map]);
-            }
-            container.innerHTML = html;
+    function rankSparklineSvg(rankHistory, teamCount) {
+      const hist = rankHistory || [];
+      if (hist.length < 2) {
+        return '<span class="text-zinc-300 text-[11px]">—</span>';
+      }
+      const w = 78;
+      const h = 26;
+      const pad = 3;
+      const n = hist.length;
+      const maxR = Math.max(2, teamCount);
+      const coords = hist.map((rk, i) => {
+        const x = n === 1 ? (w - 2 * pad) / 2 + pad : pad + (i * (w - 2 * pad)) / (n - 1);
+        const r = Math.min(maxR, Math.max(1, Number(rk) || maxR));
+        const y = pad + (r - 1) * ((h - 2 * pad) / (maxR - 1));
+        return { x, y };
+      });
+      const points = coords.map((p) => `${p.x},${p.y}`).join(' ');
+      const dots = coords.map((p) => `<circle class="spark-dot" cx="${p.x}" cy="${p.y}" r="2" />`).join('');
+      return `<svg class="inline-block align-middle" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" role="img" aria-label="라운드별 순위 추이"><title>라운드별 순위 (1이 가장 위)</title><polyline class="spark-poly" points="${points}" />${dots}</svg>`;
+    }
+
+    function rankCellHtml(rank, hasAny) {
+      if (!hasAny) return '<span class="text-zinc-300 tabular-nums text-[11px]">—</span>';
+      if (rank === 1) {
+        return '<span class="inline-flex items-center justify-center min-w-[1.35rem] h-5 px-0.5 rounded-full bg-gradient-to-br from-amber-300 to-amber-600 text-white text-[10px] font-black shadow-sm tabular-nums leading-none">1</span>';
+      }
+      if (rank === 2) {
+        return '<span class="inline-flex items-center justify-center min-w-[1.35rem] h-5 px-0.5 rounded-full bg-gradient-to-br from-zinc-300 to-zinc-500 text-white text-[10px] font-black shadow-sm tabular-nums leading-none">2</span>';
+      }
+      if (rank === 3) {
+        return '<span class="inline-flex items-center justify-center min-w-[1.35rem] h-5 px-0.5 rounded-full bg-gradient-to-br from-orange-300 to-orange-600 text-white text-[10px] font-black shadow-sm tabular-nums leading-none">3</span>';
+      }
+      return `<span class="text-zinc-700 font-semibold tabular-nums text-[11px]">${rank}</span>`;
+    }
+
+    /** lgcraft 루트의 s11_{팀번호}.{jpg|png} (5팀과 동일 규칙) */
+    const TEAM_LOGO_SRC = {
+      t1: 's11_1.jpg',
+      t2: 's11_2.jpg',
+      t3: 's11_3.png',
+      t4: 's11_4.png',
+      t5: 's11_5.png',
+      t6: 's11_6.jpg',
+    };
+
+    function teamLogoSrc(teamId) {
+      if (!teamId) return '';
+      return TEAM_LOGO_SRC[teamId] || '';
+    }
+
+    function teamShortLabel(meta, teamId) {
+      const t = meta.teams.find((x) => x.id === teamId);
+      if (!t) return '?';
+      return (t.short && String(t.short).trim()) || (t.name && String(t.name).slice(0, 2)) || '?';
+    }
+
+    function teamLogoFrameHtml(meta, teamId, sizeKey, fallbackTone = 'light') {
+      const tid = escapeHtml(teamId || '');
+      const name = escapeHtml(teamName(meta, teamId));
+      const short = escapeHtml(teamShortLabel(meta, teamId));
+      const src = escapeHtml(teamLogoSrc(teamId));
+      const sizeClass =
+        sizeKey === 'next'
+          ? 'standings-logo-frame--next'
+          : sizeKey === 'schedule'
+            ? 'standings-logo-frame--schedule'
+            : 'standings-logo-frame--team';
+      const fb =
+        fallbackTone === 'dark'
+          ? 'hidden absolute inset-0 flex items-center justify-center rounded-full bg-zinc-800 text-white text-[10px] font-extrabold leading-none'
+          : 'hidden absolute inset-0 flex items-center justify-center rounded-full bg-zinc-200 text-[10px] font-extrabold text-zinc-600 leading-none tracking-tight';
+      return `<span class="standings-logo-frame ${sizeClass} relative inline-flex items-center justify-center shrink-0" data-team-id="${tid}" title="${name}">
+        <img src="${src}" alt="" class="standings-logo-img" decoding="async" onerror="this.classList.add('hidden'); this.nextElementSibling.classList.remove('hidden')" />
+        <span class="${fb}">${short}</span>
+      </span>`;
+    }
+
+    function formatTeamNameWithShort(name, short, inline = true) {
+      const n = escapeHtml(name || '');
+      const s = short && String(short).trim();
+      if (!s) return `<span class="font-semibold text-zinc-900">${n}</span>`;
+      const shortSpan = `<span class="text-[11px] font-semibold text-indigo-700/85 tracking-tight">(${escapeHtml(s)})</span>`;
+      if (inline) {
+        return `<span class="font-semibold text-zinc-900">${n}</span> ${shortSpan}`;
+      }
+      return `<span class="block font-semibold text-zinc-900 leading-tight">${n}</span>${shortSpan}`;
+    }
+
+    function formatStandingsTeamCell(meta, t) {
+      const tid = escapeHtml(t.id || '');
+      const nameHtml = formatTeamNameWithShort(t.name, t.short, true);
+      return `<div class="flex items-center gap-2.5 min-w-0 justify-start text-left" data-team-id="${tid}">
+      ${teamLogoFrameHtml(meta, t.id, 'team')}
+      <span class="min-w-0 leading-snug">${nameHtml}</span>
+    </div>`;
+    }
+
+    function formatSetRecordHtml(setW, setL) {
+      const sw = Number(setW) || 0;
+      const sl = Number(setL) || 0;
+      if (sw === 0 && sl === 0) {
+        return '<span class="text-zinc-400 tabular-nums text-[11px]">0승 0패</span>';
+      }
+      return `<span class="tabular-nums text-[11px] sm:text-sm leading-tight"><span class="text-emerald-800 font-semibold">${sw}</span><span class="text-zinc-600 font-medium">승</span> <span class="text-zinc-700 font-semibold">${sl}</span><span class="text-zinc-600 font-medium">패</span></span>`;
+    }
+
+    function formatNextOpponentCell(meta, next) {
+      if (!next) {
+        return '<td class="px-2 sm:px-3 py-2.5 text-center align-middle"><span class="text-zinc-300 text-[11px]">—</span></td>';
+      }
+      const tip = escapeHtml(`${next.round}R · ${next.fixtureId} vs ${next.name}${next.short ? ' (' + next.short + ')' : ''}`);
+      const nameLine = escapeHtml(next.name || next.opponentId || '');
+      const shortRaw = next.short && String(next.short).trim();
+      const shortLine = shortRaw
+        ? `<span class="text-[9px] font-semibold text-indigo-700/85 leading-none truncate max-w-full">(${escapeHtml(shortRaw)})</span>`
+        : '';
+      return `<td class="px-2 sm:px-3 py-2.5 text-center align-middle" title="${tip}">
+    <div class="inline-flex flex-col items-center gap-0.5 min-w-0 max-w-[6rem] mx-auto">
+      ${teamLogoFrameHtml(meta, next.opponentId, 'next', 'dark')}
+      <span class="text-[10px] font-semibold text-zinc-800 leading-tight text-center line-clamp-2 max-w-full">${nameLine}</span>
+      ${shortLine}
+      <span class="text-[9px] text-zinc-400 tabular-nums leading-none">${next.round}R</span>
+    </div>
+  </td>`;
+    }
+
+    function formatNextOpponentMobileBlock(meta, next) {
+      if (!next) {
+        return '<span class="text-zinc-400 text-xs">다음 대전 없음</span>';
+      }
+      const tip = escapeHtml(`${next.round}R · ${next.fixtureId} vs ${next.name}${next.short ? ' (' + next.short + ')' : ''}`);
+      const nameLine = escapeHtml(next.name || next.opponentId || '');
+      const shortRaw = next.short && String(next.short).trim();
+      const shortLine = shortRaw
+        ? `<span class="text-[10px] font-semibold text-indigo-700/85">(${escapeHtml(shortRaw)})</span>`
+        : '';
+      return `<div class="standings-mobile-next min-w-0 flex-1" title="${tip}">
+      ${teamLogoFrameHtml(meta, next.opponentId, 'next', 'dark')}
+      <div class="min-w-0 flex-1">
+        <div class="text-[10px] font-bold text-zinc-500 uppercase tracking-wide mb-0.5">다음 대전</div>
+        <div class="text-sm font-semibold text-zinc-900 leading-tight">${nameLine} ${shortLine}</div>
+        <div class="text-[11px] text-zinc-500 tabular-nums mt-0.5">${next.round}라운드</div>
+      </div>
+    </div>`;
+    }
+
+    function formatStandingsMobileCard(meta, t, rank, hasAny, isPo, next) {
+      const poClass = isPo ? ' standings-mobile-card--po' : '';
+      const seriesSum = t.seriesW + t.seriesL;
+      const recentHtml = formatRecentSeriesHtml(t.recentWL);
+      const sparkHtml = rankSparklineSvg(t.rankHist, meta.teams.length);
+      return `
+    <article class="standings-mobile-card${poClass}" data-team-id="${escapeHtml(t.id || '')}">
+      <div class="flex items-center gap-3 mb-3">
+        <div class="shrink-0 w-8 flex justify-center">${rankCellHtml(rank, hasAny)}</div>
+        <div class="min-w-0 flex-1">${formatStandingsTeamCell(meta, t)}</div>
+        ${isPo ? '<span class="shrink-0 text-[9px] font-bold uppercase tracking-wide text-indigo-700 bg-indigo-50 border border-indigo-200/80 px-1.5 py-0.5 rounded">PO</span>' : ''}
+      </div>
+      <div class="grid grid-cols-3 gap-2 mb-3">
+        <div class="standings-mobile-stat">
+          <span class="standings-mobile-stat-label">대전</span>
+          <span class="text-sm font-bold text-zinc-900 tabular-nums">${t.seriesW}<span class="text-zinc-400 font-medium">승</span> ${t.seriesL}<span class="text-zinc-400 font-medium">패</span></span>
+          <div class="text-[10px] text-zinc-500 tabular-nums mt-0.5">${seriesSum}경기</div>
+        </div>
+        <div class="standings-mobile-stat">
+          <span class="standings-mobile-stat-label">세트</span>
+          <div class="text-sm">${formatSetRecordHtml(t.setW, t.setL)}</div>
+        </div>
+        <div class="standings-mobile-stat">
+          <span class="standings-mobile-stat-label">득실</span>
+          <div class="text-sm">${formatSetDiffHtml(t.setW, t.setL)}</div>
+        </div>
+      </div>
+      <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-zinc-100">
+        <div class="flex flex-col gap-0.5">
+          <span class="text-[10px] font-bold text-zinc-500 uppercase tracking-wide">최근</span>
+          ${recentHtml}
+        </div>
+        <div class="flex flex-col items-end gap-0.5 shrink-0">
+          <span class="text-[10px] font-bold text-zinc-500 uppercase tracking-wide">순위 추이</span>
+          ${sparkHtml}
+        </div>
+      </div>
+      <div class="mt-2.5 pt-2.5 border-t border-zinc-100">
+        ${formatNextOpponentMobileBlock(meta, next)}
+      </div>
+    </article>`;
+    }
+
+    function renderStandings(meta, analysis, nextByTeam) {
+      const { acc, recent, rankHist } = analysis;
+      const tbody = document.getElementById('standingsBody');
+      const nTeams = meta.teams.length;
+      const rows = meta.teams
+        .map((t) => ({
+          ...t,
+          ...acc[t.id],
+          recentWL: recent[t.id] || [],
+          rankHist: rankHist[t.id] || [],
+        }))
+        .sort(compareStandingRow);
+      const leagueStarted = rows.some((r) => r.seriesW + r.seriesL + r.setW + r.setL > 0);
+      tbody.innerHTML = rows
+        .map((t, idx) => {
+          const hasAny = t.seriesW + t.seriesL + t.setW + t.setL > 0;
+          const rank = idx + 1;
+          const seriesSum = t.seriesW + t.seriesL;
+          const poClass = leagueStarted && rank <= PLAYOFF_SPOTS ? ' standings-row--po' : '';
+          return `
+        <tr class="standings-row border-b border-zinc-100/80 transition-colors${poClass}">
+          <td class="px-2 sm:px-3 py-2.5 text-center align-middle">${rankCellHtml(rank, hasAny)}</td>
+          <td class="px-2 sm:px-3 py-2 align-middle">${formatStandingsTeamCell(meta, t)}</td>
+          <td class="px-2 sm:px-3 py-2.5 text-center align-middle tabular-nums text-zinc-500">${seriesSum}</td>
+          <td class="px-2 sm:px-3 py-2.5 text-center align-middle tabular-nums text-zinc-800 font-medium">${t.seriesW}</td>
+          <td class="px-2 sm:px-3 py-2.5 text-center align-middle tabular-nums text-zinc-500">${t.seriesL}</td>
+          <td class="px-2 sm:px-3 py-2.5 text-center align-middle">${formatSetRecordHtml(t.setW, t.setL)}</td>
+          <td class="px-2 sm:px-3 py-2.5 text-right align-middle">${formatSetDiffHtml(t.setW, t.setL)}</td>
+          <td class="px-2 sm:px-3 py-2.5 align-middle">${formatRecentSeriesHtml(t.recentWL)}</td>
+          ${formatNextOpponentCell(meta, nextByTeam[t.id])}
+          <td class="px-2 sm:px-3 py-2.5 text-center align-middle">${rankSparklineSvg(t.rankHist, nTeams)}</td>
+        </tr>`;
+        })
+        .join('');
+
+      const mobileRoot = document.getElementById('standingsMobile');
+      if (mobileRoot) {
+        mobileRoot.innerHTML = rows
+          .map((t, idx) => {
+            const hasAny = t.seriesW + t.seriesL + t.setW + t.setL > 0;
+            const rank = idx + 1;
+            const isPo = leagueStarted && rank <= PLAYOFF_SPOTS;
+            return formatStandingsMobileCard(meta, t, rank, hasAny, isPo, nextByTeam[t.id]);
+          })
+          .join('');
+      }
+    }
+
+    function parseScheduleMdDate(str, year) {
+      const m = String(str).trim().match(/^(\d{1,2})\/(\d{1,2})$/);
+      if (!m) return null;
+      const month = parseInt(m[1], 10) - 1;
+      const day = parseInt(m[2], 10);
+      if (month < 0 || month > 11 || day < 1 || day > 31) return null;
+      const d = new Date(year, month, day);
+      if (d.getFullYear() !== year || d.getMonth() !== month || d.getDate() !== day) return null;
+      return d;
+    }
+
+    function pairMod5KeyForRound(roundNum) {
+      const r = Number(roundNum);
+      if (!Number.isFinite(r)) return null;
+      const mod = ((r % 5) + 5) % 5;
+      return mod === 0 ? '0' : String(mod);
+    }
+
+    function presetPairRowsForRound(roundNum, matchupPreset) {
+      if (!matchupPreset) return null;
+      if (matchupPreset.pairsByRound && typeof matchupPreset.pairsByRound === 'object') {
+        const key = String(Number(roundNum));
+        const rows = matchupPreset.pairsByRound[key];
+        if (Array.isArray(rows)) return rows;
+      }
+      if (!matchupPreset.pairsByRoundMod5) return null;
+      const key = pairMod5KeyForRound(roundNum);
+      if (key == null) return null;
+      const rows = matchupPreset.pairsByRoundMod5[key];
+      return Array.isArray(rows) ? rows : null;
+    }
+
+    function unorderedPairKey(teamIds) {
+      const [a, b] = teamIds || [];
+      if (!a || !b) return '';
+      return a < b ? `${a}\u0000${b}` : `${b}\u0000${a}`;
+    }
+
+    /** pairsByRound(또는 pairsByRoundMod5) 한 라운드에서 해당 팀쌍이 몇 번째 줄인지(없으면 999). */
+    function presetSlotIndexForTeams(teamIds, roundNum, matchupPreset) {
+      const rows = presetPairRowsForRound(roundNum, matchupPreset);
+      if (!rows) return 999;
+      const want = unorderedPairKey(teamIds);
+      if (!want) return 999;
+      for (let i = 0; i < rows.length; i++) {
+        if (unorderedPairKey(rows[i]) === want) return i;
+      }
+      return 999;
+    }
+
+    function matchupSortKeyFromId(id) {
+      const m = String(id || '').match(/-m(\d+)$/);
+      return m ? parseInt(m[1], 10) : 999;
+    }
+
+    /**
+     * 일정 카드 표시 순서: matchupPreset.pairsByRound(또는 pairsByRoundMod5) 행 순 → 같은 슬롯이면 날짜 → fixture id.
+     * JSON 배열 순서가 일정표와 어긋나도 팀·날짜 붙은 객체는 그대로 두고 줄만 맞춥니다.
+     */
+    function sortMatchupsForScheduleDisplay(matchups, roundNum, fixtures) {
+      const mp = fixtures && fixtures.matchupPreset;
+      return [...(matchups || [])].sort((a, b) => {
+        const ia = presetSlotIndexForTeams(a.teamIds, roundNum, mp);
+        const ib = presetSlotIndexForTeams(b.teamIds, roundNum, mp);
+        if (ia !== ib) return ia - ib;
+        const da = parseScheduleMdDate(String(a.date || '').trim(), SCHEDULE_DATE_YEAR);
+        const db = parseScheduleMdDate(String(b.date || '').trim(), SCHEDULE_DATE_YEAR);
+        const ta = da ? da.getTime() : null;
+        const tb = db ? db.getTime() : null;
+        if (ta != null && tb != null && ta !== tb) return ta - tb;
+        if (ta != null && tb == null) return -1;
+        if (ta == null && tb != null) return 1;
+        return matchupSortKeyFromId(a.id) - matchupSortKeyFromId(b.id);
+      });
+    }
+
+    /** "5/26" → 날짜 + 한글 요일 한 글자 (연도는 SCHEDULE_DATE_YEAR) */
+    function formatScheduleMatchupDateHeading(raw) {
+      const trimmed = String(raw).trim();
+      if (!trimmed) return '';
+      const dt = parseScheduleMdDate(trimmed, SCHEDULE_DATE_YEAR);
+      if (!dt) return `<span class="text-indigo-900">${escapeHtml(trimmed)}</span>`;
+      const wd = SCHEDULE_WEEKDAY_KO[dt.getDay()];
+      return `<span class="tabular-nums text-indigo-900">${escapeHtml(trimmed)}</span><span class="text-zinc-500 font-bold"> ${escapeHtml(wd)}</span>`;
+    }
+
+    function formatScheduleSlotTierCell(s) {
+      if (!s) return '<span class="text-zinc-300">—</span>';
+      const f = String(s.format || '').toLowerCase();
+      if (f === '2v2') return '<span class="text-zinc-600 font-semibold">2:2</span>';
+      if (f === '3v3') return '<span class="text-zinc-600 font-semibold">3:3</span>';
+      if (f === '1v1' || f === '') {
+        return s.tierLine
+          ? `<span class="text-zinc-800">${escapeHtml(s.tierLine)}</span>`
+          : '<span class="text-zinc-400">—</span>';
+      }
+      return `<span class="text-zinc-700">${escapeHtml(s.format || '—')}</span>`;
+    }
+
+    function formatScheduleSlotMapCell(s) {
+      if (!s) return '<span class="text-zinc-300">—</span>';
+      const map = s.map ? escapeHtml(s.map) : '—';
+      const cap =
+        s.pointCapPerTeam != null
+          ? `<span class="text-zinc-600 tabular-nums font-medium">(${escapeHtml(String(s.pointCapPerTeam))})</span>`
+          : '';
+      return `<span class="font-semibold text-zinc-900">${map}</span>${cap}`;
+    }
+
+    function formatScheduleSlotRow(s) {
+      if (!s) {
+        return `<div class="schedule-slot-grid schedule-slot-grid--row">
+          <div class="schedule-slot-cell schedule-slot-cell--seq"><span class="text-zinc-300">·</span></div>
+          <div class="schedule-slot-cell schedule-slot-cell--tier"><span class="text-zinc-300">—</span></div>
+          <div class="schedule-slot-cell schedule-slot-cell--map"></div>
+        </div>`;
+      }
+      return `<div class="schedule-slot-grid schedule-slot-grid--row">
+        <div class="schedule-slot-cell schedule-slot-cell--seq"><span class="font-mono font-bold text-indigo-700 tabular-nums text-sm">${s.slot}</span></div>
+        <div class="schedule-slot-cell schedule-slot-cell--tier">${formatScheduleSlotTierCell(s)}</div>
+        <div class="schedule-slot-cell schedule-slot-cell--map">${formatScheduleSlotMapCell(s)}</div>
+      </div>`;
+    }
+
+    function scheduleRankBadgeHtml(rank, title) {
+      if (rank == null) return '';
+      const t = escapeHtml(title != null ? String(title) : `${rank}위`);
+      let extra = '';
+      if (rank === 1) extra = ' schedule-rank-badge--1';
+      else if (rank === 2) extra = ' schedule-rank-badge--2';
+      else if (rank === 3) extra = ' schedule-rank-badge--3';
+      return `<span class="schedule-rank-badge${extra}" title="${t}">${escapeHtml(String(rank))}</span>`;
+    }
+
+    function formatScheduleMatchupSide(meta, teamId, rankMap) {
+      const name = escapeHtml(teamName(meta, teamId));
+      const rank = rankMap[teamId];
+      const badge = scheduleRankBadgeHtml(rank, `${rank}위`);
+      return `<div class="schedule-matchup-team">
+        ${teamLogoFrameHtml(meta, teamId, 'schedule')}
+        <div class="schedule-matchup-meta">
+          ${badge}<span class="font-semibold">${name}</span>
+        </div>
+      </div>`;
+    }
+
+    function formatScheduleMatchupWithRanks(meta, m, rankMap) {
+      const [idA, idB] = m.teamIds || [];
+      return `<div class="schedule-matchup">
+        ${formatScheduleMatchupSide(meta, idA, rankMap)}
+        <span class="schedule-matchup-vs">vs</span>
+        ${formatScheduleMatchupSide(meta, idB, rankMap)}
+      </div>`;
+    }
+
+    function renderScheduleSlotPlanCard(slots) {
+      const headerRow = `<div class="schedule-slot-grid schedule-slot-grid--head" role="row">
+        <div class="schedule-slot-cell schedule-slot-cell--seq">순서</div>
+        <div class="schedule-slot-cell schedule-slot-cell--tier">티어</div>
+        <div class="schedule-slot-cell schedule-slot-cell--map">맵</div>
+      </div>`;
+      const sorted = [...(slots || [])].sort((a, b) => (a.slot || 0) - (b.slot || 0));
+      const lines = sorted
+        .map((s) => `<div class="schedule-slot-line">${formatScheduleSlotRow(s)}</div>`)
+        .join('');
+      return `
+        <div class="schedule-card schedule-card--maps overflow-hidden">
+          <div class="px-3 py-2 text-[11px] font-bold text-indigo-900 bg-indigo-50/95 border-b border-indigo-100/80 text-center">세트 · 맵</div>
+          ${headerRow}
+          <div>${lines || '<div class="px-3 py-6 text-center text-xs text-zinc-400">세트 구성 없음</div>'}</div>
+        </div>`;
+    }
+
+    function renderScheduleMatchupCard(meta, m, rankMap, index1, h2hWins) {
+      const inner = formatScheduleMatchupWithRanks(meta, m, rankMap);
+      const [tid0, tid1] = m.teamIds || [];
+      const h2hHtml = formatScheduleHeadToHeadHtml(meta, tid0, tid1, h2hWins);
+      const raw = m.date != null && String(m.date).trim() ? String(m.date).trim() : '';
+      const head = raw
+        ? `<div class="text-center leading-tight">${formatScheduleMatchupDateHeading(raw)}</div>`
+        : `<div class="text-center text-[11px] font-bold text-zinc-500">대전 ${index1}</div>`;
+      return `
+        <div class="schedule-card schedule-card--match px-3 py-3.5 flex flex-col justify-center min-h-[5.5rem] items-stretch text-center">
+          <div class="mb-1.5">${head}</div>
+          <div class="min-w-0 flex justify-center w-full">${inner}</div>
+          ${h2hHtml}
+        </div>`;
+    }
+
+    function chunkArray(arr, size) {
+      const out = [];
+      for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
+      return out;
+    }
+
+    function renderScheduleRoundPanel(meta, fixtures, roundDocs, r) {
+      const matchups = sortMatchupsForScheduleDisplay(r.matchups, r.round, fixtures);
+      const slots = r.slotPlan || [];
+      const prevR = (r.round ?? 1) - 1;
+      const { rankMap } = standingsAfterThroughRound(meta, fixtures, roundDocs, prevR);
+      const showRanks = allScheduledRoundsSeriesCompleteThrough(fixtures, roundDocs, prevR);
+      const effectiveRankMap = showRanks ? rankMap : {};
+      const mapCard = renderScheduleSlotPlanCard(slots);
+      const h2hWins = buildSeriesHeadToHeadBeforeRound(fixtures, roundDocs, r.round);
+      const matchCards = matchups
+        .map((m, i) => renderScheduleMatchupCard(meta, m, effectiveRankMap, i + 1, h2hWins))
+        .join('');
+      const rankNote = showRanks
+        ? '<p class="text-[10px] text-zinc-500 leading-snug text-center">숫자 뱃지: 직전 라까지 확정된 순위.</p>'
+        : '';
+      return `
+        <div class="schedule-round-shell overflow-hidden min-w-0 flex flex-col h-full">
+          <div class="px-3 py-2.5 border-b border-zinc-200/80 bg-gradient-to-r from-indigo-600 to-indigo-700 text-white text-center shrink-0">
+            <span class="text-sm font-bold tracking-tight tabular-nums">${r.round}라운드</span>
+          </div>
+          <div class="p-2 sm:p-3 space-y-2 sm:space-y-3 flex-1 min-h-0 flex flex-col">
+            ${mapCard}
+            <div class="grid grid-cols-1 gap-2">${matchCards || '<div class="schedule-card px-3 py-4 text-center text-xs text-zinc-400">대전 없음</div>'}</div>
+            ${rankNote}
+          </div>
+        </div>`;
+    }
+
+    function renderSchedule(meta, fixtures, roundDocs) {
+      const root = document.getElementById('scheduleRoot');
+      const rounds = [...(fixtures.rounds || [])].sort((a, b) => (a.round || 0) - (b.round || 0));
+      if (!rounds.length) {
+        root.innerHTML = '<p class="text-sm text-zinc-500">일정 데이터가 없습니다.</p>';
+        return;
+      }
+      const SCHEDULE_ROUNDS_PER_CHUNK = 5;
+      const chunks = chunkArray(rounds, SCHEDULE_ROUNDS_PER_CHUNK);
+      root.innerHTML = chunks
+        .map((chunk) => {
+          const startR = chunk[0].round;
+          const endR = chunk[chunk.length - 1].round;
+          const panels = chunk.map((rd) => renderScheduleRoundPanel(meta, fixtures, roundDocs, rd)).join('');
+          return `
+        <section class="schedule-chunk mb-8 last:mb-0">
+          <h3 class="text-sm font-bold text-zinc-900 mb-3 flex flex-wrap items-center justify-center gap-2">
+            <span class="rounded-md bg-indigo-100 text-indigo-900 px-2 py-0.5 tabular-nums">${startR}~${endR}</span>
+            <span>라운드</span>
+          </h3>
+          <div class="grid grid-cols-1 gap-3 min-w-0 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 sm:gap-3">
+            ${panels}
+          </div>
+        </section>`;
+        })
+        .join('');
+    }
+
+    function escapeHtml(s) {
+      if (s == null) return '';
+      return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        const [meta, fixtures] = await Promise.all([
+          loadJson('data/s11/meta.json'),
+          loadJson('data/s11/fixtures.json'),
+        ]);
+        const roundDocs = await loadAllRoundResults(10, fixtures);
+        const analysis = buildStandingsAnalysis(meta, fixtures, roundDocs);
+        const nextByTeam = computeNextOpponents(meta, fixtures, roundDocs);
+        renderStandings(meta, analysis, nextByTeam);
+        renderSchedule(meta, fixtures, roundDocs);
+      } catch (e) {
+        console.error(e);
+        document.getElementById('standingsBody').innerHTML =
+          `<tr><td colspan="11" class="px-4 py-4 text-red-600">${escapeHtml(e.message)}</td></tr>`;
+        const mobileRoot = document.getElementById('standingsMobile');
+        if (mobileRoot) {
+          mobileRoot.innerHTML = `<p class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">${escapeHtml(e.message)}</p>`;
         }
-
-        function renderMapMatchupTable(map, stats) {
-            const races = ['T', 'P', 'Z'];
-            const getWinRate = (w, l) => (w + l > 0) ? Math.round(w / (w + l) * 100) : -1;
-            const getRateColor = (rate) => rate > 50 ? 'text-green-600' : rate < 50 && rate !== -1 ? 'text-red-600' : '';
-
-            let tableHtml = `
-                <div class="bg-white p-4 rounded-lg shadow">
-                    <h4 class="font-bold text-lg mb-3">${map}</h4>
-                    <table class="w-full text-center text-sm border-collapse">
-                        <thead class="bg-gray-100">
-                            <tr class="text-xs">
-                                <th class="p-2 border" rowspan="2">종족</th>
-                                <th class="p-2 border" colspan="3">전체(동족전 제외)</th>
-                                <th class="p-2 border" colspan="3">vs Terran</th>
-                                <th class="p-2 border" colspan="3">vs Protoss</th>
-                                <th class="p-2 border" colspan="3">vs Zerg</th>
-                            </tr>
-                            <tr class="bg-gray-100 text-xs">
-                                <th class="p-1 border">승</th><th class="p-1 border">패</th><th class="p-1 border">승률</th>
-                                <th class="p-1 border">승</th><th class="p-1 border">패</th><th class="p-1 border">승률</th>
-                                <th class="p-1 border">승</th><th class="p-1 border">패</th><th class="p-1 border">승률</th>
-                                <th class="p-1 border">승</th><th class="p-1 border">패</th><th class="p-1 border">승률</th>
-                            </tr>
-                        </thead>
-                        <tbody>`;
-            
-            races.forEach(race => {
-                const s = stats[race];
-                const totalRate = getWinRate(s.total.w, s.total.l);
-                const vsT_Rate = getWinRate(s.vsT?.w, s.vsT?.l);
-                const vsP_Rate = getWinRate(s.vsP?.w, s.vsP?.l);
-                const vsZ_Rate = getWinRate(s.vsZ?.w, s.vsZ?.l);
-
-                tableHtml += `
-                    <tr>
-                        <td class="p-2 border font-bold">${race}</td>
-                        <td class="p-2 border">${s.total.w}</td>
-                        <td class="p-2 border">${s.total.l}</td>
-                        <td class="p-2 border font-bold ${getRateColor(totalRate)}">${totalRate !== -1 ? totalRate + '%' : '-'}</td>
-                        ${race === 'T' ? '<td class="p-2 border bg-gray-200" colspan="3"></td>' : `<td class="p-2 border">${s.vsT.w}</td><td class="p-2 border">${s.vsT.l}</td><td class="p-2 border font-bold ${getRateColor(vsT_Rate)}">${vsT_Rate !== -1 ? vsT_Rate + '%' : '-'}</td>`}
-                        ${race === 'P' ? '<td class="p-2 border bg-gray-200" colspan="3"></td>' : `<td class="p-2 border">${s.vsP.w}</td><td class="p-2 border">${s.vsP.l}</td><td class="p-2 border font-bold ${getRateColor(vsP_Rate)}">${vsP_Rate !== -1 ? vsP_Rate + '%' : '-'}</td>`}
-                        ${race === 'Z' ? '<td class="p-2 border bg-gray-200" colspan="3"></td>' : `<td class="p-2 border">${s.vsZ.w}</td><td class="p-2 border">${s.vsZ.l}</td><td class="p-2 border font-bold ${getRateColor(vsZ_Rate)}">${vsZ_Rate !== -1 ? vsZ_Rate + '%' : '-'}</td>`}
-                    </tr>
-                `;
-            });
-
-            tableHtml += '</tbody></table></div>';
-            return tableHtml;
-        }
-        
-       // --- EVENT LISTENERS ---
-        function setupEventListeners() {
-            // Tabs
-            const tabs = document.querySelectorAll('.tab');
-            const panes = document.querySelectorAll('.tab-pane');
-            tabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    tabs.forEach(t => t.classList.remove('active'));
-                    panes.forEach(p => p.classList.add('hidden'));
-                    tab.classList.add('active');
-                    document.getElementById(`${tab.dataset.tab}-content`).classList.remove('hidden');
-                    if (tab.dataset.tab === 'charts') {
-                        renderCharts();
-                    }
-                    // Re-attach player filter listeners if players tab is selected
-                    if (tab.dataset.tab === 'players') {
-                        attachPlayerFilterListeners();
-                    }
-                });
-            });
-
-            // Initial setup for player filters
-            attachPlayerFilterListeners();
-
-            // Player links for modal
-            document.body.addEventListener('click', e => {
-                if (e.target.closest('.player-link')) {
-                    e.preventDefault();
-                    const playerId = e.target.closest('.player-link').dataset.playerId;
-                    openPlayerModal(playerId);
-                }
-            });
-
-            // Modal close
-            document.getElementById('playerModalClose').addEventListener('click', () => {
-                document.getElementById('playerModal').classList.add('hidden');
-            });
-            
-            // Table sorting
-            document.body.addEventListener('click', e => {
-                const headerCell = e.target.closest('.table-sortable th[data-sort], .table-sortable th[data-sort-numeric]');
-                if (headerCell) {
-                    // Stop propagation if the click is on a filter element inside the header
-                    if (e.target.closest('input, select')) {
-                        return;
-                    }
-                    const tableElement = headerCell.closest('table');
-                    const headerIndex = Array.prototype.indexOf.call(headerCell.parentElement.children, headerCell);
-                    const currentIsAsc = headerCell.classList.contains('sorted-asc');
-                    
-                    tableElement.querySelectorAll('th[data-sort]').forEach(th => th.classList.remove('sorted-asc', 'sorted-desc'));
-                    headerCell.classList.toggle('sorted-asc', !currentIsAsc);
-                    headerCell.classList.toggle('sorted-desc', currentIsAsc);
-
-                    sortTableByColumn(tableElement, headerIndex, !currentIsAsc, headerCell.hasAttribute('data-sort-numeric'));
-                }
-            });
-        }
-
-        function attachPlayerFilterListeners() {
-            // Desktop filters
-            const nameFilter = document.getElementById('player-name-filter');
-            const teamFilter = document.getElementById('player-team-filter');
-            const raceFilter = document.getElementById('player-race-filter');
-            const tierFilter = document.getElementById('player-tier-filter');
-            if (nameFilter && teamFilter && raceFilter && tierFilter) {
-                nameFilter.addEventListener('input', applyPlayerFilters);
-                teamFilter.addEventListener('change', applyPlayerFilters);
-                raceFilter.addEventListener('change', applyPlayerFilters);
-                tierFilter.addEventListener('change', applyPlayerFilters);
-                // Prevent sorting when clicking on filters in header
-                [nameFilter, teamFilter, raceFilter, tierFilter].forEach(el => {
-                    el.addEventListener('click', e => e.stopPropagation());
-                });
-            }
-
-            // Mobile filters
-            const nameFilterMobile = document.getElementById('player-name-filter-mobile');
-            const teamFilterMobile = document.getElementById('player-team-filter-mobile');
-            const raceFilterMobile = document.getElementById('player-race-filter-mobile');
-            const tierFilterMobile = document.getElementById('player-tier-filter-mobile');
-            if (nameFilterMobile && teamFilterMobile && raceFilterMobile && tierFilterMobile) {
-                nameFilterMobile.addEventListener('input', applyPlayerFilters);
-                teamFilterMobile.addEventListener('change', applyPlayerFilters);
-                raceFilterMobile.addEventListener('change', applyPlayerFilters);
-                tierFilterMobile.addEventListener('change', applyPlayerFilters);
-            }
-        }
-
-        function openPlayerModal(playerId) {
-            const player = playersData[playerId];
-            if (!player) return;
-
-            document.getElementById('modalPlayerName').innerText = `${player.이름} (${player.id})`;
-            const contentEl = document.getElementById('playerModalContent');
-            
-            const stats = player.stats;
-            let html = `
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                    <div class="bg-gray-50 p-4 rounded-lg">
-                        <h4 class="font-bold text-lg mb-2">기본 정보</h4>
-                        <p><strong>팀:</strong> ${TEAM_NAMES[player.팀] || `Team ${player.팀}`}</p>
-                        <p><strong>종족:</strong> ${getRaceIcon(player.종족)} ${player.종족}</p>
-                        <p><strong>티어:</strong> ${player.티어}</p>
-                        <p><strong>ELO:</strong> <span class="font-bold text-lg">${player.elo}</span></p>
-                    </div>
-                     <div class="bg-gray-50 p-4 rounded-lg">
-                        <h4 class="font-bold text-lg mb-2">전적 (세트 기준)</h4>
-                        <p><strong>전체:</strong> ${stats.total.w}승 ${stats.total.l}패 (${(stats.total.w + stats.total.l > 0 ? (stats.total.w / (stats.total.w + stats.total.l) * 100).toFixed(1) : 0)}%)</p>
-                        <p><strong>개인전:</strong> ${stats.개인전.w}승 ${stats.개인전.l}패</p>
-                        <p><strong>팀전:</strong> ${stats.팀전.w}승 ${stats.팀전.l}패</p>
-                        <p><strong>2v2:</strong> ${stats['22'].w}승 ${stats['22'].l}패</p>
-                        <p><strong>3v3:</strong> ${stats['33'].w}승 ${stats['33'].l}패</p>
-                    </div>
-                </div>
-                <div class="mt-4">
-                    <h4 class="font-bold text-lg mb-2">경기 기록 (최신순)</h4>
-                    <div class="max-h-60 overflow-y-auto border rounded-lg">
-                        <table class="min-w-full text-xs">
-                            <thead class="bg-gray-100 sticky top-0"><tr>
-                                <th class="p-2">경기</th><th class="p-2">상대</th><th class="p-2">결과</th><th class="p-2">ELO 변화</th>
-                            </tr></thead>
-                            <tbody>`;
-            
-            [...player.history].reverse().forEach(matchId => {
-                const m = matchesData[matchId];
-                if (!m) return;
-                const isTeam1 = m.team1.players.includes(playerId);
-                const opponentTeam = isTeam1 ? m.team2 : m.team1;
-                const won = (isTeam1 && m.winner === 1) || (!isTeam1 && m.winner === 2);
-                const opponentName = opponentTeam.playerInfo.map(info => {
-                    const jongbyunIndicator = info.isJongbyun ? ' <span class="text-xs text-red-500">(종변)</span>' : '';
-                    return `${getRaceIcon(info.race)}${info.name}${jongbyunIndicator}`;
-                }).join(', ');
-                const eloChange = m.eloChanges.find(ec => ec.player === playerId);
-
-                html += `<tr class="border-t ${won ? 'bg-blue-50' : 'bg-red-50'}">
-                    <td class="p-2">${m.round}R ${m.matchNum}M (${m.type})</td>
-                    <td class="p-2">${opponentName}</td>
-                    <td class="p-2 font-bold ${won ? 'text-blue-700' : 'text-red-700'}">${won ? '승리' : '패배'}</td>
-                    <td class="p-2 font-mono">${eloChange ? `${eloChange.from} → ${eloChange.to} (${eloChange.change > 0 ? '+' : ''}${eloChange.change})` : 'N/A'}</td>
-                </tr>`;
-            });
-            
-            html += `</tbody></table></div></div>`;
-            contentEl.innerHTML = html;
-            document.getElementById('playerModal').classList.remove('hidden');
-        }
-
-        function sortTableByColumn(table, columnIndex, asc = true, isNumeric = false) {
-            const dirModifier = asc ? 1 : -1;
-            const tBody = table.tBodies[0];
-            const rows = Array.from(tBody.querySelectorAll('tr'));
-
-            const sortedRows = rows.sort((a, b) => {
-                let aColText = a.querySelector(`td:nth-child(${columnIndex + 1})`).textContent.trim();
-                let bColText = b.querySelector(`td:nth-child(${columnIndex + 1})`).textContent.trim();
-
-                if (isNumeric) {
-                    const regex = /(\d+)/;
-                    const aMatch = aColText.match(regex);
-                    const bMatch = bColText.match(regex);
-                    const aVal = aMatch ? parseInt(aMatch[0], 10) : parseFloat(aColText) || 0;
-                    const bVal = bMatch ? parseInt(bMatch[0], 10) : parseFloat(bColText) || 0;
-                    return (aVal - bVal) * dirModifier;
-                }
-                
-                return aColText.localeCompare(bColText, 'ko') * dirModifier;
-            });
-
-            while (tBody.firstChild) {
-                tBody.removeChild(tBody.firstChild);
-            }
-
-            tBody.append(...sortedRows);
-        }
-
-    </script>
+      }
+    });
+  </script>
 </body>
 </html>

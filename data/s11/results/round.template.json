@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "season": 11,
+  "phase": "first_half",
+  "round": 0,
+  "recordedAt": "",
+  "author": "",
+  "notes": "",
+  "matchups": [
+    {
+      "fixtureId": "s11-r00-m1",
+      "_fixtureHint": "fixtures.json 에서 해당 라운드의 id 로 교체",
+      "series": {
+        "winnerTeamIndex": null,
+        "setScoreTeamA": null,
+        "setScoreTeamB": null,
+        "decidedBy": "sets",
+        "_decidedByValues": ["sets", "forfeit", "admin"],
+        "notes": ""
+      },
+      "playedOrder": null,
+      "_playedOrderHint": null,
+      "slots": [
+        {
+          "slot": 1,
+          "winnerTeamIndex": null,
+          "_winnerHint": "teamIds 순서 기준 1 또는 2",
+          "teamA": [{ "displayName": "", "race": null }],
+          "teamB": [{ "displayName": "", "race": null }]
+        },
+        {
+          "slot": 2,
+          "winnerTeamIndex": null,
+          "teamA": [{ "displayName": "", "race": null }],
+          "teamB": [{ "displayName": "", "race": null }]
+        },
+        {
+          "slot": 3,
+          "winnerTeamIndex": null,
+          "teamA": [
+            { "displayName": "", "race": "Z" },
+            { "displayName": "", "race": "P" }
+          ],
+          "teamB": [
+            { "displayName": "", "race": "T" },
+            { "displayName": "", "race": "Z" }
+          ],
+          "_tierBudgetHint": "각 팀 두 명 tier 포인트 합 ≤ 7 (players 등록 tier 기준)"
+        },
+        {
+          "slot": 4,
+          "winnerTeamIndex": null,
+          "teamA": [{ "displayName": "", "race": null }],
+          "teamB": [{ "displayName": "", "race": null }]
+        },
+        {
+          "slot": 5,
+          "winnerTeamIndex": null,
+          "teamA": [{ "displayName": "", "race": null }],
+          "teamB": [{ "displayName": "", "race": null }]
+        },
+        {
+          "slot": 6,
+          "winnerTeamIndex": null,
+          "teamA": [
+            { "displayName": "", "race": "P" },
+            { "displayName": "", "race": "Z" },
+            { "displayName": "", "race": "T" }
+          ],
+          "teamB": [
+            { "displayName": "", "race": "Z" },
+            { "displayName": "", "race": "P" },
+            { "displayName": "", "race": "T" }
+          ],
+          "_tierBudgetHint": "각 팀 세 명 tier 포인트 합 ≤ 8"
+        },
+        {
+          "slot": 7,
+          "winnerTeamIndex": null,
+          "teamA": [{ "displayName": "", "race": null }],
+          "teamB": [{ "displayName": "", "race": null }]
+        }
+      ]
+    }
+  ]
+}

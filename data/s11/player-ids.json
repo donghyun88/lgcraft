@@ -1,0 +1,440 @@
+{
+  "source": "시즌11 로스터 표 이미지 (2026-05)",
+  "notes": [
+    "displayName 은 players.json 과 동일하게 맞춤 (예: 강응선, 염규상).",
+    "id 는 표 하단 영문 아이디 그대로.",
+    "id 는 팀 접두어 없이 저장 (apply-player-ids.mjs 가 자동 정규화)."
+  ],
+  "entries": [
+    {
+      "teamId": "t1",
+      "displayName": "이대연",
+      "id": "Tana"
+    },
+    {
+      "teamId": "t1",
+      "displayName": "황윤도",
+      "id": "Hugo"
+    },
+    {
+      "teamId": "t1",
+      "displayName": "박진욱",
+      "id": "Jenny"
+    },
+    {
+      "teamId": "t1",
+      "displayName": "전성민",
+      "id": "Chobo"
+    },
+    {
+      "teamId": "t1",
+      "displayName": "전은후",
+      "id": "Pooooker"
+    },
+    {
+      "teamId": "t1",
+      "displayName": "이창언",
+      "id": "MiMiMong"
+    },
+    {
+      "teamId": "t1",
+      "displayName": "이형섭",
+      "id": "wasub"
+    },
+    {
+      "teamId": "t1",
+      "displayName": "임호진",
+      "id": "PixeL"
+    },
+    {
+      "teamId": "t1",
+      "displayName": "황정동",
+      "id": "glory"
+    },
+    {
+      "teamId": "t1",
+      "displayName": "한규호",
+      "id": "StyLe"
+    },
+    {
+      "teamId": "t1",
+      "displayName": "정현우",
+      "id": "Jade"
+    },
+    {
+      "teamId": "t1",
+      "displayName": "최수명",
+      "id": "STeVe"
+    },
+    {
+      "teamId": "t1",
+      "displayName": "이경성",
+      "id": "Kensay"
+    },
+    {
+      "teamId": "t1",
+      "displayName": "이동균",
+      "id": "Cleanese"
+    },
+    {
+      "teamId": "t2",
+      "displayName": "박재창",
+      "id": "GodJC"
+    },
+    {
+      "teamId": "t2",
+      "displayName": "이영길",
+      "id": "hoho"
+    },
+    {
+      "teamId": "t2",
+      "displayName": "정용석",
+      "id": "ggamak"
+    },
+    {
+      "teamId": "t2",
+      "displayName": "구선웅",
+      "id": "Woong"
+    },
+    {
+      "teamId": "t2",
+      "displayName": "변정식",
+      "id": "King"
+    },
+    {
+      "teamId": "t2",
+      "displayName": "최상균",
+      "id": "sky98"
+    },
+    {
+      "teamId": "t2",
+      "displayName": "권혁준",
+      "id": "CTHD"
+    },
+    {
+      "teamId": "t2",
+      "displayName": "강성구",
+      "id": "Kkang"
+    },
+    {
+      "teamId": "t2",
+      "displayName": "장대원",
+      "id": "SIG"
+    },
+    {
+      "teamId": "t2",
+      "displayName": "공동현",
+      "id": "Asada"
+    },
+    {
+      "teamId": "t2",
+      "displayName": "황진영",
+      "id": "HJY"
+    },
+    {
+      "teamId": "t2",
+      "displayName": "조항용",
+      "id": "HD"
+    },
+    {
+      "teamId": "t2",
+      "displayName": "김도완",
+      "id": "DDOO"
+    },
+    {
+      "teamId": "t2",
+      "displayName": "이태연",
+      "id": "naru"
+    },
+    {
+      "teamId": "t3",
+      "displayName": "김주한",
+      "id": "ratel"
+    },
+    {
+      "teamId": "t3",
+      "displayName": "박광명",
+      "id": "Teo"
+    },
+    {
+      "teamId": "t3",
+      "displayName": "최재광",
+      "id": "Daheen"
+    },
+    {
+      "teamId": "t3",
+      "displayName": "김태훈",
+      "id": "Cain"
+    },
+    {
+      "teamId": "t3",
+      "displayName": "김인경",
+      "id": "eggkyung"
+    },
+    {
+      "teamId": "t3",
+      "displayName": "황찬종",
+      "id": "Ruin"
+    },
+    {
+      "teamId": "t3",
+      "displayName": "최성진",
+      "id": "ziLLeKi"
+    },
+    {
+      "teamId": "t3",
+      "displayName": "강구산",
+      "id": "KuSan"
+    },
+    {
+      "teamId": "t3",
+      "displayName": "유윤실",
+      "id": "Twin"
+    },
+    {
+      "teamId": "t3",
+      "displayName": "권오선",
+      "id": "jogak"
+    },
+    {
+      "teamId": "t3",
+      "displayName": "최화용",
+      "id": "Xelloss"
+    },
+    {
+      "teamId": "t3",
+      "displayName": "양현철",
+      "id": "hjvita"
+    },
+    {
+      "teamId": "t3",
+      "displayName": "고성근",
+      "id": "Sabo"
+    },
+    {
+      "teamId": "t3",
+      "displayName": "오석현",
+      "id": "bradsky"
+    },
+    {
+      "teamId": "t4",
+      "displayName": "안정한",
+      "id": "Eagle"
+    },
+    {
+      "teamId": "t4",
+      "displayName": "한민석",
+      "id": "HANS"
+    },
+    {
+      "teamId": "t4",
+      "displayName": "장민수",
+      "id": "HON"
+    },
+    {
+      "teamId": "t4",
+      "displayName": "안태영",
+      "id": "Nope"
+    },
+    {
+      "teamId": "t4",
+      "displayName": "이윤종",
+      "id": "Alive"
+    },
+    {
+      "teamId": "t4",
+      "displayName": "김재현",
+      "id": "rOdeO"
+    },
+    {
+      "teamId": "t4",
+      "displayName": "김도현",
+      "id": "R2bt"
+    },
+    {
+      "teamId": "t4",
+      "displayName": "경제진",
+      "id": "KJJ"
+    },
+    {
+      "teamId": "t4",
+      "displayName": "조현용",
+      "id": "TheMan"
+    },
+    {
+      "teamId": "t4",
+      "displayName": "우병진",
+      "id": "HOME"
+    },
+    {
+      "teamId": "t4",
+      "displayName": "김태수",
+      "id": "Tsyo"
+    },
+    {
+      "teamId": "t4",
+      "displayName": "염규상",
+      "id": "SandbaG"
+    },
+    {
+      "teamId": "t4",
+      "displayName": "지주영",
+      "id": "Z:IN"
+    },
+    {
+      "teamId": "t4",
+      "displayName": "김경철",
+      "id": "CoCHA"
+    },
+    {
+      "teamId": "t4",
+      "displayName": "심현도",
+      "id": "iNfErNal"
+    },
+    {
+      "teamId": "t5",
+      "displayName": "이철훈",
+      "id": "Sushi"
+    },
+    {
+      "teamId": "t5",
+      "displayName": "황윤호",
+      "id": "tacticsjeja"
+    },
+    {
+      "teamId": "t5",
+      "displayName": "남상원",
+      "id": "n31"
+    },
+    {
+      "teamId": "t5",
+      "displayName": "이봉철",
+      "id": "Attaboy"
+    },
+    {
+      "teamId": "t5",
+      "displayName": "김동현",
+      "id": "dOngkim"
+    },
+    {
+      "teamId": "t5",
+      "displayName": "정재영",
+      "id": "Helljjang"
+    },
+    {
+      "teamId": "t5",
+      "displayName": "변진황",
+      "id": "Evicu"
+    },
+    {
+      "teamId": "t5",
+      "displayName": "김민중",
+      "id": "Baba"
+    },
+    {
+      "teamId": "t5",
+      "displayName": "김재준",
+      "id": "TACTICS"
+    },
+    {
+      "teamId": "t5",
+      "displayName": "공동건",
+      "id": "Gunstory"
+    },
+    {
+      "teamId": "t5",
+      "displayName": "정주오",
+      "id": "Kakaru"
+    },
+    {
+      "teamId": "t5",
+      "displayName": "유태욱",
+      "id": "No-Gi"
+    },
+    {
+      "teamId": "t5",
+      "displayName": "양시찬",
+      "id": "Tori"
+    },
+    {
+      "teamId": "t5",
+      "displayName": "이윤호",
+      "id": "hahaha"
+    },
+    {
+      "teamId": "t5",
+      "displayName": "이웅배",
+      "id": "8!!!!!!!!D"
+    },
+    {
+      "teamId": "t6",
+      "displayName": "김종성",
+      "id": "Castle"
+    },
+    {
+      "teamId": "t6",
+      "displayName": "강응선",
+      "id": "hillock"
+    },
+    {
+      "teamId": "t6",
+      "displayName": "오택삼",
+      "id": "bullfrog"
+    },
+    {
+      "teamId": "t6",
+      "displayName": "김경식",
+      "id": "sEpl"
+    },
+    {
+      "teamId": "t6",
+      "displayName": "조승일",
+      "id": "PanYa"
+    },
+    {
+      "teamId": "t6",
+      "displayName": "주효진",
+      "id": "berrykim"
+    },
+    {
+      "teamId": "t6",
+      "displayName": "박정진",
+      "id": "Freeman"
+    },
+    {
+      "teamId": "t6",
+      "displayName": "남정석",
+      "id": "Soocom"
+    },
+    {
+      "teamId": "t6",
+      "displayName": "명동주",
+      "id": "Deokgu"
+    },
+    {
+      "teamId": "t6",
+      "displayName": "김태준",
+      "id": "SeaSee"
+    },
+    {
+      "teamId": "t6",
+      "displayName": "김현기",
+      "id": "jjabtana"
+    },
+    {
+      "teamId": "t6",
+      "displayName": "손정곤",
+      "id": "Yoohan"
+    },
+    {
+      "teamId": "t6",
+      "displayName": "설재근",
+      "id": "Force"
+    },
+    {
+      "teamId": "t6",
+      "displayName": "임채현",
+      "id": "chobo111"
+    }
+  ]
+}

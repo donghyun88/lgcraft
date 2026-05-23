@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "players": [
+    {
+      "id": "p_t1_king",
+      "displayName": "김예시",
+      "teamId": "t1",
+      "tier": "킹",
+      "raceDefault": "P",
+      "aliases": ["김예시"]
+    },
+    {
+      "id": "p_t2_god",
+      "displayName": "이예시",
+      "teamId": "t2",
+      "tier": "갓",
+      "raceDefault": "Z",
+      "aliases": ["이예시"]
+    },
+    {
+      "id": "p_t1_amoeba",
+      "displayName": "박티어",
+      "teamId": "t1",
+      "tier": "아메바",
+      "raceDefault": "T",
+      "aliases": ["박티어"]
+    },
+    {
+      "id": "p_t2_amoeba",
+      "displayName": "채티어",
+      "teamId": "t2",
+      "tier": "아메바",
+      "raceDefault": "T",
+      "aliases": ["채티어"]
+    },
+    {
+      "id": "p_t2_human",
+      "displayName": "정미러",
+      "teamId": "t2",
+      "tier": "휴먼",
+      "raceDefault": "P",
+      "aliases": ["정미러"],
+      "_comment": "개인전에서 race:null 이면 메인 P. 필요 시 해당 세트만 \"race\":\"Z\" 로 미러 대응 표시."
+    }
+  ]
+}

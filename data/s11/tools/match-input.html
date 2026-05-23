@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="s11-json-dir" content="../" />
+  <title>시즌11 경기 결과 입력 (로컬)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    body { font-family: Inter, system-ui, sans-serif; }
+    .race-mini {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 1.25rem;
+      height: 1.25rem;
+      padding: 0 0.2rem;
+      border-radius: 9999px;
+      font-size: 0.5625rem;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.35) inset;
+      vertical-align: middle;
+    }
+    .race-mini-auto { background: linear-gradient(145deg, #a1a1aa, #52525b); font-size: 0.5rem; color: #fafafa; }
+    .race-mini-Z { background: linear-gradient(145deg, #be123c, #881337); }
+    .race-mini-T { background: linear-gradient(145deg, #0369a1, #0c4a6e); }
+    .race-mini-P { background: linear-gradient(145deg, #ca8a04, #854d0e); }
+    .race-mini-R { background: linear-gradient(145deg, #57534e, #292524); font-size: 0.5rem; }
+  </style>
+</head>
+<body class="bg-zinc-100 text-zinc-800 min-h-screen text-sm">
+  <div class="max-w-4xl mx-auto px-4 py-8">
+    <header class="mb-6">
+      <h1 class="text-xl font-bold text-zinc-900">시즌11 · 경기 결과 입력</h1>
+      <p class="mt-2 text-xs">
+        <a href="../../../index.html" class="text-indigo-600 hover:underline">기록실</a>
+        · <a href="../results/s11-r01-m1.json" class="text-indigo-600 hover:underline"><code class="bg-zinc-200/80 px-1 rounded">s11-r01-m1.json</code></a>
+        · <a href="../results/round-01.sample.json" class="text-indigo-600 hover:underline"><code class="bg-zinc-200/80 px-1 rounded">round-01.sample.json</code></a>
+      </p>
+    </header>
+    <div id="loadErr" class="hidden mb-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-800"></div>
+    <section class="bg-white rounded-lg border border-zinc-200 p-4 mb-4 space-y-4">
+      <div class="grid gap-3 sm:grid-cols-2 relative z-10">
+        <label class="block" for="selRound"><span class="text-xs font-medium text-zinc-600">라운드</span><select id="selRound" disabled class="mt-1 w-full rounded-md border border-zinc-300 px-2 py-2 text-sm bg-white"></select></label>
+        <label class="block" for="selMatch"><span class="text-xs font-medium text-zinc-600">대전</span><select id="selMatch" disabled class="mt-1 w-full rounded-md border border-zinc-300 px-2 py-2 text-sm bg-white"></select></label>
+      </div>
+      <div class="grid gap-3 sm:grid-cols-2">
+        <label class="block"><span class="text-xs font-medium text-zinc-600">기록일</span><input type="date" id="inpDate" class="mt-1 w-full rounded-md border border-zinc-300 px-2 py-2 text-sm" /></label>
+        <label class="block"><span class="text-xs font-medium text-zinc-600">작성자</span><input type="text" id="inpAuthor" class="mt-1 w-full rounded-md border border-zinc-300 px-2 py-2 text-sm" placeholder="선택" /></label>
+      </div>
+      <div id="savedBar" class="text-xs text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-md px-3 py-2 hidden"></div>
+    </section>
+    <section id="slotSection" class="bg-white rounded-lg border border-zinc-200 p-4 mb-4 min-h-[120px]">
+      <p id="slotPlaceholder" class="text-zinc-400 text-sm">라운드·대전을 선택하세요.</p>
+      <div id="slotForm" class="hidden space-y-4"></div>
+    </section>
+    <section class="flex flex-wrap gap-2">
+      <button type="button" id="btnSaveMatch" class="rounded-md bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-40">이 대전 저장 (초안)</button>
+      <button type="button" id="btnDlMatch" class="rounded-md border border-zinc-300 bg-white px-4 py-2 text-sm disabled:opacity-40">이 대전만 JSON</button>
+      <button type="button" id="btnDlRound" class="rounded-md border border-indigo-200 bg-indigo-50 px-4 py-2 text-sm text-indigo-900 disabled:opacity-40">round-NN.json</button>
+      <button type="button" id="btnClearRound" class="rounded-md border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-900">이 라운드 초안 삭제</button>
+    </section>
+    <p id="msg" class="mt-2 text-xs text-zinc-600 min-h-[1.25rem]"></p>
+  </div>
+  <script>
+const DATA={fixtures:null,meta:null,players:null};
+const DRAFT={};
+const LS='s11-tools-match-draft-v2';
+function esc(s){if(s==null)return '';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function tn(id){const t=DATA.meta?.teams?.find(x=>x.id===id);return t?t.name:id;}
+function pTeam(tid){return(DATA.players||[]).filter(p=>p.teamId===tid).sort((a,b)=>a.displayName.localeCompare(b.displayName,'ko'));}
+const TIER_ORDER=['아메바','애니멀','휴먼','킹','갓'];
+function tierIdx(t){return TIER_ORDER.indexOf(t);}
+function pTeamSplit(tid,sp){
+ const all=pTeam(tid);
+ if(sp.format!=='1v1'||!sp.tierLine||tierIdx(sp.tierLine)<0)return{primary:all,rest:[],useGroups:false,slotLabel:''};
+ const line=sp.tierLine;
+ const primary=all.filter((p)=>p.tier===line);
+ const rest=all.filter((p)=>p.tier!==line);
+ if(!primary.length)return{primary:all,rest:[],useGroups:false,slotLabel:line};
+ return{primary,rest,useGroups:rest.length>0,slotLabel:line};
+}
+/** 슬롯 한 줄: 결과 JSON은 displayName(= players.json 과 동일한 표기명). 예전 초안의 playerId 는 표시 시에만 해석 */
+function lineName(c){if(!c)return'';const n=(c.displayName||c.playerName||'').trim();if(n)return n;if(c.playerId){const p=(DATA.players||[]).find(x=>x.id===c.playerId);return p?p.displayName:'';}return'';}
+function nFmt(f){return f==='2v2'?2:f==='3v3'?3:1;}
+function domId(fid){return fid.replace(/[^a-zA-Z0-9]/g,'_');}
+function emptyR(n){return Array.from({length:n},()=>({displayName:'',race:null}));}
+function seriesW(slots){let a=0,b=0;for(const s of slots){if(s.winnerTeamIndex===1)a++;else if(s.winnerTeamIndex===2)b++;}if(!a&&!b)return null;if(a>b)return 1;if(b>a)return 2;return null;}
+function rnd(roundNum){return(DATA.fixtures?.rounds||[]).find((row)=>row.round===roundNum)||null;}
+/** index.html 과 동일: 일정표·pairsByRound(또는 pairsByRoundMod5) 행 순으로 대전 정렬 */
+const MATCH_INPUT_SCHEDULE_YEAR=2026;
+function parseMdDate(str,y){
+ const m=String(str).trim().match(/^(\d{1,2})\/(\d{1,2})$/);
+ if(!m)return null;
+ const mo=parseInt(m[1],10)-1,day=parseInt(m[2],10);
+ if(mo<0||mo>11||day<1||day>31)return null;
+ const d=new Date(y,mo,day);
+ if(d.getFullYear()!==y||d.getMonth()!==mo||d.getDate()!==day)return null;
+ return d;
+}
+function pairMod5Key(r){if(!Number.isFinite(r))return null;const mod=((r%5)+5)%5;return mod===0?'0':String(mod);}
+function presetRows(r,preset){
+ if(!preset)return null;
+ if(preset.pairsByRound&&typeof preset.pairsByRound==='object'){const rows=preset.pairsByRound[String(+r)];if(Array.isArray(rows))return rows;}
+ if(!preset.pairsByRoundMod5)return null;const k=pairMod5Key(r);if(k==null)return null;const rows=preset.pairsByRoundMod5[k];return Array.isArray(rows)?rows:null;
+}
+function pairKeyU(t){const[a,b]=t||[];if(!a||!b)return'';return a<b?a+'\0'+b:b+'\0'+a;}
+function presetIx(tids,r,preset){const rows=presetRows(r,preset);if(!rows)return 999;const w=pairKeyU(tids);if(!w)return 999;for(let i=0;i<rows.length;i++){if(pairKeyU(rows[i])===w)return i;}return 999;}
+function idM(id){const m=String(id||'').match(/-m(\d+)$/);return m?parseInt(m[1],10):999;}
+function sortMu(ms,r,fx){
+ const mp=fx&&fx.matchupPreset;
+ return[...(ms||[])].sort((a,b)=>{
+  const ia=presetIx(a.teamIds,r,mp),ib=presetIx(b.teamIds,r,mp);
+  if(ia!==ib)return ia-ib;
+  const da=parseMdDate(String(a.date||'').trim(),MATCH_INPUT_SCHEDULE_YEAR),db=parseMdDate(String(b.date||'').trim(),MATCH_INPUT_SCHEDULE_YEAR);
+  const ta=da?da.getTime():null,tb=db?db.getTime():null;
+  if(ta!=null&&tb!=null&&ta!==tb)return ta-tb;
+  if(ta!=null&&tb==null)return-1;
+  if(ta==null&&tb!=null)return 1;
+  return idM(a.id)-idM(b.id);
+ });
+}
+function rndSorted(r){const d=rnd(r);if(!d)return null;return{...d,matchups:sortMu(d.matchups,r,DATA.fixtures)};}
+function emptyMu(fid,tids,plan){return{fixtureId:fid,series:{winnerTeamIndex:null,setScoreTeamA:null,setScoreTeamB:null,decidedBy:'sets',notes:''},playedOrder:null,slots:(plan||[]).map(sp=>({slot:sp.slot,winnerTeamIndex:null,teamA:emptyR(nFmt(sp.format)),teamB:emptyR(nFmt(sp.format))}))};}
+function loadLS(){try{const o=JSON.parse(localStorage.getItem(LS)||'{}');Object.keys(o).forEach(k=>{DRAFT[+k]=o[k];});}catch(e){}}
+function saveLS(){try{localStorage.setItem(LS,JSON.stringify(DRAFT));}catch(e){}}
+function bar(){
+ const r=+document.getElementById('selRound').value,el=document.getElementById('savedBar'),d=rndSorted(r);
+ if(!d){el.classList.add('hidden');return;}
+ const ids=(d.matchups||[]).map(m=>m.id),done=ids.filter(id=>DRAFT[r]?.[id]);
+ el.textContent='라운드 '+r+' 저장: '+done.length+'/'+ids.length+' ('+(done.join(', ')||'없음')+')';
+ el.classList.remove('hidden');
+}
+function raceMiniClass(v){
+ const x=(v==null?'':String(v)).trim().toUpperCase();
+ if(x==='Z')return 'race-mini race-mini-Z';
+ if(x==='T')return 'race-mini race-mini-T';
+ if(x==='P')return 'race-mini race-mini-P';
+ if(x==='R')return 'race-mini race-mini-R';
+ return 'race-mini race-mini-auto';
+}
+function raceMiniLabel(v){
+ const x=(v==null?'':String(v)).trim().toUpperCase();
+ if(x==='Z'||x==='T'||x==='P'||x==='R')return x;
+ return '자동';
+}
+function raceSel(pid,slot,side,i,v){
+ const x=v==null?'':v;
+ const id=pid+'_s'+slot+'_'+side+'_'+i+'_r';
+ const rid=id+'_pill';
+ const xc=(x==null?'':String(x)).trim().toUpperCase();
+ return '<select id="'+id+'" class="rounded border border-zinc-200 text-[11px] px-1 max-w-[5.5rem]"><option value="">종족 자동</option><option value="Z"'+(xc==='Z'?' selected':'')+'>Z</option><option value="T"'+(xc==='T'?' selected':'')+'>T</option><option value="P"'+(xc==='P'?' selected':'')+'>P</option><option value="R"'+(xc==='R'?' selected':'')+'>R (랜덤)</option></select><span id="'+rid+'" class="'+raceMiniClass(xc)+'" title="'+(xc==='R'?'랜덤':xc?('종족 '+xc):'명단·슬롯 기준 자동')+'">'+esc(raceMiniLabel(x))+'</span>';
+}
+function syncRacePills(root){
+ const box=root||document;
+ box.querySelectorAll('select[id$="_r"]').forEach((sel)=>{
+  const pill=document.getElementById(sel.id+'_pill');
+  if(!pill)return;
+  const v=(sel.value||'').trim().toUpperCase();
+  pill.className=raceMiniClass(v);
+  pill.textContent=raceMiniLabel(sel.value);
+  pill.title=v==='R'?'랜덤':v?('종족 '+v):'명단·슬롯 기준 자동';
+ });
+}
+function pSel(pid,tid,slot,side,i,sel,sp){
+ let o='<option value="">— 선수 —</option>';
+ const split=pTeamSplit(tid,sp);
+ const inList=(name)=>split.primary.some((p)=>p.displayName===name)||split.rest.some((p)=>p.displayName===name);
+ if(sel&&sel.trim()&&!inList(sel.trim())){
+  const nm=sel.trim();
+  o+='<option value="'+esc(nm)+'" selected>'+esc(nm)+' (현재 명단에 없음)</option>';
+ }
+ const addOpt=(p)=>{o+='<option value="'+esc(p.displayName)+'"'+(p.displayName===sel?' selected':'')+'>'+esc(p.displayName)+'</option>';};
+ if(!split.useGroups){
+  for(const p of split.primary)addOpt(p);
+ }else{
+  o+='<optgroup label="'+esc(split.slotLabel+' (슬롯 티어)')+'">';
+  for(const p of split.primary)addOpt(p);
+  o+='</optgroup><optgroup label="기타 티어">';
+  for(const p of split.rest)addOpt(p);
+  o+='</optgroup>';
+ }
+ return '<select id="'+pid+'_s'+slot+'_'+side+'_'+i+'_p" class="w-full rounded-md border border-zinc-300 px-2 py-1.5 text-xs">'+o+'</select>';
+}
+function render(){
+ const r=+document.getElementById('selRound').value,mi=+document.getElementById('selMatch').value;
+ const d=rndSorted(r),ph=document.getElementById('slotPlaceholder'),fm=document.getElementById('slotForm');
+ if(!d||!Number.isFinite(mi)||mi<0){ph.classList.remove('hidden');fm.classList.add('hidden');fm.innerHTML='';return;}
+ const m=d.matchups[mi],plan=d.slotPlan||[],tid=m.teamIds,pid=domId(m.id),sv=DRAFT[r]?.[m.id];
+ ph.classList.add('hidden');fm.classList.remove('hidden');
+ const tA=tn(tid[0]),tB=tn(tid[1]);
+ fm.innerHTML=plan.map(sp=>{
+  const n=nFmt(sp.format),ss=sv?.slots?.find(x=>x.slot===sp.slot);
+  const tier=sp.tierLine?sp.tierLine+' · ':'',map=sp.map||'',fmt=sp.format||'';
+  let body='';
+  for(let i=0;i<n;i++){
+   const pa=lineName(ss?.teamA?.[i]),pb=lineName(ss?.teamB?.[i]),ra=ss?.teamA?.[i]?.race??null,rb=ss?.teamB?.[i]?.race??null;
+   body+='<div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2'+(i>0?' pt-2 border-t border-zinc-100':'')+'"><div class="flex flex-wrap items-center gap-2"><span class="text-[10px] font-semibold text-indigo-800 w-16 shrink-0">'+esc(tA)+'</span>'+pSel(pid,tid[0],sp.slot,'a',i,pa,sp)+raceSel(pid,sp.slot,'a',i,ra)+'</div><div class="flex flex-wrap items-center gap-2"><span class="text-[10px] font-semibold text-rose-800 w-16 shrink-0">'+esc(tB)+'</span>'+pSel(pid,tid[1],sp.slot,'b',i,pb,sp)+raceSel(pid,sp.slot,'b',i,rb)+'</div></div>';
+  }
+  const wv=ss?.winnerTeamIndex;
+  return '<div class="rounded-lg border border-zinc-200 p-3 bg-zinc-50/50"><div class="flex flex-wrap gap-2 mb-1"><span class="font-semibold">세트 '+sp.slot+'</span><span class="text-[11px] text-zinc-500">'+esc(tier)+esc(map)+' · '+esc(fmt)+'</span></div>'+body+'<div class="mt-3 flex flex-wrap gap-3 text-xs items-center"><span class="text-zinc-500">승자</span><label class="inline-flex gap-1 cursor-pointer"><input type="radio" name="'+pid+'_w'+sp.slot+'" value=""'+(wv==null?' checked':'')+'/><span>미정</span></label><label class="inline-flex gap-1 cursor-pointer"><input type="radio" name="'+pid+'_w'+sp.slot+'" value="1"'+(wv===1?' checked':'')+'/><span>'+esc(tA)+'</span></label><label class="inline-flex gap-1 cursor-pointer"><input type="radio" name="'+pid+'_w'+sp.slot+'" value="2"'+(wv===2?' checked':'')+'/><span>'+esc(tB)+'</span></label></div></div>';
+ }).join('');
+ syncRacePills(fm);
+ document.getElementById('btnSaveMatch').disabled=false;
+ document.getElementById('btnDlMatch').disabled=false;
+ document.getElementById('btnDlRound').disabled=false;
+}
+function readMu(r,mi){
+ const d=rndSorted(r),m=d.matchups[mi],plan=d.slotPlan||[],pid=domId(m.id),tid=m.teamIds,slots=[];
+ for(const sp of plan){
+  const n=nFmt(sp.format),teamA=[],teamB=[];
+  for(let i=0;i<n;i++){
+   teamA.push({displayName:(document.getElementById(pid+'_s'+sp.slot+'_a_'+i+'_p')?.value||'').trim(),race:(document.getElementById(pid+'_s'+sp.slot+'_a_'+i+'_r')?.value||'')||null});
+   teamB.push({displayName:(document.getElementById(pid+'_s'+sp.slot+'_b_'+i+'_p')?.value||'').trim(),race:(document.getElementById(pid+'_s'+sp.slot+'_b_'+i+'_r')?.value||'')||null});
+  }
+  const rad=document.querySelector('input[name="'+pid+'_w'+sp.slot+'"]:checked');
+  const wr=rad?rad.value:'';
+  const winnerTeamIndex=wr===''||wr===undefined?null:+wr;
+  slots.push({slot:sp.slot,winnerTeamIndex,teamA,teamB});
+ }
+ for(const sp of plan){
+  const s=slots.find(x=>x.slot===sp.slot),n=nFmt(sp.format);
+  const cA=s.teamA.filter(x=>lineName(x)).length,cB=s.teamB.filter(x=>lineName(x)).length,any=cA>0||cB>0;
+  if(s.winnerTeamIndex!=null&&(cA!==n||cB!==n))throw new Error('세트 '+sp.slot+': 승자 선택 시 양 팀 '+n+'명 필요');
+  if(any&&(cA!==n||cB!==n))throw new Error('세트 '+sp.slot+': 양 팀 '+n+'명');
+  if(any&&s.winnerTeamIndex==null)throw new Error('세트 '+sp.slot+': 승자 선택');
+ }
+ for(const s of slots)for(const side of ['teamA','teamB']){
+  const arr=s[side],ti=side==='teamA'?0:1,ex=tid[ti];
+  for(const c of arr){const nm=lineName(c);if(!nm)continue;const pl=DATA.players.find(p=>p.displayName===nm);if(!pl)throw new Error('세트 '+s.slot+': 등록되지 않은 이름: '+nm);if(pl.teamId!==ex)throw new Error('세트 '+s.slot+': '+pl.displayName+' 팀 불일치');}
+ }
+ return{fixtureId:m.id,series:{winnerTeamIndex:seriesW(slots),setScoreTeamA:null,setScoreTeamB:null,decidedBy:'sets',notes:''},playedOrder:null,slots};
+}
+function dl(name,obj){const b=new Blob([JSON.stringify(obj,null,2)],{type:'application/json;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;a.click();URL.revokeObjectURL(a.href);}
+function fillMatch(){
+ const r=+document.getElementById('selRound').value,sm=document.getElementById('selMatch'),d=rndSorted(r);
+ sm.innerHTML='';
+ if(!d)return;
+ (d.matchups||[]).forEach((m,i)=>{const o=document.createElement('option');o.value=String(i);o.textContent=tn(m.teamIds[0])+' vs '+tn(m.teamIds[1])+' ('+m.id+')';sm.appendChild(o);});
+ if(sm.options.length)sm.selectedIndex=0;
+}
+function jsonDirCandidates(){
+ const pageDir=new URL('.',window.location.href);
+ const list=[];
+ const ss=sessionStorage.getItem('s11-json-dir');
+ if(ss&&ss.trim())list.push(ss.trim());
+ const meta=document.querySelector('meta[name="s11-json-dir"]')?.getAttribute('content')?.trim();
+ if(meta)list.push(meta);
+ list.push('../');
+ const seen=new Set(),out=[];
+ for(const spec of list){
+  let u;
+  try{u=spec.startsWith('/')?new URL(spec,window.location.origin):new URL(spec,pageDir);}catch(_){continue;}
+  let h=u.href;
+  if(!h.endsWith('/'))h+='/';
+  if(seen.has(h))continue;
+  seen.add(h);out.push(h);
+ }
+ return out;
+}
+async function loadJsonFromRoot(rootHref,file){
+ const res=await fetch(new URL(file,rootHref));
+ if(!res.ok)throw new Error(file+' '+res.status);
+ return res.json();
+}
+async function loadS11Data(){
+ const attempts=[];
+ for(const root of jsonDirCandidates()){
+  try{
+   const fixtures=await loadJsonFromRoot(root,'fixtures.json');
+   const meta=await loadJsonFromRoot(root,'meta.json');
+   const pw=await loadJsonFromRoot(root,'players.json');
+   return{fixtures,meta,players:pw.players||[],root};
+  }catch(e){attempts.push(root+' '+e.message);}
+ }
+ throw new Error('fixtures.json 을 찾지 못했습니다.\n시도:\n'+attempts.join('\n'));
+}
+document.addEventListener('DOMContentLoaded',()=>{
+ const selRound=document.getElementById('selRound');
+ const selMatch=document.getElementById('selMatch');
+ const loadErrEl=document.getElementById('loadErr');
+ function showLoadErr(msg){loadErrEl.textContent=msg;loadErrEl.classList.remove('hidden');}
+ function wireControls(){
+  selRound.addEventListener('change',()=>{fillMatch();bar();render();});
+  selMatch.addEventListener('change',render);
+ }
+ wireControls();
+ document.getElementById('slotForm').addEventListener('change',(e)=>{const t=e.target;if(t&&t.id&&t.id.endsWith('_r'))syncRacePills(t.closest('#slotForm')||document.getElementById('slotForm'));});
+ document.getElementById('btnSaveMatch').addEventListener('click',()=>{
+   try{const r=+document.getElementById('selRound').value,mi=+document.getElementById('selMatch').value,mu=readMu(r,mi);
+    if(!DRAFT[r])DRAFT[r]={};DRAFT[r][mu.fixtureId]=mu;saveLS();bar();document.getElementById('msg').textContent='브라우저 초안에 저장됨: '+mu.fixtureId+' (이 PC·이 브라우저만). 파일로 내려받으려면 「이 대전만 JSON」 또는 라운드 합본 「round-NN.json」을 누르세요.';document.getElementById('msg').className='mt-2 text-xs text-emerald-700';
+   }catch(e){document.getElementById('msg').textContent=e.message||String(e);document.getElementById('msg').className='mt-2 text-xs text-red-600';}
+  });
+  document.getElementById('btnDlMatch').addEventListener('click',()=>{
+   try{const r=+document.getElementById('selRound').value,mi=+document.getElementById('selMatch').value,mu=readMu(r,mi);
+    dl(mu.fixtureId+'.json',{schemaVersion:1,season:11,phase:DATA.fixtures.phase||'first_half',round:r,recordedAt:document.getElementById('inpDate').value||'',author:(document.getElementById('inpAuthor').value||'').trim(),notes:'match-input',matchups:[mu]});
+    document.getElementById('msg').textContent='다운로드 폴더에 저장됨 — 필요하면 '+mu.fixtureId+' 를 data/s11/results/ 로 옮기세요.';document.getElementById('msg').className='mt-2 text-xs text-emerald-700';
+   }catch(e){document.getElementById('msg').textContent=e.message||String(e);document.getElementById('msg').className='mt-2 text-xs text-red-600';}
+  });
+  document.getElementById('btnDlRound').addEventListener('click',()=>{
+   const r=+document.getElementById('selRound').value,d=rndSorted(r),ids=(d.matchups||[]).map(m=>m.id),miss=ids.filter(id=>!DRAFT[r]?.[id]);
+   if(miss.length&&!confirm('미저장 대전 '+miss.join(', ')+' — 빈 슬롯으로 합본할까요?'))return;
+   const mus=ids.map(id=>{
+    const x=DRAFT[r]?.[id];
+    if(x)return x;
+    const mm=d.matchups.find(m=>m.id===id);
+    return emptyMu(id,mm.teamIds,d.slotPlan);
+   });
+   dl('round-'+String(r).padStart(2,'0')+'.json',{schemaVersion:1,season:11,phase:DATA.fixtures.phase||'first_half',round:r,recordedAt:document.getElementById('inpDate').value||'',author:(document.getElementById('inpAuthor').value||'').trim(),notes:'match-input',matchups:mus});
+   document.getElementById('msg').textContent='round-'+String(r).padStart(2,'0')+'.json 이 다운로드됨 — data/s11/results/ 에 복사하면 레포에 반영할 수 있습니다.';document.getElementById('msg').className='mt-2 text-xs text-emerald-700';
+  });
+  document.getElementById('btnClearRound').addEventListener('click',()=>{
+   const r=+selRound.value;if(confirm('라운드 '+r+' 메모리 삭제?')){delete DRAFT[r];saveLS();bar();render();}
+  });
+ (async()=>{
+ try{
+  if(location.protocol==='file:'){
+   showLoadErr('JSON을 불러올 수 없습니다.');
+   return;
+  }
+  const bundle=await loadS11Data();
+  DATA.fixtures=bundle.fixtures;DATA.meta=bundle.meta;DATA.players=bundle.players;
+  if(typeof console!=='undefined')console.info('[match-input] JSON 루트:',bundle.root);
+  loadLS();
+  selRound.innerHTML=(bundle.fixtures.rounds||[]).map((x)=>'<option value="'+x.round+'">'+x.round+'라운드</option>').join('');
+  document.getElementById('inpDate').value=new Date().toISOString().slice(0,10);
+  selRound.disabled=false;
+  selMatch.disabled=false;
+  fillMatch();bar();render();
+ }catch(e){console.error(e);showLoadErr('로드 실패: '+e.message);}
+ })();
+});
+  </script>
+</body>
+</html>

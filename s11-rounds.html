@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>멸망전 시즌11 · 라운드별 결과</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="s11-site-header.css" />
+  <style>
+    body { font-family: Inter, sans-serif; }
+    .race-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.125rem;
+      height: 1.125rem;
+      border-radius: 9999px;
+      font-size: 0.5rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #fff;
+      flex-shrink: 0;
+      line-height: 1;
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35) inset;
+    }
+    .race-pill-Z { background: linear-gradient(145deg, #be123c, #881337); }
+    .race-pill-T { background: linear-gradient(145deg, #0369a1, #0c4a6e); }
+    .race-pill-P { background: linear-gradient(145deg, #ca8a04, #854d0e); }
+    .race-pill-R {
+      background: linear-gradient(145deg, #57534e, #292524);
+      font-size: 0.48rem;
+    }
+    .race-pill-? { background: linear-gradient(145deg, #71717a, #3f3f46); font-size: 0.45rem; }
+    .sub-tab {
+      color: #52525b;
+      border: 1px solid transparent;
+      transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+    }
+    .sub-tab:hover {
+      background: rgba(255, 255, 255, 0.9);
+      border-color: #e4e4e7;
+    }
+    .sub-tab.active {
+      background: linear-gradient(165deg, #4f46e5 0%, #4338ca 100%);
+      color: #fff;
+      font-weight: 600;
+      border-color: #4338ca;
+      box-shadow: 0 1px 2px rgba(67, 56, 202, 0.25);
+    }
+    .round-pane.hidden { display: none; }
+    .round-team-logo-frame {
+      position: relative;
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 0.4rem;
+      overflow: hidden;
+      flex-shrink: 0;
+      background: linear-gradient(180deg, #fafafa 0%, #f4f4f5 100%);
+      border: 1px solid #e4e4e7;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+    @media (min-width: 640px) {
+      .round-team-logo-frame {
+        width: 2.875rem;
+        height: 2.875rem;
+      }
+    }
+    .round-team-logo-img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center center;
+    }
+    .round-team-logo-fallback {
+      font-size: 0.5625rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      color: #52525b;
+    }
+  </style>
+</head>
+<body class="bg-zinc-100 text-zinc-800 min-h-screen text-sm antialiased">
+  <div class="max-w-6xl mx-auto px-4 py-8">
+    <header class="s11-site-header" role="banner">
+      <div class="s11-site-header-accent" aria-hidden="true"></div>
+      <div class="s11-site-header-panel">
+        <div class="s11-site-header-body">
+          <div class="s11-site-header-top">
+            <div class="s11-site-header-brand">
+              <div class="lg-craft-lockup lg-craft-lockup--hero" title="LG Craft">
+                <img src="LG_symbol.svg.png" alt="" class="lg-craft-hero-img mx-auto w-auto max-w-full object-contain" decoding="async" />
+                <div class="lg-craft-wordmark" lang="en"><span class="lg-red">LG</span> Craft</div>
+              </div>
+            </div>
+            <div class="s11-site-header-series" aria-label="멸망전 시즌 11">
+              <span class="s11-site-header-series-ko" lang="ko">멸망전</span>
+              <span class="s11-site-header-series-en" lang="en">Season 11</span>
+            </div>
+          </div>
+          <h1 class="s11-site-header-page-title">라운드별 결과</h1>
+        </div>
+      </div>
+    </header>
+    <nav class="s11-site-nav mb-8 border-b border-zinc-200 pb-3" aria-label="시즌11">
+      <a href="index.html" class="s11-site-nav-link">팀 순위 및 경기 일정</a>
+      <a href="s11-roster.html" class="s11-site-nav-link">로스터</a>
+      <span class="s11-site-nav-current">라운드 결과</span>
+      <a href="s11-players.html" class="s11-site-nav-link">선수 기록</a>
+      <a href="s11-stats.html" class="s11-site-nav-link">통계 차트</a>
+    </nav>
+
+    <div id="loading" class="rounded-xl border border-zinc-200 bg-white p-10 text-center text-zinc-500 shadow-sm">불러오는 중…</div>
+    <div id="main" class="hidden rounded-xl border border-zinc-200 bg-white p-4 sm:p-6 shadow-sm">
+      <div id="roundTabs" class="mb-4 flex flex-wrap gap-1 border-b border-zinc-200 pb-2"></div>
+      <div id="roundPanes"></div>
+    </div>
+  </div>
+
+  <script>
+    async function loadJson(path) {
+      const res = await fetch(path);
+      if (!res.ok) throw new Error(path + ' ' + res.status);
+      return res.json();
+    }
+
+    async function loadRoundResultDoc(roundNum) {
+      const p = String(roundNum).padStart(2, '0');
+      const urls = [`data/s11/results/round-${p}.json`, `data/s11/results/round-${p}.sample.json`];
+      for (const url of urls) {
+        const res = await fetch(url, { cache: 'no-store' });
+        if (res.ok) return res.json();
+      }
+      return null;
+    }
+
+    async function fetchPerMatchResultDoc(fixtureId) {
+      const url = `data/s11/results/${fixtureId}.json`;
+      const res = await fetch(url, { cache: 'no-store' });
+      if (!res.ok) return null;
+      return res.json();
+    }
+
+    function matchupFromPerMatchDoc(doc, fixtureId) {
+      if (!doc || !Array.isArray(doc.matchups)) return null;
+      return doc.matchups.find((x) => x.fixtureId === fixtureId) || null;
+    }
+
+    /** `s11-rNN-mM.json` 한 대전 파일이 있으면 합본(round-NN)의 동일 fixtureId 를 덮어씁니다. */
+    async function mergePerMatchOverlaysIntoRoundDoc(baseDoc, roundNum, fixtures) {
+      const rd = (fixtures.rounds || []).find((x) => x.round === roundNum);
+      const fixtureIds = (rd && rd.matchups ? rd.matchups.map((m) => m.id).filter(Boolean) : []) || [];
+      const overlays = new Map();
+      await Promise.all(
+        fixtureIds.map(async (fid) => {
+          const pm = await fetchPerMatchResultDoc(fid);
+          const mu = matchupFromPerMatchDoc(pm, fid);
+          if (mu) overlays.set(fid, mu);
+        }),
+      );
+      if (!overlays.size && !baseDoc) return null;
+
+      const out = baseDoc
+        ? JSON.parse(JSON.stringify(baseDoc))
+        : {
+            schemaVersion: 1,
+            season: 11,
+            phase: fixtures.phase || 'first_half',
+            round: roundNum,
+            recordedAt: '',
+            author: '',
+            notes: '',
+            matchups: [],
+          };
+      if (!Array.isArray(out.matchups)) out.matchups = [];
+
+      if (baseDoc) {
+        for (const [fid, mu] of overlays) {
+          const idx = out.matchups.findIndex((x) => x.fixtureId === fid);
+          if (idx >= 0) out.matchups[idx] = mu;
+          else out.matchups.push(mu);
+        }
+      } else {
+        const ordered = [];
+        for (const fid of fixtureIds) {
+          const mu = overlays.get(fid);
+          if (mu) ordered.push(mu);
+        }
+        out.matchups = ordered;
+      }
+      return out;
+    }
+
+    async function loadRoundResultDocMerged(roundNum, fixtures) {
+      const base = await loadRoundResultDoc(roundNum);
+      return mergePerMatchOverlaysIntoRoundDoc(base, roundNum, fixtures);
+    }
+
+    async function loadAllRoundResults(maxRound, fixtures) {
+      const docs = [];
+      for (let r = 1; r <= maxRound; r++) {
+        const doc = await loadRoundResultDocMerged(r, fixtures);
+        if (doc) docs.push(doc);
+      }
+      return docs;
+    }
+
+    function escapeHtml(s) {
+      if (s == null) return '';
+      return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function teamName(meta, id) {
+      const t = meta.teams.find((x) => x.id === id);
+      return t ? t.name : id;
+    }
+
+    function teamMeta(meta, id) {
+      return (meta.teams || []).find((x) => x.id === id) || null;
+    }
+
+    const TEAM_LOGO_SRC = {
+      t1: 's11_1.jpg',
+      t2: 's11_2.jpg',
+      t3: 's11_3.png',
+      t4: 's11_4.png',
+      t5: 's11_5.png',
+      t6: 's11_6.jpg',
+    };
+
+    function teamLogoSrc(teamId) {
+      if (!teamId) return '';
+      return TEAM_LOGO_SRC[teamId] || '';
+    }
+
+    function formatRoundTeamLogo(teamId, t) {
+      const src = teamLogoSrc(teamId);
+      if (!src) return '';
+      const short = (t?.short && String(t.short).trim()) || (t?.name && String(t.name).slice(0, 2)) || '?';
+      const title = escapeHtml(t?.name || teamId || '');
+      return `<span class="round-team-logo-frame relative inline-flex items-center justify-center" title="${title}">
+        <img src="${escapeHtml(src)}" alt="" class="round-team-logo-img" decoding="async" onerror="this.classList.add('hidden'); this.nextElementSibling.classList.remove('hidden')" />
+        <span class="round-team-logo-fallback hidden absolute inset-0 flex items-center justify-center bg-zinc-200">${escapeHtml(short)}</span>
+      </span>`;
+    }
+
+    function formatTeamMatchupHeader(meta, teamId, align, nameCls) {
+      const t = teamMeta(meta, teamId);
+      const name = escapeHtml(t ? t.name : teamId);
+      const short = t?.short && String(t.short).trim();
+      const shortHtml = short
+        ? ` <span class="text-[11px] sm:text-xs font-semibold text-indigo-700/85 tracking-tight">(${escapeHtml(short)})</span>`
+        : '';
+      const logo = formatRoundTeamLogo(teamId, t);
+      const label = `<div class="min-w-0 ${nameCls} text-sm sm:text-base leading-snug break-words"><span>${name}</span>${shortHtml}</div>`;
+      if (align === 'end') {
+        return `<div class="flex items-center justify-end gap-2 min-w-0">${label}${logo}</div>`;
+      }
+      return `<div class="flex items-center justify-start gap-2 min-w-0">${logo}${label}</div>`;
+    }
+
+    function raceKo(letter) {
+      const c = letter && String(letter).toUpperCase().charAt(0);
+      const m = { Z: '저그', T: '테란', P: '토스', R: '랜덤' };
+      return m[c] || '';
+    }
+
+    /** 칩 왼쪽 액센트만 종족색 (배경은 흰색 유지) */
+    function raceAccentBorder(letter) {
+      const c = letter && String(letter).toUpperCase().charAt(0);
+      if (c === 'Z') return 'border-l-rose-500';
+      if (c === 'T') return 'border-l-sky-600';
+      if (c === 'P') return 'border-l-amber-500';
+      if (c === 'R') return 'border-l-stone-500';
+      return 'border-l-zinc-300';
+    }
+
+    function racePillClass(letter) {
+      const c = letter && String(letter).toUpperCase().charAt(0);
+      if (c === 'Z') return 'race-pill race-pill-Z';
+      if (c === 'T') return 'race-pill race-pill-T';
+      if (c === 'P') return 'race-pill race-pill-P';
+      if (c === 'R') return 'race-pill race-pill-R';
+      return 'race-pill race-pill-?';
+    }
+
+    function racePill(letter) {
+      const c = letter && String(letter).toUpperCase().charAt(0);
+      const lab = c === 'Z' || c === 'T' || c === 'P' || c === 'R' ? c : '?';
+      const tip = raceKo(lab === '?' ? '' : lab) || (lab === '?' ? '미등록' : lab);
+      return `<span class="${racePillClass(c)}" title="${escapeHtml(tip)}">${lab}</span>`;
+    }
+
+    function slotPlanBySlot(roundDef) {
+      const m = new Map();
+      for (const s of roundDef.slotPlan || []) m.set(s.slot, s);
+      return m;
+    }
+
+    function resultMatchupByFixtureId(doc, fixtureId) {
+      if (!doc || !doc.matchups) return null;
+      return doc.matchups.find((x) => x.fixtureId === fixtureId) || null;
+    }
+
+    function countSlotWins(slots) {
+      let a = 0;
+      let b = 0;
+      for (const sl of slots || []) {
+        if (sl.winnerTeamIndex === 1) a++;
+        else if (sl.winnerTeamIndex === 2) b++;
+      }
+      return [a, b];
+    }
+
+    /** 표시용 세트 스코어: series에 점수 있으면 우선, 없으면 슬롯 집계 */
+    function displayedSetScores(resMu) {
+      const s = resMu && resMu.series;
+      const [ca, cb] = countSlotWins(resMu && resMu.slots);
+      if (s && s.setScoreTeamA != null && s.setScoreTeamB != null) {
+        const na = Number(s.setScoreTeamA);
+        const nb = Number(s.setScoreTeamB);
+        if (!Number.isNaN(na) && !Number.isNaN(nb)) return [na, nb];
+      }
+      return [ca, cb];
+    }
+
+    function rosterByDisplayName(players) {
+      const m = new Map();
+      for (const p of players || []) {
+        const dn = (p.displayName || '').trim();
+        if (dn) m.set(dn, p);
+      }
+      return m;
+    }
+
+    /** JSON race 없을 때 players.json 메인 종족 */
+    function resolvedRaceLetter(row, rosterMap) {
+      const raw = row?.race && String(row.race).trim().toUpperCase();
+      if (raw) {
+        const c = raw.charAt(0);
+        if (c === 'Z' || c === 'T' || c === 'P' || c === 'R') return c;
+      }
+      const p = rosterMap.get((row.displayName || '').trim());
+      const letter = String((p && (p.tierSheetMainRace || p.raceDefault)) || '')
+        .trim()
+        .toUpperCase()
+        .charAt(0);
+      if (letter === 'Z' || letter === 'T' || letter === 'P' || letter === 'R') return letter;
+      return '';
+    }
+
+    /** 선수 칩: 이름 한 줄 · ID는 아래 작게 (종족은 왼쪽 컬러 바만) */
+    function slotPlayerCompact(row, rosterMap, align) {
+      const dn = (row.displayName || '').trim();
+      if (!dn) return '';
+      const p = rosterMap.get(dn);
+      const letter = resolvedRaceLetter(row, rosterMap);
+      const bgLetter = letter || (p && String(p.tierSheetMainRace || p.raceDefault || '').toUpperCase().charAt(0)) || '';
+      const accent = raceAccentBorder(bgLetter);
+      const colAlign = align === 'end' ? 'items-end text-right' : 'items-start text-left';
+      const pid = (p && p.id) || '';
+      const pidEsc = escapeHtml(pid);
+      const capMark = p && p.isCaptain ? '<span class="text-amber-500 text-[10px] font-bold" title="팀장">★</span>' : '';
+      const tip = [raceKo(letter), dn].filter(Boolean).join(' · ');
+      const idAlign = align === 'end' ? 'text-right' : 'text-left';
+      const idLine = pid
+        ? `<span class="text-[10px] font-mono text-zinc-400 tabular-nums tracking-tight max-w-full truncate block w-full ${idAlign}">${pidEsc}</span>`
+        : `<span class="text-[10px] text-zinc-300 w-full ${idAlign}">—</span>`;
+      const rowJustify = align === 'end' ? 'justify-end' : 'justify-start';
+      return `<div class="inline-flex flex-col gap-0.5 min-w-0 max-w-[14rem] rounded-lg border border-zinc-200/70 bg-white/95 px-2 py-1.5 shadow-sm ${accent} border-l-[3px] ${colAlign}" title="${escapeHtml(tip)}">
+        <div class="flex ${rowJustify} items-center gap-1.5 min-w-0 w-full">
+          ${racePill(letter)}
+          <span class="text-xs font-semibold text-zinc-900 truncate">${escapeHtml(dn)}</span>${capMark}
+        </div>
+        ${idLine}
+      </div>`;
+    }
+
+    function formatRoster(rows, rosterMap, align) {
+      const list = (rows || []).filter((r) => (r.displayName || '').trim());
+      if (!list.length) return '<span class="text-zinc-400 text-xs">—</span>';
+      const justify = align === 'end' ? 'justify-end' : 'justify-start';
+      const items = list.map((r) => slotPlayerCompact(r, rosterMap, align)).join('');
+      return `<div class="flex flex-wrap gap-2 ${justify}">${items}</div>`;
+    }
+
+    function formatChip(format) {
+      if (format === '1v1') return '<span class="inline-flex rounded-full bg-sky-100/90 text-sky-800 px-2 py-0.5 text-[10px] font-semibold leading-none ring-1 ring-inset ring-sky-200/60">1:1</span>';
+      if (format === '2v2') return '<span class="inline-flex rounded-full bg-fuchsia-50 text-fuchsia-800 px-2 py-0.5 text-[10px] font-semibold leading-none ring-1 ring-inset ring-fuchsia-200/50">2:2</span>';
+      if (format === '3v3') return '<span class="inline-flex rounded-full bg-violet-50 text-violet-800 px-2 py-0.5 text-[10px] font-semibold leading-none ring-1 ring-inset ring-violet-200/50">3:3</span>';
+      return `<span class="inline-flex rounded-full bg-zinc-100 text-zinc-700 px-2 py-0.5 text-[10px] font-semibold leading-none ring-1 ring-inset ring-zinc-200/70">${escapeHtml(format || '—')}</span>`;
+    }
+
+    /** 세트 가운데: 맵·승자 한 덩어리 */
+    function slotCenterBlock(plan, w, nameA, nameB) {
+      if (!plan) return '—';
+      const slotNum = plan.slot != null ? plan.slot : '—';
+      const tierPart = plan.tierLine
+        ? `<span class="text-zinc-300">·</span><span class="text-zinc-500 font-normal">${escapeHtml(plan.tierLine)}</span>`
+        : '';
+      const top = `<div class="flex flex-wrap items-center justify-center gap-x-1 text-[10px] text-zinc-500 leading-none">
+        <span class="font-bold text-indigo-600/90 tabular-nums">#${slotNum}</span>
+        <span class="text-zinc-200 select-none">|</span>
+        ${formatChip(plan.format)}${tierPart}
+      </div>`;
+      const mapName = plan.map ? escapeHtml(plan.map) : '—';
+      const mapEl = `<div class="mt-1 text-[11px] font-semibold text-zinc-700 leading-snug tracking-tight">${mapName}</div>`;
+      let winEl = '';
+      if (w == null) {
+        winEl = '<div class="mt-1 text-[10px] text-zinc-400">미정</div>';
+      } else if (w === 1) {
+        winEl = `<div class="mt-1 text-[10px] font-medium text-emerald-700 leading-snug truncate max-w-full">${escapeHtml(nameA)}</div>`;
+      } else {
+        winEl = `<div class="mt-1 text-[10px] font-medium text-emerald-700 leading-snug truncate max-w-full">${escapeHtml(nameB)}</div>`;
+      }
+      return top + mapEl + winEl;
+    }
+
+    function renderMatchupCard(meta, fixMu, planBySlot, planSlotOrder, resMu, hasRoundDoc, rosterMap) {
+      const [tA, tB] = fixMu.teamIds || [];
+      const nameA = teamName(meta, tA);
+      const nameB = teamName(meta, tB);
+      const slotsRes = resMu && resMu.slots ? [...resMu.slots].sort((a, b) => (a.slot || 0) - (b.slot || 0)) : [];
+      const [cntA, cntB] = resMu ? countSlotWins(slotsRes) : [0, 0];
+      const [dispA, dispB] = resMu ? displayedSetScores(resMu) : [0, 0];
+      const sw = resMu && resMu.series && resMu.series.winnerTeamIndex;
+      const scoreA = !resMu ? '—' : String(dispA);
+      const scoreB = !resMu ? '—' : String(dispB);
+
+      let nameAcls = 'text-indigo-950 font-bold';
+      let nameBcls = 'text-indigo-950 font-bold';
+      let scoreAcls = 'text-zinc-800';
+      let scoreBcls = 'text-zinc-800';
+      if (!resMu) {
+        nameAcls = nameBcls = 'text-zinc-500 font-semibold';
+        scoreAcls = scoreBcls = 'text-zinc-400';
+      } else if (sw === 1) {
+        nameAcls = 'text-emerald-700 font-extrabold';
+        nameBcls = 'text-zinc-500 font-semibold';
+        scoreAcls = 'text-emerald-600 font-black';
+        scoreBcls = 'text-zinc-400';
+      } else if (sw === 2) {
+        nameBcls = 'text-emerald-700 font-extrabold';
+        nameAcls = 'text-zinc-500 font-semibold';
+        scoreBcls = 'text-emerald-600 font-black';
+        scoreAcls = 'text-zinc-400';
+      } else if (dispA > dispB) {
+        nameAcls = 'text-zinc-900 font-extrabold';
+        nameBcls = 'text-zinc-500 font-medium';
+        scoreAcls = 'text-emerald-600 font-black';
+        scoreBcls = 'text-zinc-500';
+      } else if (dispB > dispA) {
+        nameBcls = 'text-zinc-900 font-extrabold';
+        nameAcls = 'text-zinc-500 font-medium';
+        scoreBcls = 'text-emerald-600 font-black';
+        scoreAcls = 'text-zinc-500';
+      }
+
+      const teamAHtml = formatTeamMatchupHeader(meta, tA, 'end', nameAcls);
+      const teamBHtml = formatTeamMatchupHeader(meta, tB, 'start', nameBcls);
+
+      let seriesNote = '';
+      if (sw === 1 || sw === 2) {
+        seriesNote = '';
+      } else if (resMu && (cntA > 0 || cntB > 0)) {
+        seriesNote = '<span class="text-[10px] text-amber-700/90">시리즈 승 미기재</span>';
+      } else if (!hasRoundDoc) {
+        seriesNote = '';
+      } else if (!resMu) {
+        seriesNote = '<span class="text-[10px] font-medium text-amber-800">대전 미입력</span>';
+      } else {
+        seriesNote = '<span class="text-[10px] text-zinc-400">결과 대기</span>';
+      }
+      const showMetaRow = Boolean(seriesNote);
+
+      const order = planSlotOrder && planSlotOrder.length ? planSlotOrder : [...planBySlot.keys()].sort((a, b) => a - b);
+      const orderedPlans = order.map((slot) => planBySlot.get(slot)).filter(Boolean);
+      const slotRows = [];
+      for (const plan of orderedPlans) {
+        const sl = resMu && slotsRes.find((x) => x.slot === plan.slot);
+        const w = sl && sl.winnerTeamIndex;
+        const t1Win = w === 1 ? 'bg-emerald-50/90 border-r-[4px] border-r-emerald-500' : 'bg-zinc-50/40';
+        const t2Win = w === 2 ? 'bg-emerald-50/90 border-l-[4px] border-l-emerald-500' : 'bg-zinc-50/40';
+        const centerHtml = slotCenterBlock(plan, w, nameA, nameB);
+        slotRows.push(`
+          <div class="grid grid-cols-1 sm:grid-cols-12 gap-0 items-stretch rounded-xl border border-zinc-200/50 bg-white shadow-sm overflow-hidden ring-1 ring-zinc-900/[0.03]">
+            <div class="sm:col-span-5 px-3 py-2.5 text-right ${t1Win} border-b sm:border-b-0 sm:border-r border-zinc-100">
+              <div class="w-full">${formatRoster(sl ? sl.teamA : null, rosterMap, 'end')}</div>
+            </div>
+            <div class="sm:col-span-2 px-2 py-2 flex flex-col items-center justify-center bg-zinc-50/90 border-y sm:border-y-0 sm:border-x border-zinc-100/90 text-center min-w-0">
+              ${centerHtml}
+            </div>
+            <div class="sm:col-span-5 px-3 py-2.5 text-left ${t2Win}">
+              <div class="w-full">${formatRoster(sl ? sl.teamB : null, rosterMap, 'start')}</div>
+            </div>
+          </div>`);
+      }
+
+      return `
+        <article class="rounded-2xl border border-zinc-200/60 bg-white shadow-sm shadow-zinc-900/5 overflow-hidden mb-4 ring-1 ring-zinc-900/[0.04]" title="${escapeHtml(fixMu.id)}">
+          <div class="px-4 py-3 sm:px-5 sm:py-4 bg-gradient-to-b from-zinc-50/80 to-white border-b border-zinc-100/90">
+            <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-3 sm:gap-6">
+              <div class="text-right min-w-0">
+                ${teamAHtml}
+              </div>
+              <div class="flex flex-col items-center shrink-0 px-1">
+                <div class="text-2xl sm:text-3xl font-black tabular-nums leading-none tracking-tight text-zinc-900">
+                  <span class="${scoreAcls}">${escapeHtml(scoreA)}</span><span class="text-zinc-300 mx-0.5 sm:mx-1 font-light">:</span><span class="${scoreBcls}">${escapeHtml(scoreB)}</span>
+                </div>
+                <div class="text-[10px] text-zinc-400 mt-1.5 font-medium tracking-wide">세트</div>
+              </div>
+              <div class="text-left min-w-0">
+                ${teamBHtml}
+              </div>
+            </div>
+          </div>
+          ${showMetaRow ? `<div class="px-4 py-1.5 border-b border-zinc-100 bg-amber-50/40 text-right text-xs">${seriesNote}</div>` : ''}
+          <div class="p-2.5 space-y-2">${slotRows.join('')}</div>
+        </article>`;
+    }
+
+    function renderRoundPane(meta, fr, doc, isFirst, rosterMap) {
+      const planBySlot = slotPlanBySlot(fr);
+      const planSlotOrder = [...planBySlot.keys()].sort((a, b) => a - b);
+      const metaLine = '';
+
+      const cards = (fr.matchups || [])
+        .map((m) => {
+          const resMu = resultMatchupByFixtureId(doc, m.id);
+          return renderMatchupCard(meta, m, planBySlot, planSlotOrder, resMu, !!doc, rosterMap);
+        })
+        .join('');
+
+      return `
+        <section class="round-pane ${isFirst ? '' : 'hidden'}" id="round-pane-${fr.round}" data-round="${fr.round}">
+          <h2 class="text-lg font-semibold text-zinc-900 mb-0.5 tracking-tight">${fr.round}라운드</h2>
+          ${metaLine}
+          ${cards || '<p class="text-zinc-400 text-sm">대전 정보가 없습니다.</p>'}
+        </section>`;
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      const loading = document.getElementById('loading');
+      const main = document.getElementById('main');
+      const tabsEl = document.getElementById('roundTabs');
+      const panesEl = document.getElementById('roundPanes');
+
+      try {
+        const [meta, fixtures, playersData] = await Promise.all([
+          loadJson('data/s11/meta.json'),
+          loadJson('data/s11/fixtures.json'),
+          loadJson('data/s11/players.json'),
+        ]);
+        const rosterMap = rosterByDisplayName(playersData.players || []);
+        const maxR = Math.max(10, ...(fixtures.rounds || []).map((r) => r.round || 0));
+        const roundDocs = await loadAllRoundResults(maxR, fixtures);
+        const docByRound = new Map();
+        for (const d of roundDocs) {
+          if (d.round != null) docByRound.set(d.round, d);
+        }
+
+        const rounds = [...(fixtures.rounds || [])].sort((a, b) => (a.round || 0) - (b.round || 0));
+        if (!rounds.length) throw new Error('fixtures.json에 rounds가 없습니다.');
+
+        tabsEl.className = 'mb-5 flex flex-wrap gap-1 p-1 rounded-xl bg-zinc-200/35 border border-zinc-200/60';
+        tabsEl.innerHTML = rounds
+          .map(
+            (r, i) =>
+              `<button type="button" data-round="${r.round}" class="sub-tab py-2 px-3.5 text-sm rounded-lg ${i === 0 ? 'active' : ''}">${r.round}라운드</button>`,
+          )
+          .join('');
+
+        panesEl.innerHTML = rounds.map((fr, i) => renderRoundPane(meta, fr, docByRound.get(fr.round), i === 0, rosterMap)).join('');
+
+        tabsEl.querySelectorAll('.sub-tab').forEach((tab) => {
+          tab.addEventListener('click', () => {
+            const r = tab.dataset.round;
+            tabsEl.querySelectorAll('.sub-tab').forEach((t) => t.classList.remove('active'));
+            panesEl.querySelectorAll('.round-pane').forEach((p) => p.classList.add('hidden'));
+            tab.classList.add('active');
+            const pane = panesEl.querySelector(`#round-pane-${r}`);
+            if (pane) pane.classList.remove('hidden');
+          });
+        });
+
+        loading.classList.add('hidden');
+        main.classList.remove('hidden');
+      } catch (e) {
+        console.error(e);
+        loading.innerHTML = `<p class="text-red-600 font-medium">${escapeHtml(e.message)}</p>`;
+      }
+    });
+  </script>
+</body>
+</html>

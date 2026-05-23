@@ -1,0 +1,56 @@
+{
+  "season": 11,
+  "phase": "first_half",
+  "title": "LG크래프트 팀리그 멸망전 시즌11",
+  "tierCatalogId": "tiers.json",
+  "notes": [
+    "t1~t6 = 팀 id. 팀장은 players.json 의 isCaptain.",
+    "주장(mainCaptain): 팀별 주장 이름. 정해지면 문자열로 넣고, 미정이면 null.",
+    "fixtures.json 의 t1~t6 대진은 팀 번호와 동일하게 쓰면 됩니다.",
+    "name = 팀명, short = 팀 아이디(영문)."
+  ],
+  "teams": [
+    {
+      "id": "t1",
+      "name": "원펀치",
+      "short": "1Punch",
+      "playerCount": 14,
+      "mainCaptain": "이대연"
+    },
+    {
+      "id": "t2",
+      "name": "투파이터",
+      "short": "2Fighters",
+      "playerCount": 14,
+      "mainCaptain": "공동현"
+    },
+    {
+      "id": "t3",
+      "name": "3성",
+      "short": "3Star",
+      "playerCount": 14,
+      "mainCaptain": "최성진"
+    },
+    {
+      "id": "t4",
+      "name": "영혼스타즈",
+      "short": "Soul",
+      "playerCount": 15,
+      "mainCaptain": "안태영"
+    },
+    {
+      "id": "t5",
+      "name": "팀택틱스",
+      "short": "TX",
+      "playerCount": 15,
+      "mainCaptain": "양시찬"
+    },
+    {
+      "id": "t6",
+      "name": "6킹즈",
+      "short": "6Kings",
+      "playerCount": 14,
+      "mainCaptain": "김종성"
+    }
+  ]
+}

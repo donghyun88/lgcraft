@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>멸망전 시즌11 선수 기록</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="s11-site-header.css" />
+  <style>
+    body { font-family: Inter, sans-serif; }
+    .table-sortable th[data-sort],
+    .table-sortable th[data-sort-numeric] { cursor: pointer; user-select: none; }
+    .table-sortable th[data-sort]:hover,
+    .table-sortable th[data-sort-numeric]:hover { background: linear-gradient(180deg, #eef2ff, #e0e7ff); }
+    .race-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.25rem;
+      height: 1.25rem;
+      border-radius: 9999px;
+      font-size: 0.65rem;
+      font-weight: 800;
+      color: #fff;
+      margin-right: 0.25rem;
+      vertical-align: middle;
+    }
+    .race-Z { background: linear-gradient(145deg, #9f1239, #881337); }
+    .race-T { background: linear-gradient(145deg, #0c4a6e, #0369a1); }
+    .race-P { background: linear-gradient(145deg, #a16207, #ca8a04); }
+    .race-R { background: linear-gradient(145deg, #44403c, #1c1917); }
+    .race-ZP, .race-PT { background: #57534e; }
+    .choice-chip-compact .race-icon {
+      width: 0.85rem;
+      height: 0.85rem;
+      font-size: 0.5rem;
+      margin-right: 0.1rem;
+    }
+    .modal-panel {
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+    }
+    .elo-up { color: #059669; }
+    .elo-down { color: #dc2626; }
+    .chip { font-size: 0.65rem; font-weight: 700; padding: 0.1rem 0.35rem; border-radius: 0.25rem; }
+    .chip-1v1 { background: #dbeafe; color: #1e40af; }
+    .chip-22 { background: #fce7f3; color: #9d174d; }
+    .chip-33 { background: #ede9fe; color: #5b21b6; }
+  </style>
+</head>
+<body class="bg-zinc-100 text-zinc-800 min-h-screen antialiased">
+  <div id="s11-page-header" class="max-w-6xl mx-auto px-4 pt-8">
+    <header class="s11-site-header" role="banner">
+      <div class="s11-site-header-accent" aria-hidden="true"></div>
+      <div class="s11-site-header-panel">
+        <div class="s11-site-header-body">
+          <div class="s11-site-header-top">
+            <div class="s11-site-header-brand">
+              <div class="lg-craft-lockup lg-craft-lockup--hero" title="LG Craft">
+                <img src="LG_symbol.svg.png" alt="" class="lg-craft-hero-img mx-auto w-auto max-w-full object-contain" decoding="async" />
+                <div class="lg-craft-wordmark" lang="en"><span class="lg-red">LG</span> Craft</div>
+              </div>
+            </div>
+            <div class="s11-site-header-series" aria-label="멸망전 시즌 11">
+              <span class="s11-site-header-series-ko" lang="ko">멸망전</span>
+              <span class="s11-site-header-series-en" lang="en">Season 11</span>
+            </div>
+          </div>
+          <h1 class="s11-site-header-page-title">선수 기록</h1>
+        </div>
+      </div>
+    </header>
+    <nav class="s11-site-nav mb-8 border-b border-zinc-200 pb-3" aria-label="시즌11">
+      <a href="index.html" class="s11-site-nav-link">팀 순위 및 경기 일정</a>
+      <a href="s11-roster.html" class="s11-site-nav-link">로스터</a>
+      <a href="s11-rounds.html" class="s11-site-nav-link">라운드 결과</a>
+      <span class="s11-site-nav-current">선수 기록</span>
+      <a href="s11-stats.html" class="s11-site-nav-link">통계 차트</a>
+    </nav>
+  </div>
+
+  <div id="main-stack" class="max-w-6xl mx-auto px-4 pb-16">
+    <div id="loading" class="rounded-xl border border-zinc-200 bg-white p-12 text-center text-zinc-500 shadow-sm">
+      <svg class="animate-spin h-9 w-9 text-indigo-600 mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      </svg>
+      <p class="mt-4 font-medium text-zinc-700">불러오는 중…</p>
+    </div>
+
+    <main id="main-content" class="hidden">
+      <div id="players-root"></div>
+    </main>
+  </div>
+
+  <div id="playerModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+    <div class="min-h-full flex items-start justify-center p-4 sm:p-8 bg-zinc-900/55 backdrop-blur-sm">
+      <div class="modal-panel relative w-full max-w-4xl rounded-2xl bg-white border border-zinc-200/80 my-8">
+        <div class="sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-zinc-100 bg-gradient-to-r from-indigo-50/90 to-white px-5 py-4 rounded-t-2xl">
+          <h3 class="text-xl sm:text-2xl font-bold text-zinc-900 pr-8" id="modalPlayerName"></h3>
+          <button type="button" id="playerModalClose" class="shrink-0 rounded-full p-2 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 transition" aria-label="닫기">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+          </button>
+        </div>
+        <div id="playerModalContent" class="p-5 sm:p-6"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const K_VALUES = { 개인전: 32, '22': 24, '33': 16 };
+
+    function emptyStats() {
+      return {
+        total: { w: 0, l: 0 },
+        개인전: { w: 0, l: 0 },
+        팀전: { w: 0, l: 0 },
+        '22': { w: 0, l: 0 },
+        '33': { w: 0, l: 0 },
+      };
+    }
+
+    function statKeysForFormat(format) {
+      const keys = ['total'];
+      if (format === '1v1') {
+        keys.push('개인전');
+        return keys;
+      }
+      if (format === '2v2') {
+        keys.push('팀전', '22');
+        return keys;
+      }
+      if (format === '3v3') {
+        keys.push('팀전', '33');
+        return keys;
+      }
+      keys.push('팀전');
+      return keys;
+    }
+
+    function bumpStats(stats, format, won) {
+      for (const k of statKeysForFormat(format)) {
+        if (won) stats[k].w++;
+        else stats[k].l++;
+      }
+    }
+
+    function updateEloPair(elo1, elo2, result, k) {
+      const expected = 1 / (1 + 10 ** ((elo2 - elo1) / 400));
+      const delta = Math.round(k * (result - expected));
+      return { d1: delta, d2: -delta };
+    }
+
+    function kForFormat(format) {
+      if (format === '2v2') return K_VALUES['22'];
+      if (format === '3v3') return K_VALUES['33'];
+      return K_VALUES.개인전;
+    }
+
+    async function loadJson(path) {
+      const res = await fetch(path);
+      if (!res.ok) throw new Error(path + ' ' + res.status);
+      return res.json();
+    }
+
+    async function loadRoundResultDoc(roundNum) {
+      const p = String(roundNum).padStart(2, '0');
+      for (const url of [`data/s11/results/round-${p}.json`, `data/s11/results/round-${p}.sample.json`]) {
+        const res = await fetch(url, { cache: 'no-store' });
+        if (res.ok) return res.json();
+      }
+      return null;
+    }
+
+    async function fetchPerMatchResultDoc(fixtureId) {
+      const url = `data/s11/results/${fixtureId}.json`;
+      const res = await fetch(url, { cache: 'no-store' });
+      if (!res.ok) return null;
+      return res.json();
+    }
+
+    function matchupFromPerMatchDoc(doc, fixtureId) {
+      if (!doc || !Array.isArray(doc.matchups)) return null;
+      return doc.matchups.find((x) => x.fixtureId === fixtureId) || null;
+    }
+
+    async function mergePerMatchOverlaysIntoRoundDoc(baseDoc, roundNum, fixtures) {
+      const rd = (fixtures.rounds || []).find((x) => x.round === roundNum);
+      const fixtureIds = (rd && rd.matchups ? rd.matchups.map((m) => m.id).filter(Boolean) : []) || [];
+      const overlays = new Map();
+      await Promise.all(
+        fixtureIds.map(async (fid) => {
+          const pm = await fetchPerMatchResultDoc(fid);
+          const mu = matchupFromPerMatchDoc(pm, fid);
+          if (mu) overlays.set(fid, mu);
+        }),
+      );
+      if (!overlays.size && !baseDoc) return null;
+
+      const out = baseDoc
+        ? JSON.parse(JSON.stringify(baseDoc))
+        : {
+            schemaVersion: 1,
+            season: 11,
+            phase: fixtures.phase || 'first_half',
+            round: roundNum,
+            recordedAt: '',
+            author: '',
+            notes: '',
+            matchups: [],
+          };
+      if (!Array.isArray(out.matchups)) out.matchups = [];
+
+      if (baseDoc) {
+        for (const [fid, mu] of overlays) {
+          const idx = out.matchups.findIndex((x) => x.fixtureId === fid);
+          if (idx >= 0) out.matchups[idx] = mu;
+          else out.matchups.push(mu);
+        }
+      } else {
+        const ordered = [];
+        for (const fid of fixtureIds) {
+          const mu = overlays.get(fid);
+          if (mu) ordered.push(mu);
+        }
+        out.matchups = ordered;
+      }
+      return out;
+    }
+
+    async function loadRoundResultDocMerged(roundNum, fixtures) {
+      const base = await loadRoundResultDoc(roundNum);
+      return mergePerMatchOverlaysIntoRoundDoc(base, roundNum, fixtures);
+    }
+
+    async function loadAllRoundResults(maxRound, fixtures) {
+      const docs = [];
+      for (let r = 1; r <= maxRound; r++) {
+        const doc = await loadRoundResultDocMerged(r, fixtures);
+        if (doc) docs.push(doc);
+      }
+      return docs;
+    }
+
+    function fixtureRoundMap(fixtures, roundNum) {
+      const rd = (fixtures.rounds || []).find((x) => x.round === roundNum);
+      if (!rd) return new Map();
+      const m = new Map();
+      for (const mu of rd.matchups || []) m.set(mu.id, mu);
+      return m;
+    }
+
+    function slotPlanBySlot(fixtures, roundNum) {
+      const rd = (fixtures.rounds || []).find((x) => x.round === roundNum);
+      const m = new Map();
+      if (!rd || !rd.slotPlan) return m;
+      for (const s of rd.slotPlan) m.set(s.slot, s);
+      return m;
+    }
+
+    function escapeHtml(s) {
+      if (s == null) return '';
+      return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function teamName(meta, id) {
+      const t = meta.teams.find((x) => x.id === id);
+      return t ? t.name : id;
+    }
+
+    function getRaceLetter(p) {
+      return (p.tierSheetMainRace || p.raceDefault || '').trim() || '';
+    }
+
+    function raceKo(letter) {
+      const m = { Z: '저', T: '테', P: '토', R: '랜' };
+      return m[letter] || letter || '';
+    }
+
+    /** 개인전 상대종족별 픽 — 칩 HTML (없으면 빈 문자열). opts.compact: 목록 종족란용 소형 */
+    function renderRaceVsOpponentChips(p, opts) {
+      const map = p && p.raceVsOpponent;
+      if (!map || typeof map !== 'object') return '';
+      const compact = !!(opts && opts.compact);
+      const chipCls = compact
+        ? 'inline-flex items-center gap-px rounded border border-violet-200/65 bg-violet-50/85 px-1 py-px text-[9px] font-bold text-violet-900 leading-tight'
+        : 'inline-flex items-center gap-0.5 rounded-md bg-violet-50 border border-violet-200/80 px-1.5 py-0.5 text-[10px] font-bold text-violet-900';
+      const order = ['Z', 'T', 'P', 'R'];
+      const parts = [];
+      for (const opp of order) {
+        if (!Object.prototype.hasOwnProperty.call(map, opp)) continue;
+        const pick = map[opp];
+        if (pick == null || pick === '') continue;
+        const pc = String(pick).toUpperCase().charAt(0);
+        if (!['Z', 'T', 'P', 'R'].includes(opp) || !['Z', 'T', 'P', 'R'].includes(pc)) continue;
+        parts.push(
+          `<span class="${chipCls}">${getRaceIcon(opp)}<span>${raceKo(opp)}</span><span class="text-violet-500 font-extrabold">→</span>${getRaceIcon(pc)}<span>${raceKo(pc)}</span></span>`,
+        );
+      }
+      if (!parts.length) return '';
+      const joined = parts.join('');
+      return compact ? `<span class="choice-chip-compact inline-flex flex-wrap gap-0.5 max-w-[11rem]">${joined}</span>` : joined;
+    }
+
+    function renderRaceVsOpponentBlock(p) {
+      const chips = renderRaceVsOpponentChips(p);
+      if (!chips) return '';
+      const note = p.raceNotes && String(p.raceNotes).trim() ? `<p class="mt-1.5 text-[10px] text-violet-700/90 leading-snug">${escapeHtml(p.raceNotes.trim())}</p>` : '';
+      return `<div class="mt-2 pt-2 border-t border-violet-100/80">
+        <p class="text-[10px] font-bold uppercase tracking-wide text-violet-600 mb-1">1:1 초이스</p>
+        <div class="flex flex-wrap gap-1">${chips}</div>${note}</div>`;
+    }
+
+    /** 상대 이름 옆 종족 아이콘 (세트 기록용) */
+    function formatOpponentsWithRaces(names, races) {
+      if (!names || !names.length) return '—';
+      const rarr = races || [];
+      return names
+        .map((n, i) => {
+          const r = rarr[i];
+          const iconHtml = r && ['Z', 'T', 'P', 'R'].includes(r) ? `<span class="inline-flex shrink-0 opacity-90">${getRaceIcon(r)}</span>` : '';
+          return `<span class="inline-flex items-center gap-0.5">${escapeHtml(n)}${iconHtml}</span>`;
+        })
+        .join('<span class="text-zinc-300 mx-0.5">·</span>');
+    }
+
+    function opponentRacesFromSlotRows(slotRows, nameList, rosterMap) {
+      return (nameList || []).map((nm) => {
+        const row = (slotRows || []).find((r) => (r.displayName || '').trim() === nm);
+        return oppRaceZtp(row || {}, rosterMap, nm) || '';
+      });
+    }
+
+    function getRaceIcon(race) {
+      if (!race) return '';
+      const c = race.charAt(0);
+      return `<span class="race-icon race-${race}">${escapeHtml(c)}</span>`;
+    }
+
+    function wlCell(s) {
+      return `${s.w}승 ${s.l}패`;
+    }
+
+    function rosterByDisplayName(players) {
+      const m = new Map();
+      for (const p of players || []) {
+        const dn = (p.displayName || '').trim();
+        if (dn) m.set(dn, p);
+      }
+      return m;
+    }
+
+    /** 1v1만: 맵 이름 → { w, l } */
+    function bumpMapSimple(perMap, mapName, won) {
+      if (!mapName || mapName === '—') return;
+      if (!perMap[mapName]) perMap[mapName] = { w: 0, l: 0 };
+      if (won) perMap[mapName].w++;
+      else perMap[mapName].l++;
+    }
+
+    function emptyVsOppRace() {
+      return { Z: { w: 0, l: 0 }, T: { w: 0, l: 0 }, P: { w: 0, l: 0 } };
+    }
+
+    function emptyTeamMapStats() {
+      return { '2v2': {}, '3v3': {} };
+    }
+
+    /** 슬롯 줄·이름으로 상대 종족 표시용 문자. 집계(bumpVsOppRace)는 Z/T/P만 사용. */
+    function oppRaceZtp(row, rosterMap, displayName) {
+      const raw = row?.race && String(row.race).trim().toUpperCase();
+      if (raw) {
+        const c = raw.charAt(0);
+        if (c === 'Z' || c === 'T' || c === 'P' || c === 'R') return c;
+        return null;
+      }
+      const p = rosterMap.get((displayName || '').trim());
+      const letter = getRaceLetter(p || {});
+      return letter === 'Z' || letter === 'T' || letter === 'P' || letter === 'R' ? letter : null;
+    }
+
+    function bumpVsOppRace(vs, oppRace, won) {
+      if (!oppRace || !vs[oppRace]) return;
+      if (won) vs[oppRace].w++;
+      else vs[oppRace].l++;
+    }
+
+    function bumpTeamMap(teamMapStats, format, mapName, won) {
+      if (!mapName || mapName === '—') return;
+      const bucketKey = format === '2v2' ? '2v2' : format === '3v3' ? '3v3' : null;
+      if (!bucketKey) return;
+      const bucket = teamMapStats[bucketKey];
+      if (!bucket[mapName]) bucket[mapName] = { w: 0, l: 0 };
+      if (won) bucket[mapName].w++;
+      else bucket[mapName].l++;
+    }
+
+    /**
+     * 라운드 → 대전 → 슬롯 번호 순으로 ELO·통계 반영
+     * @returns {{ statsByName: object, stateByName: Map }}
+     */
+    function simulateSeason(fixtures, roundDocs, rosterPlayers) {
+      const rosterMap = rosterByDisplayName(rosterPlayers);
+      const statsByName = {};
+      const stateByName = new Map();
+
+      function ensure(name) {
+        const n = (name || '').trim();
+        if (!n) return null;
+        if (!stateByName.has(n)) {
+          const player = rosterMap.get(n) || { displayName: n, id: '', teamId: '' };
+          stateByName.set(n, {
+            displayName: n,
+            player,
+            elo: 1000,
+            history: [],
+            mapStats: {},
+            vsOppRace: emptyVsOppRace(),
+            teamMapStats: emptyTeamMapStats(),
+          });
+        }
+        if (!statsByName[n]) statsByName[n] = emptyStats();
+        return stateByName.get(n);
+      }
+
+      const sortedDocs = [...roundDocs].sort((a, b) => (a.round || 0) - (b.round || 0));
+      let globalSeq = 0;
+
+      for (const doc of sortedDocs) {
+        const rnum = doc.round;
+        if (rnum == null) continue;
+        const byId = fixtureRoundMap(fixtures, rnum);
+        const planBySlot = slotPlanBySlot(fixtures, rnum);
+
+        for (const mu of doc.matchups || []) {
+          const fix = byId.get(mu.fixtureId);
+          if (!fix || !fix.teamIds || fix.teamIds.length < 2) continue;
+          const [tA, tB] = fix.teamIds;
+          const slots = [...(mu.slots || [])].sort((a, b) => (a.slot || 0) - (b.slot || 0));
+
+          for (const sl of slots) {
+            const w = sl.winnerTeamIndex;
+            if (w !== 1 && w !== 2) continue;
+            const team1Won = w === 1;
+            const metaSlot = planBySlot.get(sl.slot) || {};
+            const format = metaSlot.format || '1v1';
+            const mapName = metaSlot.map || '—';
+            const k = kForFormat(format);
+
+            const namesA = (sl.teamA || []).map((r) => (r.displayName || '').trim()).filter(Boolean);
+            const namesB = (sl.teamB || []).map((r) => (r.displayName || '').trim()).filter(Boolean);
+
+            for (const nm of [...namesA, ...namesB]) ensure(nm);
+
+            const bumpSide = (names, sideWon) => {
+              for (const nm of names) bumpStats(statsByName[nm], format, sideWon);
+            };
+            bumpSide(namesA, team1Won);
+            bumpSide(namesB, !team1Won);
+
+            const record = (nm, eloBefore, delta, won, opponents, opponentRaces) => {
+              const st = ensure(nm);
+              if (!st) return;
+              const eloAfter = eloBefore + delta;
+              st.elo = eloAfter;
+              const opps = opponents || [];
+              const races =
+                Array.isArray(opponentRaces) && opponentRaces.length === opps.length
+                  ? opponentRaces
+                  : opps.map(() => '');
+              st.history.push({
+                seq: ++globalSeq,
+                round: rnum,
+                fixtureId: mu.fixtureId,
+                slot: sl.slot,
+                map: mapName,
+                format,
+                tierLine: metaSlot.tierLine || '',
+                won,
+                delta,
+                eloBefore,
+                eloAfter,
+                opponents: opps,
+                opponentRaces: races,
+                teamIds: [tA, tB],
+              });
+            };
+
+            if (format === '1v1' && namesA.length >= 1 && namesB.length >= 1) {
+              const n1 = namesA[0];
+              const n2 = namesB[0];
+              const s1 = ensure(n1);
+              const s2 = ensure(n2);
+              const e1 = s1.elo;
+              const e2 = s2.elo;
+              const { d1, d2 } = updateEloPair(e1, e2, team1Won ? 1 : 0, k);
+              bumpMapSimple(s1.mapStats, mapName, team1Won);
+              bumpMapSimple(s2.mapStats, mapName, !team1Won);
+              const roppFor1 = oppRaceZtp(sl.teamB[0], rosterMap, n2);
+              const roppFor2 = oppRaceZtp(sl.teamA[0], rosterMap, n1);
+              bumpVsOppRace(s1.vsOppRace, roppFor1, team1Won);
+              bumpVsOppRace(s2.vsOppRace, roppFor2, !team1Won);
+              record(n1, e1, d1, team1Won, [n2], [roppFor1 || '']);
+              record(n2, e2, d2, !team1Won, [n1], [roppFor2 || '']);
+            } else if ((format === '2v2' || format === '3v3') && namesA.length && namesB.length) {
+              const snapA = namesA.map((nm) => ({ nm, eloBefore: ensure(nm).elo }));
+              const snapB = namesB.map((nm) => ({ nm, eloBefore: ensure(nm).elo }));
+              const racesB = opponentRacesFromSlotRows(sl.teamB, namesB, rosterMap);
+              const racesA = opponentRacesFromSlotRows(sl.teamA, namesA, rosterMap);
+              const aAvg = snapA.reduce((s, x) => s + x.eloBefore, 0) / snapA.length;
+              const bAvg = snapB.reduce((s, x) => s + x.eloBefore, 0) / snapB.length;
+              const { d1, d2 } = updateEloPair(aAvg, bAvg, team1Won ? 1 : 0, k);
+              for (const { nm, eloBefore } of snapA) {
+                record(nm, eloBefore, d1, team1Won, namesB, racesB);
+                bumpTeamMap(ensure(nm).teamMapStats, format, mapName, team1Won);
+              }
+              for (const { nm, eloBefore } of snapB) {
+                record(nm, eloBefore, d2, !team1Won, namesA, racesA);
+                bumpTeamMap(ensure(nm).teamMapStats, format, mapName, !team1Won);
+              }
+            }
+          }
+        }
+      }
+
+      return { statsByName, stateByName };
+    }
+
+    function assignEloRanks(sorted) {
+      let lastElo = null;
+      let rank = 0;
+      return sorted.map((p, i) => {
+        const e = p.elo;
+        if (e !== lastElo) {
+          rank = i + 1;
+          lastElo = e;
+        }
+        return { ...p, rank };
+      });
+    }
+
+    function renderPlayersPage(meta, players, statsByName, stateByName) {
+      const roster = (players || []).filter((p) => p.teamId);
+      const rows = roster.map((p) => {
+        const dn = (p.displayName || '').trim();
+        const stats = statsByName[dn] || emptyStats();
+        const elo = stateByName.get(dn)?.elo ?? 1000;
+        return { ...p, stats, elo };
+      });
+      rows.sort((a, b) => {
+        if (b.elo !== a.elo) return b.elo - a.elo;
+        const tw = (b.stats.total.w || 0) - (a.stats.total.w || 0);
+        if (tw !== 0) return tw;
+        return (a.displayName || '').localeCompare(b.displayName || '', 'ko');
+      });
+      const ranked = assignEloRanks(rows);
+
+      const teamOptions = meta.teams.map((t) => `<option value="${escapeHtml(t.name)}">${escapeHtml(t.name)}</option>`).join('');
+      const uniqueRaces = [...new Set(roster.map(getRaceLetter).filter(Boolean))].sort();
+      const raceOptions = uniqueRaces.map((r) => `<option value="${escapeHtml(r)}">${escapeHtml(r)}</option>`).join('');
+      const uniqueTiers = [...new Set(roster.map((p) => p.tier).filter(Boolean))].sort();
+      const tierOptions = uniqueTiers.map((t) => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join('');
+
+      const mobileFilters = `
+        <div class="md:hidden rounded-xl border border-zinc-200 bg-white shadow-sm p-4 mb-4 flex flex-col gap-2">
+          <input type="text" id="player-name-filter-mobile" placeholder="이름 또는 ID 검색…" class="w-full rounded-xl border border-zinc-200 px-3 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+          <select id="player-team-filter-mobile" class="w-full rounded-xl border border-zinc-200 px-3 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500">
+            <option value="all">모든 팀</option>${teamOptions}
+          </select>
+          <select id="player-race-filter-mobile" class="w-full rounded-xl border border-zinc-200 px-3 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500">
+            <option value="all">모든 종족</option>${raceOptions}
+          </select>
+          <select id="player-tier-filter-mobile" class="w-full rounded-xl border border-zinc-200 px-3 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500">
+            <option value="all">모든 티어</option>${tierOptions}
+          </select>
+        </div>`;
+
+      let html = mobileFilters;
+      html += `<div class="rounded-xl border border-zinc-200 bg-white shadow-sm overflow-hidden overflow-x-auto">
+        <div class="hidden md:block min-w-[800px]">
+          <table class="min-w-full divide-y divide-zinc-200/80 table-sortable" id="player-table">
+            <thead class="bg-gradient-to-b from-zinc-50 to-indigo-50/40">
+              <tr>
+                <th data-sort-numeric="rank" class="px-4 py-3.5 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">순위</th>
+                <th data-sort="name" class="px-4 py-3.5 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">선수</th>
+                <th data-sort="team" class="px-4 py-3.5 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">팀</th>
+                <th data-sort="race" class="px-4 py-3.5 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">종족</th>
+                <th data-sort="tier" class="px-4 py-3.5 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">티어</th>
+                <th data-sort-numeric="elo" class="px-4 py-3.5 text-left text-xs font-semibold text-indigo-700 uppercase tracking-wider">ELO</th>
+                <th data-sort-numeric="total" class="px-4 py-3.5 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">전체</th>
+                <th data-sort-numeric="1v1" class="px-4 py-3.5 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">1:1</th>
+                <th data-sort-numeric="team" class="px-4 py-3.5 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">팀전</th>
+              </tr>
+              <tr class="bg-zinc-50 border-t border-zinc-100">
+                <th class="px-2 py-2"></th>
+                <th class="px-2 py-2"><input type="text" id="player-name-filter" placeholder="이름 / ID…" class="w-full rounded-lg border border-zinc-200 px-2 py-1.5 text-xs" /></th>
+                <th class="px-2 py-2">
+                  <select id="player-team-filter" class="w-full rounded-lg border border-zinc-200 px-2 py-1.5 text-xs">
+                    <option value="all">모든 팀</option>${teamOptions}
+                  </select>
+                </th>
+                <th class="px-2 py-2">
+                  <select id="player-race-filter" class="w-full rounded-lg border border-zinc-200 px-2 py-1.5 text-xs">
+                    <option value="all">모든 종족</option>${raceOptions}
+                  </select>
+                </th>
+                <th class="px-2 py-2">
+                  <select id="player-tier-filter" class="w-full rounded-lg border border-zinc-200 px-2 py-1.5 text-xs">
+                    <option value="all">모든 티어</option>${tierOptions}
+                  </select>
+                </th>
+                <th class="px-2 py-2" colspan="4"></th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-zinc-100">`;
+
+      for (const p of ranked) {
+        const st = p.stats;
+        const race = getRaceLetter(p);
+        const tname = teamName(meta, p.teamId);
+        const pid = (p.id || '').toLowerCase();
+        const pname = (p.displayName || '').toLowerCase();
+        const pidEnc = p.id ? encodeURIComponent(p.id) : '';
+        const hrefPlayer = pidEnc ? ` href="?player=${pidEnc}"` : ' href="#"';
+        const vsChip = renderRaceVsOpponentChips(p, { compact: true });
+        html += `
+          <tr class="player-row transition hover:bg-indigo-50/40" data-name="${escapeHtml(pname)}" data-id="${escapeHtml(pid)}" data-team="${escapeHtml(tname)}" data-race="${escapeHtml(race)}" data-tier="${escapeHtml(p.tier || '')}">
+            <td class="px-4 py-3 align-top whitespace-nowrap text-sm font-semibold text-zinc-500 tabular-nums">${p.rank}</td>
+            <td class="px-4 py-3 align-top whitespace-nowrap text-sm font-semibold text-zinc-900">
+              <a${hrefPlayer} class="player-link text-indigo-600 hover:text-indigo-800 hover:underline" data-player-id="${escapeHtml(p.id || '')}">${escapeHtml(p.displayName || '')}<span class="text-zinc-400 font-normal"> · ${escapeHtml(p.id || '—')}</span></a>
+            </td>
+            <td class="px-4 py-3 align-top whitespace-nowrap text-sm text-zinc-600">${escapeHtml(tname)}</td>
+            <td class="px-4 py-3 align-top text-sm text-zinc-600">
+              <div class="whitespace-nowrap">${getRaceIcon(race)}${escapeHtml(race || '—')}</div>
+              ${vsChip ? `<div class="mt-1">${vsChip}</div>` : ''}
+            </td>
+            <td class="px-4 py-3 align-top whitespace-nowrap text-sm text-zinc-600">${escapeHtml(p.tier || '—')}</td>
+            <td class="px-4 py-3 align-top whitespace-nowrap text-sm font-bold tabular-nums text-indigo-700">${p.elo}</td>
+            <td class="px-4 py-3 align-top whitespace-nowrap text-sm text-zinc-600">${wlCell(st.total)}</td>
+            <td class="px-4 py-3 align-top whitespace-nowrap text-sm text-zinc-600">${wlCell(st.개인전)}</td>
+            <td class="px-4 py-3 align-top whitespace-nowrap text-sm text-zinc-600">${wlCell(st.팀전)}</td>
+          </tr>`;
+      }
+      html += `</tbody></table></div>`;
+
+      html += `<div class="md:hidden space-y-3 p-3">`;
+      for (const p of ranked) {
+        const st = p.stats;
+        const race = getRaceLetter(p);
+        const tname = teamName(meta, p.teamId);
+        const totalWinRate = st.total.w + st.total.l > 0 ? Math.round((st.total.w / (st.total.w + st.total.l)) * 100) : 0;
+        const pid = (p.id || '').toLowerCase();
+        const pname = (p.displayName || '').toLowerCase();
+        const pidEncM = p.id ? encodeURIComponent(p.id) : '';
+        const hrefPlayerM = pidEncM ? ` href="?player=${pidEncM}"` : ' href="#"';
+        const vsChipM = renderRaceVsOpponentChips(p, { compact: true });
+        html += `
+          <div class="player-card rounded-2xl border border-zinc-200/80 bg-white p-4 shadow-md" data-name="${escapeHtml(pname)}" data-id="${escapeHtml(pid)}" data-team="${escapeHtml(tname)}" data-race="${escapeHtml(race)}" data-tier="${escapeHtml(p.tier || '')}">
+            <div class="flex justify-between items-start gap-3">
+              <div class="min-w-0 flex-1">
+                <div class="flex items-baseline gap-2 flex-wrap">
+                  <span class="text-xs font-bold text-zinc-400 tabular-nums w-6">${p.rank}</span>
+                  <a${hrefPlayerM} class="player-link font-bold text-zinc-900 text-lg hover:text-indigo-600" data-player-id="${escapeHtml(p.id || '')}">${escapeHtml(p.displayName || '')}</a>
+                  <span class="text-xs text-zinc-500 font-mono">${escapeHtml(p.id || '')}</span>
+                </div>
+                <p class="text-xs text-zinc-500 mt-2 ml-8"><span class="text-zinc-400 font-semibold mr-1.5">종족</span>${getRaceIcon(race)}<span class="text-sm text-zinc-700 font-medium">${escapeHtml(race || '—')}</span></p>
+                ${vsChipM ? `<div class="mt-1 ml-8">${vsChipM}</div>` : ''}
+                <p class="text-sm text-zinc-500 mt-1.5 ml-8">${escapeHtml(p.tier || '—')} · ${escapeHtml(tname)}</p>
+              </div>
+              <div class="text-right shrink-0 rounded-xl bg-indigo-50 px-3 py-2 border border-indigo-100">
+                <div class="text-2xl font-extrabold text-indigo-700 tabular-nums leading-none">${p.elo}</div>
+                <div class="text-[10px] font-semibold text-indigo-500 uppercase tracking-wide mt-1">ELO</div>
+              </div>
+            </div>
+            <div class="mt-3 grid grid-cols-3 gap-2 text-center text-xs border-t border-zinc-100 pt-3">
+              <div><span class="font-semibold text-zinc-800">${wlCell(st.total)}</span><div class="text-zinc-400">전체 ${totalWinRate ? totalWinRate + '%' : ''}</div></div>
+              <div><span class="font-semibold">${wlCell(st.개인전)}</span><div class="text-zinc-400">1:1</div></div>
+              <div><span class="font-semibold">${wlCell(st.팀전)}</span><div class="text-zinc-400">팀전</div></div>
+            </div>
+          </div>`;
+      }
+      html += `</div></div>`;
+
+      document.getElementById('players-root').innerHTML = html;
+    }
+
+    function applyPlayerFilters() {
+      const nameD = document.getElementById('player-name-filter');
+      const teamD = document.getElementById('player-team-filter');
+      const raceD = document.getElementById('player-race-filter');
+      const tierD = document.getElementById('player-tier-filter');
+      const nameM = document.getElementById('player-name-filter-mobile');
+      const teamM = document.getElementById('player-team-filter-mobile');
+      const raceM = document.getElementById('player-race-filter-mobile');
+      const tierM = document.getElementById('player-tier-filter-mobile');
+      if (!nameD || !teamD) return;
+
+      const isMobile = window.innerWidth < 768;
+      const currentName = (isMobile ? nameM.value : nameD.value).toLowerCase();
+      const currentTeam = isMobile ? teamM.value : teamD.value;
+      const currentRace = isMobile ? raceM.value : raceD.value;
+      const currentTier = isMobile ? tierM.value : tierD.value;
+
+      if (isMobile) {
+        nameD.value = nameM.value;
+        teamD.value = teamM.value;
+        raceD.value = raceM.value;
+        tierD.value = tierM.value;
+      } else {
+        nameM.value = nameD.value;
+        teamM.value = teamD.value;
+        raceM.value = raceD.value;
+        tierM.value = tierD.value;
+      }
+
+      const run = (selector) => {
+        document.querySelectorAll(selector).forEach((item) => {
+          const name = item.dataset.name || '';
+          const id = item.dataset.id || '';
+          const team = item.dataset.team || '';
+          const race = item.dataset.race || '';
+          const tier = item.dataset.tier || '';
+          const nameMatch = name.includes(currentName) || id.includes(currentName);
+          const teamMatch = currentTeam === 'all' || team === currentTeam;
+          const raceMatch = currentRace === 'all' || race === currentRace;
+          const tierMatch = currentTier === 'all' || tier === currentTier;
+          item.style.display = nameMatch && teamMatch && raceMatch && tierMatch ? '' : 'none';
+        });
+      };
+      run('#player-table .player-row');
+      run('#players-root .player-card');
+    }
+
+    function attachPlayerFilterListeners() {
+      const ids = [
+        ['player-name-filter', 'input'],
+        ['player-team-filter', 'change'],
+        ['player-race-filter', 'change'],
+        ['player-tier-filter', 'change'],
+        ['player-name-filter-mobile', 'input'],
+        ['player-team-filter-mobile', 'change'],
+        ['player-race-filter-mobile', 'change'],
+        ['player-tier-filter-mobile', 'change'],
+      ];
+      for (const [id, ev] of ids) {
+        const el = document.getElementById(id);
+        if (!el) continue;
+        el.addEventListener(ev, applyPlayerFilters);
+        el.addEventListener('click', (e) => e.stopPropagation());
+      }
+    }
+
+    function sortTableByColumn(table, columnIndex, asc, isNumeric) {
+      const dirModifier = asc ? 1 : -1;
+      const tBody = table.tBodies[0];
+      const rows = Array.from(tBody.querySelectorAll('tr'));
+      const sortedRows = rows.sort((a, b) => {
+        const aTd = a.querySelector(`td:nth-child(${columnIndex + 1})`);
+        const bTd = b.querySelector(`td:nth-child(${columnIndex + 1})`);
+        let aColText = aTd ? aTd.textContent.trim() : '';
+        let bColText = bTd ? bTd.textContent.trim() : '';
+        if (isNumeric) {
+          const parseNum = (t) => {
+            const m = t.match(/-?\d+/);
+            return m ? parseInt(m[0], 10) : 0;
+          };
+          return (parseNum(aColText) - parseNum(bColText)) * dirModifier;
+        }
+        return aColText.localeCompare(bColText, 'ko') * dirModifier;
+      });
+      while (tBody.firstChild) tBody.removeChild(tBody.firstChild);
+      tBody.append(...sortedRows);
+    }
+
+    let lastMeta = null;
+    let lastPlayers = [];
+    let lastStatsByName = {};
+    let lastStateByName = new Map();
+    let modalEloChart = null;
+    let detailPageChart = null;
+    /** 모바일에서 목록→선수 클릭으로 pushState 된 경우, 뒤로가기는 history.back()으로 스택 정리 */
+    let mobilePlayerDetailViaList = false;
+
+    function formatChip(format) {
+      if (format === '1v1') return '<span class="chip chip-1v1">1:1</span>';
+      if (format === '2v2') return '<span class="chip chip-22">2:2</span>';
+      if (format === '3v3') return '<span class="chip chip-33">3:3</span>';
+      return `<span class="chip bg-zinc-200 text-zinc-700">${escapeHtml(format)}</span>`;
+    }
+
+    function destroyDetailChart() {
+      if (detailPageChart) {
+        detailPageChart.destroy();
+        detailPageChart = null;
+      }
+    }
+
+    function mountEloLineChart(canvasId, history) {
+      const canvas = document.getElementById(canvasId);
+      if (!canvas || typeof Chart === 'undefined') return null;
+      const labels = ['0'];
+      const data = [1000];
+      for (let i = 0; i < history.length; i++) {
+        labels.push(String(i + 1));
+        data.push(history[i].eloAfter);
+      }
+      return new Chart(canvas.getContext('2d'), {
+        type: 'line',
+        data: {
+          labels,
+          datasets: [
+            {
+              label: 'ELO',
+              data,
+              borderColor: '#4f46e5',
+              backgroundColor: 'rgba(79, 70, 229, 0.06)',
+              fill: true,
+              tension: 0.3,
+              pointRadius: 2,
+              pointHoverRadius: 5,
+              borderWidth: 2,
+            },
+          ],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: false,
+              grid: { color: 'rgba(148,163,184,0.2)' },
+              ticks: { font: { size: 11 } },
+            },
+            x: {
+              title: { display: true, text: '세트 순번 (툴팁에 라운드·맵)', font: { size: 10 } },
+              ticks: { maxTicksLimit: 14, font: { size: 9 } },
+              grid: { display: false },
+            },
+          },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              callbacks: {
+                title: (items) => {
+                  const idx = items[0].dataIndex;
+                  if (idx <= 0) return '시작 · 1000';
+                  const h = history[idx - 1];
+                  return `R${h.round} · ${h.fixtureId} · 슬롯${h.slot} · ${h.format} · ${h.map}`;
+                },
+                label: (item) => `ELO ${item.raw}`,
+              },
+            },
+          },
+        },
+      });
+    }
+
+    function buildPlayerDetailInnerHTML(meta, p, chartCanvasId) {
+      const dn = (p.displayName || '').trim();
+      const st = lastStatsByName[dn] || emptyStats();
+      const pst = lastStateByName.get(dn);
+      const elo = pst?.elo ?? 1000;
+      const history = [...(pst?.history || [])].sort((a, b) => a.seq - b.seq);
+      const race = getRaceLetter(p);
+
+      const histRows = [...history].reverse().slice(0, 50).map((h) => {
+        const res = h.won ? '승' : '패';
+        const resCls = h.won ? 'text-emerald-600 font-semibold' : 'text-rose-600 font-semibold';
+        const dCls = h.delta > 0 ? 'elo-up' : h.delta < 0 ? 'elo-down' : 'text-zinc-500';
+        const oppHtml = formatOpponentsWithRaces(h.opponents || [], h.opponentRaces || []);
+        const tip = `${h.fixtureId || ''} · 슬롯${h.slot}`.trim();
+        return `<tr class="border-b border-zinc-50 hover:bg-zinc-50/80">
+          <td class="px-2 py-2 whitespace-nowrap text-zinc-600">${h.round}R</td>
+          <td class="px-2 py-2">${h.slot}</td>
+          <td class="px-2 py-2">${formatChip(h.format)}</td>
+          <td class="px-2 py-2 text-zinc-700">${escapeHtml(h.map)}</td>
+          <td class="px-2 py-2 text-xs text-zinc-700 max-w-[11rem] sm:max-w-[14rem] leading-snug" title="${escapeHtml(tip)}">${oppHtml}</td>
+          <td class="px-2 py-2 ${resCls}">${res}</td>
+          <td class="px-2 py-2 tabular-nums font-mono text-xs ${dCls}">${h.delta > 0 ? '+' : ''}${h.delta}</td>
+          <td class="px-2 py-2 tabular-nums text-zinc-600">${h.eloAfter}</td>
+        </tr>`;
+      }).join('');
+
+      return `
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div class="rounded-xl border border-zinc-200 bg-gradient-to-br from-zinc-50 to-white p-4 shadow-sm">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-3">프로필</h4>
+            <p class="text-sm"><span class="text-zinc-500">팀</span> <span class="font-semibold text-zinc-900">${escapeHtml(teamName(meta, p.teamId))}</span></p>
+            <p class="text-sm mt-1"><span class="text-zinc-500">종족</span> ${getRaceIcon(race)}<span class="font-medium">${escapeHtml(race || '—')}</span></p>
+            <p class="text-sm mt-1"><span class="text-zinc-500">티어</span> <span class="font-medium">${escapeHtml(p.tier || '—')}</span></p>
+            ${renderRaceVsOpponentBlock(p)}
+            <div class="mt-4 flex items-end gap-2">
+              <span class="text-4xl font-extrabold text-indigo-700 tabular-nums">${elo}</span>
+              <span class="text-sm font-semibold text-indigo-500 pb-1">ELO</span>
+            </div>
+          </div>
+          <div class="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-3">세트 요약</h4>
+            <p class="text-sm"><span class="text-zinc-500">전체</span> <strong>${wlCell(st.total)}</strong>
+              <span class="text-zinc-400">(${st.total.w + st.total.l > 0 ? ((st.total.w / (st.total.w + st.total.l)) * 100).toFixed(1) : '0'}%)</span></p>
+            <p class="text-sm mt-1"><span class="text-zinc-500">1:1</span> <strong>${wlCell(st.개인전)}</strong></p>
+            <p class="text-sm mt-1"><span class="text-zinc-500">팀전</span> <strong>${wlCell(st.팀전)}</strong></p>
+            <p class="text-sm mt-1"><span class="text-zinc-500">2:2 / 3:3</span> <strong>${wlCell(st['22'])}</strong> · <strong>${wlCell(st['33'])}</strong></p>
+          </div>
+        </div>
+
+        <div class="mt-6 rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
+          <h4 class="text-sm font-bold text-zinc-800 mb-3">ELO 변화</h4>
+          <div class="h-52 sm:h-64"><canvas id="${escapeHtml(chartCanvasId)}"></canvas></div>
+        </div>
+
+        <div class="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div class="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
+            <h4 class="text-sm font-bold text-zinc-800 mb-3">맵별 1:1</h4>
+            ${renderMapSection(pst?.mapStats)}
+          </div>
+          ${renderVsOppRaceSection(pst?.vsOppRace)}
+        </div>
+
+        <div class="mt-4">${renderTeamMapSection(pst?.teamMapStats)}</div>
+
+        <div class="mt-6 rounded-xl border border-zinc-200 bg-white p-4 shadow-sm overflow-hidden">
+          <h4 class="text-sm font-bold text-zinc-800 mb-3">세트 기록</h4>
+          <div class="overflow-x-auto max-h-96 overflow-y-auto text-xs">
+            <table class="min-w-full text-left">
+              <thead class="sticky top-0 bg-zinc-50 text-zinc-500 font-semibold z-10">
+                <tr>
+                  <th class="px-2 py-2">R</th>
+                  <th class="px-2 py-2">#</th>
+                  <th class="px-2 py-2">유형</th>
+                  <th class="px-2 py-2">맵</th>
+                  <th class="px-2 py-2">상대</th>
+                  <th class="px-2 py-2">결</th>
+                  <th class="px-2 py-2">Δ</th>
+                  <th class="px-2 py-2">ELO</th>
+                </tr>
+              </thead>
+              <tbody>${histRows || '<tr><td colspan="8" class="p-4 text-zinc-400">기록 없음</td></tr>'}</tbody>
+            </table>
+          </div>
+        </div>`;
+    }
+
+    function renderVsOppRaceSection(vs) {
+      if (!vs) return '<div class="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm"><p class="text-sm text-zinc-500">상대 종족 데이터 없음</p></div>';
+      let rows = '';
+      for (const key of ['Z', 'T', 'P']) {
+        const o = vs[key] || { w: 0, l: 0 };
+        const n = o.w + o.l;
+        const pct = n ? ((o.w / n) * 100).toFixed(1) : '—';
+        const cls = !n ? 'text-zinc-400' : Number(pct) > 50 ? 'text-emerald-600 font-semibold' : Number(pct) < 50 ? 'text-rose-600' : '';
+        rows += `<tr class="border-b border-zinc-50">
+          <td class="py-2">${getRaceIcon(key)}${key}</td>
+          <td class="py-2 text-right tabular-nums">${o.w}</td>
+          <td class="py-2 text-right tabular-nums">${o.l}</td>
+          <td class="py-2 text-right tabular-nums ${cls}">${pct === '—' ? '—' : pct + '%'}</td>
+        </tr>`;
+      }
+      return `<div class="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
+        <h4 class="text-sm font-bold text-zinc-800 mb-2">1:1 · 상대 종족별</h4>
+        <p class="text-xs text-zinc-500 mb-3">슬롯에 적힌 상대 race가 있으면 우선, 없으면 선수 명단의 등록 종족을 사용합니다. Z / T / P만 집계합니다.</p>
+        <table class="w-full text-sm"><thead><tr class="text-left text-zinc-500 border-b border-zinc-200">
+          <th class="py-2">상대</th><th class="py-2 text-right">승</th><th class="py-2 text-right">패</th><th class="py-2 text-right">승률</th>
+        </tr></thead><tbody>${rows}</tbody></table></div>`;
+    }
+
+    function renderTeamMapBucket(label, mapObj) {
+      const maps = Object.keys(mapObj || {}).sort();
+      if (!maps.length) {
+        return `<div class="rounded-lg border border-dashed border-zinc-200 p-3 text-xs text-zinc-500">${escapeHtml(label)} 맵별 기록 없음</div>`;
+      }
+      let body = '';
+      for (const map of maps) {
+        const o = mapObj[map];
+        const n = o.w + o.l;
+        const pct = n ? ((o.w / n) * 100).toFixed(1) : '—';
+        const cls = !n ? 'text-zinc-400' : Number(pct) > 50 ? 'text-emerald-600 font-semibold' : Number(pct) < 50 ? 'text-rose-600' : '';
+        body += `<tr class="border-b border-zinc-50">
+          <td class="py-1.5 font-medium text-zinc-800">${escapeHtml(map)}</td>
+          <td class="py-1.5 text-right tabular-nums">${o.w}</td>
+          <td class="py-1.5 text-right tabular-nums">${o.l}</td>
+          <td class="py-1.5 text-right tabular-nums ${cls}">${pct === '—' ? '—' : pct + '%'}</td>
+        </tr>`;
+      }
+      return `<div class="rounded-lg border border-zinc-200 bg-zinc-50/60 p-3">
+        <h5 class="text-xs font-bold text-zinc-600 uppercase tracking-wide mb-2">${escapeHtml(label)}</h5>
+        <table class="w-full text-xs"><thead><tr class="text-zinc-500">
+          <th class="text-left py-1">맵</th><th class="text-right py-1">승</th><th class="text-right py-1">패</th><th class="text-right py-1">승률</th>
+        </tr></thead><tbody>${body}</tbody></table></div>`;
+    }
+
+    function renderTeamMapSection(tms) {
+      const tm = tms || { '2v2': {}, '3v3': {} };
+      return `<div class="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
+        <h4 class="text-sm font-bold text-zinc-800 mb-3">팀플 · 맵별 (2:2 / 3:3)</h4>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          ${renderTeamMapBucket('2v2', tm['2v2'])}
+          ${renderTeamMapBucket('3v3', tm['3v3'])}
+        </div>
+      </div>`;
+    }
+
+    function setHeroDetailMode(detail) {
+      const h = document.getElementById('s11-page-header');
+      const m = document.getElementById('main-stack');
+      if (h) h.classList.toggle('hidden', !!detail);
+      if (m) m.classList.toggle('mt-4', !!detail);
+    }
+
+    function findPlayerById(playerId) {
+      return (lastPlayers || []).find((x) => String(x.id || '') === String(playerId || ''));
+    }
+
+    function showPlayerListPage() {
+      mobilePlayerDetailViaList = false;
+      destroyDetailChart();
+      setHeroDetailMode(false);
+      renderPlayersPage(lastMeta, lastPlayers, lastStatsByName, lastStateByName);
+      attachPlayerFilterListeners();
+      if (typeof applyPlayerFilters === 'function') applyPlayerFilters();
+    }
+
+    function showPlayerDetailFullPage(playerId) {
+      const p = findPlayerById(playerId);
+      if (!p || !lastMeta) return;
+      destroyDetailChart();
+      if (modalEloChart) {
+        modalEloChart.destroy();
+        modalEloChart = null;
+      }
+      setHeroDetailMode(true);
+      const dn = (p.displayName || '').trim();
+      const pst = lastStateByName.get(dn);
+      const eloHistory = [...(pst?.history || [])].sort((a, b) => a.seq - b.seq);
+      const chartId = 'eloDetailChart';
+      const inner = buildPlayerDetailInnerHTML(lastMeta, p, chartId);
+      document.getElementById('players-root').innerHTML = `
+        <div class="rounded-xl border border-zinc-200 bg-white shadow-sm overflow-hidden">
+          <div class="flex flex-wrap items-center gap-3 border-b border-zinc-200 bg-zinc-50 px-4 py-3">
+            <button type="button" id="detail-back-btn" class="inline-flex items-center gap-1 rounded-full bg-white border border-zinc-200 px-3 py-1.5 text-sm font-semibold text-zinc-700 hover:bg-zinc-100">
+              ← 선수 목록
+            </button>
+            <div class="min-w-0 flex-1">
+              <h2 class="text-lg font-bold text-zinc-900 truncate">${escapeHtml(p.displayName)} <span class="text-zinc-400 font-mono text-sm">${escapeHtml(p.id || '')}</span></h2>
+              <p class="text-[11px] text-zinc-500">이 화면 URL을 저장하면 북마크로 다시 열 수 있습니다.</p>
+            </div>
+          </div>
+          <div class="p-4 sm:p-6 bg-white">${inner}</div>
+        </div>`;
+      document.getElementById('detail-back-btn').addEventListener('click', () => {
+        if (mobilePlayerDetailViaList) {
+          window.history.back();
+        } else {
+          window.history.replaceState({}, '', location.pathname);
+          showPlayerListPage();
+        }
+      });
+      detailPageChart = mountEloLineChart(chartId, eloHistory);
+    }
+
+    function isMobilePlayerDetail() {
+      return window.matchMedia('(max-width: 767px)').matches;
+    }
+
+    function routeFromUrl() {
+      const q = new URLSearchParams(location.search).get('player');
+      if (q) {
+        if (findPlayerById(q)) showPlayerDetailFullPage(q);
+        else {
+          window.history.replaceState({}, '', location.pathname);
+          showPlayerListPage();
+        }
+      } else {
+        showPlayerListPage();
+      }
+    }
+
+    function renderMapSection(mapStats) {
+      const maps = Object.keys(mapStats || {}).sort();
+      if (!maps.length) {
+        return '<p class="text-sm text-zinc-500">1:1 세트가 입력되면 맵별 승패가 표시됩니다.</p>';
+      }
+      let html = '<table class="w-full text-sm"><thead><tr class="text-left text-zinc-500 border-b border-zinc-200">';
+      html += '<th class="py-2 pr-2">맵</th><th class="py-2 text-right">승</th><th class="py-2 text-right">패</th><th class="py-2 text-right">승률</th></tr></thead><tbody>';
+      for (const map of maps) {
+        const o = mapStats[map];
+        const w = o.w;
+        const l = o.l;
+        const pct = w + l > 0 ? ((w / (w + l)) * 100).toFixed(1) : '—';
+        const cls = w + l === 0 ? 'text-zinc-400' : Number(pct) > 50 ? 'text-emerald-600 font-semibold' : Number(pct) < 50 ? 'text-rose-600' : '';
+        html += `<tr class="border-b border-zinc-50">
+          <td class="py-2 font-medium text-zinc-800">${escapeHtml(map)}</td>
+          <td class="py-2 text-right tabular-nums">${w}</td>
+          <td class="py-2 text-right tabular-nums">${l}</td>
+          <td class="py-2 text-right tabular-nums ${cls}">${pct === '—' ? '—' : pct + '%'}</td>
+        </tr>`;
+      }
+      html += '</tbody></table>';
+      return html;
+    }
+
+    function openPlayerModal(playerId) {
+      const p = findPlayerById(playerId);
+      if (!p || !lastMeta) return;
+      destroyDetailChart();
+      const dn = (p.displayName || '').trim();
+      const pst = lastStateByName.get(dn);
+      const eloHistory = [...(pst?.history || [])].sort((a, b) => a.seq - b.seq);
+      const chartId = 'eloHistoryChart';
+      document.getElementById('modalPlayerName').textContent = `${p.displayName} (${p.id || '—'})`;
+      document.getElementById('playerModalContent').innerHTML = buildPlayerDetailInnerHTML(lastMeta, p, chartId);
+      document.getElementById('playerModal').classList.remove('hidden');
+      if (modalEloChart) {
+        modalEloChart.destroy();
+        modalEloChart = null;
+      }
+      modalEloChart = mountEloLineChart(chartId, eloHistory);
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        const [meta, playersData, fixtures] = await Promise.all([
+          loadJson('data/s11/meta.json'),
+          loadJson('data/s11/players.json'),
+          loadJson('data/s11/fixtures.json'),
+        ]);
+        const roundDocs = await loadAllRoundResults(10, fixtures);
+        const players = playersData.players || [];
+        const { statsByName, stateByName } = simulateSeason(fixtures, roundDocs, players);
+
+        lastMeta = meta;
+        lastPlayers = players;
+        lastStatsByName = statsByName;
+        lastStateByName = stateByName;
+
+        routeFromUrl();
+        window.addEventListener('popstate', () => routeFromUrl());
+
+        document.body.addEventListener('click', (e) => {
+          const headerCell = e.target.closest('.table-sortable th[data-sort], .table-sortable th[data-sort-numeric]');
+          if (headerCell && !e.target.closest('input, select')) {
+            const tableElement = headerCell.closest('table');
+            const headerIndex = Array.prototype.indexOf.call(headerCell.parentElement.children, headerCell);
+            const currentIsAsc = headerCell.classList.contains('sorted-asc');
+            tableElement.querySelectorAll('th[data-sort], th[data-sort-numeric]').forEach((th) => th.classList.remove('sorted-asc', 'sorted-desc'));
+            headerCell.classList.toggle('sorted-asc', !currentIsAsc);
+            headerCell.classList.toggle('sorted-desc', currentIsAsc);
+            sortTableByColumn(tableElement, headerIndex, !currentIsAsc, headerCell.hasAttribute('data-sort-numeric'));
+          }
+          const plink = e.target.closest('.player-link');
+          if (plink) {
+            e.preventDefault();
+            const id = plink.dataset.playerId;
+            if (!id) return;
+            if (isMobilePlayerDetail()) {
+              mobilePlayerDetailViaList = true;
+              window.history.pushState({ view: 'player', id }, '', `?player=${encodeURIComponent(id)}`);
+              showPlayerDetailFullPage(id);
+              window.scrollTo(0, 0);
+            } else {
+              openPlayerModal(id);
+            }
+          }
+        });
+
+        document.getElementById('playerModalClose').addEventListener('click', () => {
+          document.getElementById('playerModal').classList.add('hidden');
+          if (modalEloChart) {
+            modalEloChart.destroy();
+            modalEloChart = null;
+          }
+        });
+        const modalShell = document.querySelector('#playerModal > div');
+        if (modalShell) {
+          modalShell.addEventListener('click', (e) => {
+            if (e.target === modalShell) document.getElementById('playerModalClose').click();
+          });
+        }
+      } catch (err) {
+        console.error(err);
+        document.getElementById('loading').innerHTML = `<p class="text-red-600 px-4">로딩 실패: ${escapeHtml(err.message)}</p>`;
+        return;
+      }
+      document.getElementById('loading').classList.add('hidden');
+      document.getElementById('main-content').classList.remove('hidden');
+    });
+  </script>
+</body>
+</html>

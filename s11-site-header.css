@@ -1,0 +1,263 @@
+/* 시즌11 공통 사이트 헤더 + LG Craft 락업 (표 코너 등 소형 락업 포함) */
+
+.lg-craft-lockup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.3rem 0.2rem;
+  border-radius: 0.375rem;
+  background: linear-gradient(160deg, #ffffff 0%, #f4f4f5 52%, #e8e8ec 100%);
+  border: 1px solid rgba(212, 212, 216, 0.95);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85);
+}
+
+.lg-craft-lockup img {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  object-fit: contain;
+}
+
+.lg-craft-wordmark {
+  font-size: 0.5625rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  color: #3f3f46;
+  margin-top: 3px;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.lg-craft-wordmark .lg-red {
+  color: #a50034;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+}
+
+.lg-craft-lockup--hero {
+  padding: 0.5rem 0.6rem 0.45rem;
+  border-radius: 0.65rem;
+  background: linear-gradient(165deg, #ffffff 0%, #fafafa 45%, #f4f4f5 100%);
+  border: 1px solid #e4e4e7;
+  box-shadow:
+    0 1px 3px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.lg-craft-lockup--hero .lg-craft-hero-img {
+  height: 2.85rem;
+  width: auto;
+}
+
+@media (min-width: 640px) {
+  .lg-craft-lockup--hero .lg-craft-hero-img {
+    height: 3.15rem;
+  }
+}
+
+/* 헤더: 본문(zinc-100)과 맞는 밝은 카드 — 과한 다크/블렌드 제거 */
+.s11-site-header {
+  position: relative;
+  margin-bottom: 1.5rem;
+  border-radius: 1rem;
+  border: 1px solid #e4e4e7;
+  background: linear-gradient(180deg, #fafafa 0%, #f4f4f5 100%);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  overflow: hidden;
+}
+
+.s11-site-header-accent {
+  height: 3px;
+  background: linear-gradient(90deg, #4f46e5, #6366f1 55%, #7c3aed);
+}
+
+.s11-site-header-panel {
+  margin: 0;
+  border-radius: 0;
+  background: #ffffff;
+  border: none;
+  border-top: 1px solid #f4f4f5;
+  box-shadow: none;
+}
+
+.s11-site-header-body {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding: 1.15rem 1rem 1.2rem;
+  gap: 0;
+}
+
+@media (min-width: 640px) {
+  .s11-site-header-body {
+    padding: 1.3rem 1.75rem 1.35rem;
+  }
+}
+
+/* 1행: 로고 + 시리즈 (메인 비주얼) */
+.s11-site-header-top {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.85rem 1.25rem;
+  padding-top: 0.2rem;
+}
+
+.s11-site-header-brand {
+  flex-shrink: 0;
+}
+
+/* 멸망전 + SEASON 11: 나란히 배치, 겹침 없음 */
+.s11-site-header-series {
+  display: inline-flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem 0.75rem;
+  line-height: 1;
+}
+
+.s11-site-header-series-ko {
+  display: inline-block;
+  width: max-content;
+  max-width: 100%;
+  font-size: clamp(1.9rem, 6vw, 2.65rem);
+  font-weight: 900;
+  letter-spacing: -0.055em;
+  line-height: 1;
+  background: linear-gradient(105deg, #020617 0%, #1e293b 38%, #312e81 72%, #4338ca 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 10px rgba(79, 70, 229, 0.18));
+}
+
+@supports not ((-webkit-background-clip: text) or (background-clip: text)) {
+  .s11-site-header-series-ko {
+    color: #0f172a;
+    background: none;
+    -webkit-text-fill-color: currentColor;
+    filter: none;
+  }
+}
+
+.s11-site-header-series-en {
+  flex: 0 0 auto;
+  font-size: clamp(0.6875rem, 2.15vw, 0.8125rem);
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-indent: 0.08em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  color: #4338ca;
+  padding: 0.3em 0.55em 0.28em 0.62em;
+  border-radius: 0.375rem;
+  background: linear-gradient(180deg, #faf5ff 0%, #f5f3ff 45%, #ede9fe 100%);
+  border: 1px solid #ddd6fe;
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    0 1px 2px rgba(79, 70, 229, 0.06);
+}
+
+/* 2행: 페이지 타이틀 */
+.s11-site-header-page-title {
+  width: 100%;
+  max-width: 40rem;
+  margin: 0.95rem auto 0;
+  padding-top: 0.9rem;
+  border-top: 1px solid #e4e4e7;
+  text-align: center;
+  font-size: 1.125rem;
+  line-height: 1.35;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: #3f3f46;
+}
+
+@media (min-width: 640px) {
+  .s11-site-header-page-title {
+    font-size: 1.1875rem;
+    padding-top: 1rem;
+  }
+}
+
+/* 시즌11 공통 네비 — 모바일 터치 영역(최소 44px) 확대, PC는 기존 크기 */
+.s11-site-nav {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+@media (max-width: 767px) {
+  .s11-site-nav > :nth-child(5):last-child {
+    grid-column: 1 / -1;
+  }
+
+  .s11-site-nav-link,
+  .s11-site-nav-current {
+    width: 100%;
+  }
+}
+
+@media (min-width: 768px) {
+  .s11-site-nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+}
+
+.s11-site-nav-link,
+.s11-site-nav-current {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 2.75rem;
+  padding: 0.625rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.8125rem;
+  line-height: 1.3;
+  border: 1px solid;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+@media (min-width: 768px) {
+  .s11-site-nav-link,
+  .s11-site-nav-current {
+    min-height: 0;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.75rem;
+    line-height: 1.25;
+  }
+}
+
+.s11-site-nav-link {
+  background: #fff;
+  border-color: #e4e4e7;
+  color: #4338ca;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.s11-site-nav-link:hover {
+  border-color: #a5b4fc;
+}
+
+.s11-site-nav-current {
+  background: #eef2ff;
+  border-color: #c7d2fe;
+  color: #3730a3;
+  font-weight: 600;
+}

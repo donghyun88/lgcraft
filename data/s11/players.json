@@ -1,0 +1,1140 @@
+{
+  "schemaVersion": 1,
+  "season": 11,
+  "notes": "티어 표에서 같은 티어 블록의 1행=메인저그(Z), 2행=메인테란(T), 3행=메인토스(P). tierSheetMainRace 와 raceDefault 가 동일합니다. teamId 는 팀 확정 후 meta.json 의 t1~t6 로 채웁니다. raceVsOpponent 는 개인전 상대 종족(T/Z/P)별 픽. 팀 배정표 반영: teamId t1~t6 = 1~6팀. isCaptain = 팀장.",
+  "players": [
+    {
+      "id": "KuSan",
+      "displayName": "강구산",
+      "teamId": "t3",
+      "tier": "휴먼",
+      "tierSheetMainRace": "Z",
+      "raceDefault": "Z",
+      "aliases": [
+        "KuSan",
+        "3Star_KuSan"
+      ],
+      "isCaptain": true
+    },
+    {
+      "id": "Kkang",
+      "displayName": "강성구",
+      "teamId": "t2",
+      "tier": "휴먼",
+      "tierSheetMainRace": "P",
+      "raceDefault": "P",
+      "aliases": [
+        "s11_8f7f3cd",
+        "2Fighters_Kkang"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "hillock",
+      "displayName": "강응선",
+      "teamId": "t6",
+      "tier": "갓",
+      "tierSheetMainRace": "P",
+      "raceDefault": "P",
+      "aliases": [
+        "Hillock",
+        "6Kings_hillock"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "KJJ",
+      "displayName": "경제진",
+      "teamId": "t4",
+      "tier": "휴먼",
+      "tierSheetMainRace": "T",
+      "raceDefault": "T",
+      "aliases": [
+        "KJJ",
+        "Soul_KJJ"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "Sabo",
+      "displayName": "고성근",
+      "teamId": "t3",
+      "tier": "아메바",
+      "tierSheetMainRace": "P",
+      "raceDefault": "P",
+      "aliases": [
+        "s11_8f536a8",
+        "3Star_Sabo"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "Gunstory",
+      "displayName": "공동건",
+      "teamId": "t5",
+      "tier": "애니멀",
+      "tierSheetMainRace": "Z",
+      "raceDefault": "Z",
+      "aliases": [
+        "gunstory",
+        "TX_Gunstory"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "Asada",
+      "displayName": "공동현",
+      "teamId": "t2",
+      "tier": "애니멀",
+      "tierSheetMainRace": "Z",
+      "raceDefault": "Z",
+      "aliases": [
+        "Asada",
+        "2Fighters_Asada"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "Woong",
+      "displayName": "구선웅",
+      "teamId": "t2",
+      "tier": "킹",
+      "tierSheetMainRace": "T",
+      "raceDefault": "T",
+      "aliases": [
+        "WoongD",
+        "2Fighters_Woong"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "jogak",
+      "displayName": "권오선",
+      "teamId": "t3",
+      "tier": "애니멀",
+      "tierSheetMainRace": "Z",
+      "raceDefault": "Z",
+      "aliases": [
+        "Jogak",
+        "3Star_jogak"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "CTHD",
+      "displayName": "권혁준",
+      "teamId": "t2",
+      "tier": "휴먼",
+      "tierSheetMainRace": "P",
+      "raceDefault": "P",
+      "aliases": [
+        "sAviOr",
+        "2Fighters_CTHD"
+      ],
+      "raceVsOpponent": {
+        "Z": "T"
+      },
+      "raceNotes": "메인 토스. 저그 상대일 때만 테란.",
+      "isCaptain": false
+    },
+    {
+      "id": "sEpl",
+      "displayName": "김경식",
+      "teamId": "t6",
+      "tier": "킹",
+      "tierSheetMainRace": "T",
+      "raceDefault": "T",
+      "aliases": [
+        "sEpI",
+        "6Kings_sEpl"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "CoCHA",
+      "displayName": "김경철",
+      "teamId": "t4",
+      "tier": "아메바",
+      "tierSheetMainRace": "T",
+      "raceDefault": "T",
+      "aliases": [
+        "s11_8eb7798",
+        "Soul_CoCHA"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "DDOO",
+      "displayName": "김도완",
+      "teamId": "t2",
+      "tier": "아메바",
+      "tierSheetMainRace": "Z",
+      "raceDefault": "Z",
+      "aliases": [
+        "s11_8ea5525",
+        "2Fighters_DDOO"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "R2bt",
+      "displayName": "김도현",
+      "teamId": "t4",
+      "tier": "휴먼",
+      "tierSheetMainRace": "Z",
+      "raceDefault": "Z",
+      "aliases": [
+        "zergking",
+        "Soul_R2bt"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "dOngkim",
+      "displayName": "김동현",
+      "teamId": "t5",
+      "tier": "킹",
+      "tierSheetMainRace": "P",
+      "raceDefault": "P",
+      "aliases": [
+        "dOngkim!",
+        "d0ngkim",
+        "TX_d0ngkim"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "Baba",
+      "displayName": "김민중",
+      "teamId": "t5",
+      "tier": "휴먼",
+      "tierSheetMainRace": "Z",
+      "raceDefault": "Z",
+      "aliases": [
+        "s11_8e95b88",
+        "TX_Baba"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "eggkyung",
+      "displayName": "김인경",
+      "teamId": "t3",
+      "tier": "킹",
+      "tierSheetMainRace": "T",
+      "raceDefault": "T",
+      "aliases": [
+        "s11_8f1f320",
+        "3Star_eggkyung"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "TACTICS",
+      "displayName": "김재준",
+      "teamId": "t5",
+      "tier": "휴먼",
+      "tierSheetMainRace": "Z",
+      "raceDefault": "Z",
+      "aliases": [
+        "s11_8f18d49",
+        "TX_TACTICS"
+      ],
+      "isCaptain": true
+    },
+    {
+      "id": "rOdeO",
+      "displayName": "김재현",
+      "teamId": "t4",
+      "tier": "킹",
+      "tierSheetMainRace": "Z",
+      "raceDefault": "Z",
+      "aliases": [
+        "rOde0",
+        "Soul_r0de0"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "Castle",
+      "displayName": "김종성",
+      "teamId": "t6",
+      "tier": "갓",
+      "tierSheetMainRace": "T",
+      "raceDefault": "T",
+      "aliases": [
+        "Castle",
+        "6Kings_Castle"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "ratel",
+      "displayName": "김주한",
+      "teamId": "t3",
+      "tier": "갓",
+      "tierSheetMainRace": "P",
+      "raceDefault": "P",
+      "aliases": [
+        "Sign1666",
+        "3Star_ratel"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "Tsyo",
+      "displayName": "김태수",
+      "teamId": "t4",
+      "tier": "애니멀",
+      "tierSheetMainRace": "T",
+      "raceDefault": "T",
+      "aliases": [
+        "s11_8ee9161",
+        "Soul_Tsyo"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "SeaSee",
+      "displayName": "김태준",
+      "teamId": "t6",
+      "tier": "애니멀",
+      "tierSheetMainRace": "P",
+      "raceDefault": "P",
+      "aliases": [
+        "SeaSee",
+        "6Kings_SeaSee"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "Cain",
+      "displayName": "김태훈",
+      "teamId": "t3",
+      "tier": "킹",
+      "tierSheetMainRace": "P",
+      "raceDefault": "P",
+      "aliases": [
+        "Cain",
+        "3Star_Cain"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "jjabtana",
+      "displayName": "김현기",
+      "teamId": "t6",
+      "tier": "애니멀",
+      "tierSheetMainRace": "Z",
+      "raceDefault": "Z",
+      "aliases": [
+        "jjabTana",
+        "6Kings_jjabtana"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "n31",
+      "displayName": "남상원",
+      "teamId": "t5",
+      "tier": "갓",
+      "tierSheetMainRace": "Z",
+      "raceDefault": "Z",
+      "aliases": [
+        "s11_88ff53c",
+        "TX_n31"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "Soocom",
+      "displayName": "남정석",
+      "teamId": "t6",
+      "tier": "휴먼",
+      "tierSheetMainRace": "P",
+      "raceDefault": "P",
+      "aliases": [
+        "s11_89084a5",
+        "6Kings_Soocom"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "Deokgu",
+      "displayName": "명동주",
+      "teamId": "t6",
+      "tier": "휴먼",
+      "tierSheetMainRace": "P",
+      "raceDefault": "P",
+      "aliases": [
+        "s11_8aba8e5",
+        "6Kings_Deokgu"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "Teo",
+      "displayName": "박광명",
+      "teamId": "t3",
+      "tier": "갓",
+      "tierSheetMainRace": "T",
+      "raceDefault": "T",
+      "aliases": [
+        "s11_8b55c44",
+        "3Star_Teo"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "GodJC",
+      "displayName": "박재창",
+      "teamId": "t2",
+      "tier": "갓",
+      "tierSheetMainRace": "T",
+      "raceDefault": "T",
+      "aliases": [
+        "ShaDOw",
+        "2Fighters_GodJC"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "Freeman",
+      "displayName": "박정진",
+      "teamId": "t6",
+      "tier": "휴먼",
+      "tierSheetMainRace": "P",
+      "raceDefault": "P",
+      "aliases": [
+        "Freeman",
+        "6Kings_Freeman"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "Jenny",
+      "displayName": "박진욱",
+      "teamId": "t1",
+      "tier": "킹",
+      "tierSheetMainRace": "Z",
+      "raceDefault": "Z",
+      "aliases": [
+        "Jenny",
+        "1P_Jenny"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "King",
+      "displayName": "변정식",
+      "teamId": "t2",
+      "tier": "킹",
+      "tierSheetMainRace": "Z",
+      "raceDefault": "Z",
+      "aliases": [
+        "King",
+        "2Fighters_King"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "Evicu",
+      "displayName": "변진황",
+      "teamId": "t5",
+      "tier": "휴먼",
+      "tierSheetMainRace": "P",
+      "raceDefault": "P",
+      "aliases": [
+        "Evicu",
+        "TX_Evicu"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "Force",
+      "displayName": "설재근",
+      "teamId": "t6",
+      "tier": "아메바",
+      "tierSheetMainRace": "P",
+      "raceDefault": "P",
+      "aliases": [
+        "Toast",
+        "6Kings_Force"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "Yoohan",
+      "displayName": "손정곤",
+      "teamId": "t6",
+      "tier": "애니멀",
+      "tierSheetMainRace": "T",
+      "raceDefault": "T",
+      "aliases": [
+        "PerfecT",
+        "6Kings_Yoohan"
+      ],
+      "isCaptain": true
+    },
+    {
+      "id": "iNfErNal",
+      "displayName": "심현도",
+      "teamId": "t4",
+      "tier": "아메바",
+      "tierSheetMainRace": "Z",
+      "raceDefault": "Z",
+      "aliases": [
+        "s11_a8837c9",
+        "Soul_iNfErNal"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "Eagle",
+      "displayName": "안정한",
+      "teamId": "t4",
+      "tier": "갓",
+      "tierSheetMainRace": "Z",
+      "raceDefault": "Z",
+      "aliases": [
+        "s11_a59ccc4",
+        "Soul_Eagle"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "Nope",
+      "displayName": "안태영",
+      "teamId": "t4",
+      "tier": "킹",
+      "tierSheetMainRace": "Z",
+      "raceDefault": "Z",
+      "aliases": [
+        "Nope",
+        "Soul_Nope"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "Tori",
+      "displayName": "양시찬",
+      "teamId": "t5",
+      "tier": "아메바",
+      "tierSheetMainRace": "P",
+      "raceDefault": "P",
+      "aliases": [
+        "Tori",
+        "TX_Tori"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "hjvita",
+      "displayName": "양현철",
+      "teamId": "t3",
+      "tier": "아메바",
+      "tierSheetMainRace": "P",
+      "raceDefault": "P",
+      "aliases": [
+        "Hjvita",
+        "3Star_hjvita"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "SandbaG",
+      "displayName": "염규상",
+      "teamId": "t4",
+      "tier": "애니멀",
+      "tierSheetMainRace": "P",
+      "raceDefault": "P",
+      "aliases": [
+        "SandbaG",
+        "Soul_SandbaG"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "bradsky",
+      "displayName": "오석현",
+      "teamId": "t3",
+      "tier": "아메바",
+      "tierSheetMainRace": "Z",
+      "raceDefault": "Z",
+      "aliases": [
+        "bradsk",
+        "3Star_bradsky"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "bullfrog",
+      "displayName": "오택삼",
+      "teamId": "t6",
+      "tier": "갓",
+      "tierSheetMainRace": "Z",
+      "raceDefault": "Z",
+      "aliases": [
+        "Bullfrog",
+        "6Kings_bullfrog"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "HOME",
+      "displayName": "우병진",
+      "teamId": "t4",
+      "tier": "애니멀",
+      "tierSheetMainRace": "Z",
+      "raceDefault": "Z",
+      "aliases": [
+        "home",
+        "Soul_HOME"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "Twin",
+      "displayName": "유윤실",
+      "teamId": "t3",
+      "tier": "애니멀",
+      "tierSheetMainRace": "P",
+      "raceDefault": "P",
+      "aliases": [
+        "Twin",
+        "3Star_Twin"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "No-Gi",
+      "displayName": "유태욱",
+      "teamId": "t5",
+      "tier": "애니멀",
+      "tierSheetMainRace": "Z",
+      "raceDefault": "Z",
+      "aliases": [
+        "No-Gi",
+        "TX_No-Gi"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "Kensay",
+      "displayName": "이경성",
+      "teamId": "t1",
+      "tier": "아메바",
+      "tierSheetMainRace": "Z",
+      "raceDefault": "Z",
+      "aliases": [
+        "Kensay",
+        "1P_Kensay"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "Tana",
+      "displayName": "이대연",
+      "teamId": "t1",
+      "tier": "갓",
+      "tierSheetMainRace": "Z",
+      "raceDefault": "Z",
+      "aliases": [
+        "Tana",
+        "1P_Tana"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "Cleanese",
+      "displayName": "이동균",
+      "teamId": "t1",
+      "tier": "아메바",
+      "tierSheetMainRace": "Z",
+      "raceDefault": "Z",
+      "aliases": [
+        "s11_a60c9c8",
+        "1P_Cleanese"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "Attaboy",
+      "displayName": "이봉철",
+      "teamId": "t5",
+      "tier": "킹",
+      "tierSheetMainRace": "Z",
+      "raceDefault": "Z",
+      "aliases": [
+        "Atta",
+        "TX_Attaboy"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "hoho",
+      "displayName": "이영길",
+      "teamId": "t2",
+      "tier": "갓",
+      "tierSheetMainRace": "Z",
+      "raceDefault": "Z",
+      "aliases": [
+        "s11_a51c6c8",
+        "2Fighters_hoho"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "8!!!!!!!!D",
+      "displayName": "이웅배",
+      "teamId": "t5",
+      "tier": "아메바",
+      "tierSheetMainRace": "T",
+      "raceDefault": "T",
+      "aliases": [
+        "s11_a51ec84",
+        "TX_8!!!!!!!!D"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "Alive",
+      "displayName": "이윤종",
+      "teamId": "t4",
+      "tier": "킹",
+      "tierSheetMainRace": "T",
+      "raceDefault": "T",
+      "aliases": [
+        "Alive",
+        "Soul_Alive"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "hahaha",
+      "displayName": "이윤호",
+      "teamId": "t5",
+      "tier": "아메바",
+      "tierSheetMainRace": "Z",
+      "raceDefault": "Z",
+      "aliases": [
+        "hahaha",
+        "TX_hahaha"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "MiMiMong",
+      "displayName": "이창언",
+      "teamId": "t1",
+      "tier": "휴먼",
+      "tierSheetMainRace": "Z",
+      "raceDefault": "Z",
+      "aliases": [
+        "MiMiMong",
+        "1P_MiMiMong"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "Sushi",
+      "displayName": "이철훈",
+      "teamId": "t5",
+      "tier": "갓",
+      "tierSheetMainRace": "T",
+      "raceDefault": "T",
+      "aliases": [
+        "s11_a50dcb9",
+        "TX_Sushi"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "naru",
+      "displayName": "이태연",
+      "teamId": "t2",
+      "tier": "아메바",
+      "tierSheetMainRace": "T",
+      "raceDefault": "T",
+      "aliases": [
+        "s11_a53643d",
+        "2Fighters_naru"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "wasub",
+      "displayName": "이형섭",
+      "teamId": "t1",
+      "tier": "휴먼",
+      "tierSheetMainRace": "P",
+      "raceDefault": "P",
+      "aliases": [
+        "wassub",
+        "1P_wasub"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "chobo111",
+      "displayName": "임채현",
+      "teamId": "t6",
+      "tier": "아메바",
+      "tierSheetMainRace": "Z",
+      "raceDefault": "Z",
+      "aliases": [
+        "s11_a5f6ca1",
+        "6Kings_chobo111"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "PixeL",
+      "displayName": "임호진",
+      "teamId": "t1",
+      "tier": "휴먼",
+      "tierSheetMainRace": "T",
+      "raceDefault": "T",
+      "aliases": [
+        "Pixel",
+        "1P_PixeL"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "SIG",
+      "displayName": "장대원",
+      "teamId": "t2",
+      "tier": "휴먼",
+      "tierSheetMainRace": "Z",
+      "raceDefault": "Z",
+      "aliases": [
+        "s11_a50e7d0",
+        "2Fighters_SIG"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "HON",
+      "displayName": "장민수",
+      "teamId": "t4",
+      "tier": "갓",
+      "tierSheetMainRace": "Z",
+      "raceDefault": "Z",
+      "aliases": [
+        "HON",
+        "Soul_HON"
+      ],
+      "isCaptain": true
+    },
+    {
+      "id": "Chobo",
+      "displayName": "전성민",
+      "teamId": "t1",
+      "tier": "킹",
+      "tierSheetMainRace": "Z",
+      "raceDefault": "Z",
+      "aliases": [
+        "HKK",
+        "1P_Chobo"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "Pooooker",
+      "displayName": "전은후",
+      "teamId": "t1",
+      "tier": "킹",
+      "tierSheetMainRace": "P",
+      "raceDefault": "P",
+      "aliases": [
+        "Pooooker",
+        "1P_Pooooker"
+      ],
+      "isCaptain": true
+    },
+    {
+      "id": "ggamak",
+      "displayName": "정용석",
+      "teamId": "t2",
+      "tier": "갓",
+      "tierSheetMainRace": "Z",
+      "raceDefault": "Z",
+      "aliases": [
+        "ggamak",
+        "2Fighters_ggamak"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "Helljjang",
+      "displayName": "정재영",
+      "teamId": "t5",
+      "tier": "킹",
+      "tierSheetMainRace": "Z",
+      "raceDefault": "Z",
+      "aliases": [
+        "s11_ab1b19d",
+        "TX_Helljjang"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "Kakaru",
+      "displayName": "정주오",
+      "teamId": "t5",
+      "tier": "애니멀",
+      "tierSheetMainRace": "T",
+      "raceDefault": "T",
+      "aliases": [
+        "Kakaru",
+        "TX_Kakaru"
+      ],
+      "raceNotes": "시즌11부터 테란으로 변경 참가(시즌10 기록과 등록 종족이 다름).",
+      "isCaptain": false
+    },
+    {
+      "id": "Jade",
+      "displayName": "정현우",
+      "teamId": "t1",
+      "tier": "애니멀",
+      "tierSheetMainRace": "Z",
+      "raceDefault": "Z",
+      "aliases": [
+        "CibalBattle",
+        "1P_Jade"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "PanYa",
+      "displayName": "조승일",
+      "teamId": "t6",
+      "tier": "킹",
+      "tierSheetMainRace": "P",
+      "raceDefault": "P",
+      "aliases": [
+        "Panya",
+        "6Kings_PanYa"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "HD",
+      "displayName": "조항용",
+      "teamId": "t2",
+      "tier": "애니멀",
+      "tierSheetMainRace": "P",
+      "raceDefault": "P",
+      "aliases": [
+        "HD",
+        "2Fighters_HD"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "TheMan",
+      "displayName": "조현용",
+      "teamId": "t4",
+      "tier": "휴먼",
+      "tierSheetMainRace": "P",
+      "raceDefault": "P",
+      "aliases": [
+        "TheMan",
+        "Soul_TheMan"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "berrykim",
+      "displayName": "주효진",
+      "teamId": "t6",
+      "tier": "킹",
+      "tierSheetMainRace": "Z",
+      "raceDefault": "Z",
+      "aliases": [
+        "berrykim",
+        "6Kings_berrykim"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "Z:IN",
+      "displayName": "지주영",
+      "teamId": "t4",
+      "tier": "아메바",
+      "tierSheetMainRace": "P",
+      "raceDefault": "P",
+      "aliases": [
+        "s11_jijuyeong",
+        "Soul_z:IN"
+      ],
+      "isCaptain": false,
+      "raceNotes": "팀 배정표 기준 추가(총원 86). 아메바 티어, 메인 토스."
+    },
+    {
+      "id": "sky98",
+      "displayName": "최상균",
+      "teamId": "t2",
+      "tier": "킹",
+      "tierSheetMainRace": "Z",
+      "raceDefault": "Z",
+      "aliases": [
+        "sky9898",
+        "2Fighters_sky98"
+      ],
+      "raceVsOpponent": {
+        "Z": "P"
+      },
+      "raceNotes": "메인 저그. 저그 상대일 때만 토스.",
+      "isCaptain": true
+    },
+    {
+      "id": "ziLLeKi",
+      "displayName": "최성진",
+      "teamId": "t3",
+      "tier": "휴먼",
+      "tierSheetMainRace": "P",
+      "raceDefault": "P",
+      "aliases": [
+        "ziLLeKi",
+        "3Star_ziLLeKi"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "STeVe",
+      "displayName": "최수명",
+      "teamId": "t1",
+      "tier": "아메바",
+      "tierSheetMainRace": "P",
+      "raceDefault": "P",
+      "aliases": [
+        "STeVe",
+        "1P_STeVe"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "Daheen",
+      "displayName": "최재광",
+      "teamId": "t3",
+      "tier": "킹",
+      "tierSheetMainRace": "Z",
+      "raceDefault": "Z",
+      "aliases": [
+        "s11_a7dfb44",
+        "3Star_Daheen"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "Xelloss",
+      "displayName": "최화용",
+      "teamId": "t3",
+      "tier": "애니멀",
+      "tierSheetMainRace": "T",
+      "raceDefault": "T",
+      "aliases": [
+        "Xellos",
+        "3Star_Xelloss"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "StyLe",
+      "displayName": "한규호",
+      "teamId": "t1",
+      "tier": "애니멀",
+      "tierSheetMainRace": "P",
+      "raceDefault": "P",
+      "aliases": [
+        "StyLe",
+        "1P_StyLe"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "HANS",
+      "displayName": "한민석",
+      "teamId": "t4",
+      "tier": "갓",
+      "tierSheetMainRace": "T",
+      "raceDefault": "T",
+      "aliases": [
+        "s11_a157998",
+        "Soul_HANS"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "Hugo",
+      "displayName": "황윤도",
+      "teamId": "t1",
+      "tier": "갓",
+      "tierSheetMainRace": "T",
+      "raceDefault": "T",
+      "aliases": [
+        "s11_a11d4ac",
+        "1P_Hugo"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "tacticsjeja",
+      "displayName": "황윤호",
+      "teamId": "t5",
+      "tier": "갓",
+      "tierSheetMainRace": "P",
+      "raceDefault": "P",
+      "aliases": [
+        "s11_a11b150",
+        "TX_tacticsjeja"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "glory",
+      "displayName": "황정동",
+      "teamId": "t1",
+      "tier": "애니멀",
+      "tierSheetMainRace": "P",
+      "raceDefault": "P",
+      "aliases": [
+        "glory",
+        "1P_glory"
+      ],
+      "raceVsOpponent": {
+        "P": "Z"
+      },
+      "raceNotes": "메인 토스. 토스 상대일 때만 저그.",
+      "isCaptain": false
+    },
+    {
+      "id": "HJY",
+      "displayName": "황진영",
+      "teamId": "t2",
+      "tier": "애니멀",
+      "tierSheetMainRace": "Z",
+      "raceDefault": "Z",
+      "aliases": [
+        "JY",
+        "2Fighters_HJY"
+      ],
+      "isCaptain": false
+    },
+    {
+      "id": "Ruin",
+      "displayName": "황찬종",
+      "teamId": "t3",
+      "tier": "휴먼",
+      "tierSheetMainRace": "Z",
+      "raceDefault": "Z",
+      "aliases": [
+        "Ruin",
+        "3Star_Ruin"
+      ],
+      "isCaptain": false
+    }
+  ]
+}

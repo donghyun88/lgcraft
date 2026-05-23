@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>멸망전 시즌11 로스터</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="s11-site-header.css" />
+  <style>
+    body { font-family: Inter, sans-serif; }
+    .race-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 1.125rem;
+      height: 1.125rem;
+      border-radius: 9999px;
+      font-size: 0.5625rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #fff;
+      flex-shrink: 0;
+      line-height: 1;
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.35) inset;
+    }
+    .race-pill-Z { background: linear-gradient(145deg, #be123c, #881337); }
+    .race-pill-T { background: linear-gradient(145deg, #0369a1, #0c4a6e); }
+    .race-pill-P { background: linear-gradient(145deg, #ca8a04, #854d0e); }
+    .race-pill-R { background: linear-gradient(145deg, #57534e, #292524); font-size: 0.5rem; }
+    .race-pill-? { background: linear-gradient(145deg, #71717a, #3f3f46); font-size: 0.5rem; }
+    .cap-badge {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 0.25rem;
+      padding: 0.1rem 0.35rem;
+      font-size: 0.5625rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #fff;
+      line-height: 1.1;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.12);
+    }
+    .cap-badge-team { background: linear-gradient(135deg, #4f46e5, #3730a3); }
+    .cap-badge-main { background: linear-gradient(135deg, #7c3aed, #5b21b6); }
+    .chip-cap-badge {
+      font-size: 0.5625rem;
+      font-weight: 800;
+      padding: 0.1rem 0.3rem;
+      border-radius: 0.2rem;
+      background: linear-gradient(135deg, #4f46e5, #4338ca);
+      color: #fff;
+      letter-spacing: 0.02em;
+    }
+    .chip-main-badge {
+      font-size: 0.5625rem;
+      font-weight: 800;
+      padding: 0.1rem 0.3rem;
+      border-radius: 0.2rem;
+      background: linear-gradient(135deg, #7c3aed, #5b21b6);
+      color: #fff;
+      letter-spacing: 0.02em;
+    }
+    .roster-team-logo-wrap {
+      display: flex;
+      justify-content: center;
+      margin: 0.5rem 0 0.35rem;
+    }
+    .roster-team-logo-frame {
+      position: relative;
+      width: 4.5rem;
+      height: 4.5rem;
+      border-radius: 0.5rem;
+      overflow: hidden;
+      flex-shrink: 0;
+      background: linear-gradient(180deg, #fafafa 0%, #f4f4f5 100%);
+      border: 1px solid #e4e4e7;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    }
+    @media (min-width: 640px) {
+      .roster-team-logo-frame {
+        width: 5rem;
+        height: 5rem;
+      }
+    }
+    .roster-team-logo-img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center center;
+    }
+    .roster-team-logo-fallback {
+      font-size: 0.625rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      color: #52525b;
+    }
+    /* 모바일 로스터: 팀별 아코디언 (md 미만) */
+    .roster-mobile-team {
+      border-radius: 0.875rem;
+      border: 1px solid rgba(228, 228, 231, 0.95);
+      background: #fff;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      overflow: hidden;
+    }
+    .roster-mobile-team[open] {
+      border-color: rgba(199, 210, 254, 0.95);
+      box-shadow: 0 2px 8px rgba(79, 70, 229, 0.08);
+    }
+    .roster-mobile-team summary {
+      list-style: none;
+      cursor: pointer;
+      padding: 0.875rem 1rem;
+      background: linear-gradient(180deg, #fafafa 0%, #fff 100%);
+      border-bottom: 1px solid transparent;
+      transition: background 0.15s ease;
+    }
+    .roster-mobile-team[open] summary {
+      border-bottom-color: rgba(244, 244, 245, 0.95);
+      background: linear-gradient(180deg, #f5f3ff 0%, #fff 100%);
+    }
+    .roster-mobile-team summary::-webkit-details-marker {
+      display: none;
+    }
+    .roster-mobile-team summary::marker {
+      content: '';
+    }
+    .roster-mobile-chevron {
+      flex-shrink: 0;
+      width: 1.25rem;
+      height: 1.25rem;
+      color: #71717a;
+      transition: transform 0.2s ease;
+    }
+    .roster-mobile-team[open] .roster-mobile-chevron {
+      transform: rotate(180deg);
+      color: #4f46e5;
+    }
+    .roster-team-logo-frame--sm {
+      width: 2.75rem;
+      height: 2.75rem;
+    }
+    .roster-mobile-tier-label {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 2.75rem;
+      padding: 0.2rem 0.45rem;
+      border-radius: 0.375rem;
+      font-size: 0.6875rem;
+      font-weight: 800;
+      color: #52525b;
+      background: #f4f4f5;
+      border: 1px solid #e4e4e7;
+    }
+  </style>
+</head>
+<body class="bg-zinc-100 text-zinc-800 min-h-screen text-sm">
+  <div class="max-w-6xl mx-auto px-4 py-8">
+    <header class="s11-site-header" role="banner">
+      <div class="s11-site-header-accent" aria-hidden="true"></div>
+      <div class="s11-site-header-panel">
+        <div class="s11-site-header-body">
+          <div class="s11-site-header-top">
+            <div class="s11-site-header-brand">
+              <div class="lg-craft-lockup lg-craft-lockup--hero" title="LG Craft">
+                <img src="LG_symbol.svg.png" alt="" class="lg-craft-hero-img mx-auto w-auto max-w-full object-contain" decoding="async" />
+                <div class="lg-craft-wordmark" lang="en"><span class="lg-red">LG</span> Craft</div>
+              </div>
+            </div>
+            <div class="s11-site-header-series" aria-label="멸망전 시즌 11">
+              <span class="s11-site-header-series-ko" lang="ko">멸망전</span>
+              <span class="s11-site-header-series-en" lang="en">Season 11</span>
+            </div>
+          </div>
+          <h1 class="s11-site-header-page-title">로스터</h1>
+        </div>
+      </div>
+    </header>
+
+    <nav class="s11-site-nav mb-8 border-b border-zinc-200 pb-3" aria-label="시즌11">
+      <a href="index.html" class="s11-site-nav-link">팀 순위 및 경기 일정</a>
+      <span class="s11-site-nav-current">로스터</span>
+      <a href="s11-rounds.html" class="s11-site-nav-link">라운드 결과</a>
+      <a href="s11-players.html" class="s11-site-nav-link">선수 기록</a>
+      <a href="s11-stats.html" class="s11-site-nav-link">통계 차트</a>
+    </nav>
+
+    <section id="rosters" class="mb-10 scroll-mt-8">
+      <h2 class="text-base font-semibold text-zinc-900 mb-2">로스터</h2>
+      <div class="hidden md:block bg-white rounded-lg border border-zinc-200 overflow-x-auto">
+        <table id="rostersMatrix" class="min-w-full border-collapse text-xs">
+          <thead id="rostersMatrixHead"></thead>
+          <tbody id="rostersMatrixBody"></tbody>
+        </table>
+      </div>
+      <div id="rostersMobile" class="md:hidden space-y-2.5" aria-label="로스터 (모바일)"></div>
+    </section>
+  </div>
+
+  <script>
+    const TIER_ROWS = ['갓', '킹', '휴먼', '애니멀', '아메바'];
+
+    async function loadJson(path) {
+      const res = await fetch(path);
+      if (!res.ok) throw new Error(path + ' ' + res.status);
+      return res.json();
+    }
+
+    function escapeHtml(s) {
+      if (s == null) return '';
+      return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function raceKo(letter) {
+      const m = { Z: '저그', T: '테란', P: '토스', R: '랜덤' };
+      return m[letter] || letter;
+    }
+
+    function formatOpponentPickRule(p) {
+      const map = p.raceVsOpponent;
+      if (!map || typeof map !== 'object') return '';
+      const parts = [];
+      for (const [opp, pick] of Object.entries(map)) {
+        parts.push(`${raceKo(opp)} 상대 → ${raceKo(pick)}`);
+      }
+      return parts.join(' · ');
+    }
+
+    const MAIN_RACE_ORDER = { Z: 0, T: 1, P: 2, R: 3 };
+
+    function raceRowClass(letter) {
+      if (letter === 'Z') return 'bg-orange-100/90 border-orange-200/60';
+      if (letter === 'T') return 'bg-sky-100/85 border-sky-200/50';
+      if (letter === 'P') return 'bg-amber-100/80 border-amber-200/50';
+      if (letter === 'R') return 'bg-stone-200/90 border-stone-400/75';
+      return 'bg-zinc-100/85 border-zinc-200/65';
+    }
+
+    function racePillClass(letter) {
+      if (letter === 'Z') return 'race-pill race-pill-Z';
+      if (letter === 'T') return 'race-pill race-pill-T';
+      if (letter === 'P') return 'race-pill race-pill-P';
+      if (letter === 'R') return 'race-pill race-pill-R';
+      return 'race-pill race-pill-?';
+    }
+
+    function racePillLabel(letter) {
+      if (letter === 'Z' || letter === 'T' || letter === 'P' || letter === 'R') return letter;
+      return '?';
+    }
+
+    function teamCaptainPlayer(players, teamId) {
+      return (players || []).find((p) => p.teamId === teamId && p.isCaptain) || null;
+    }
+
+    function formatTeamHeaderName(t) {
+      const name = escapeHtml(t.name || '');
+      const short = t.short && String(t.short).trim();
+      if (!short) return name;
+      return `${name} <span class="text-[11px] font-semibold text-indigo-700/90 tracking-tight">(${escapeHtml(short)})</span>`;
+    }
+
+    const TEAM_LOGO_SRC = {
+      t1: 's11_1.jpg',
+      t2: 's11_2.jpg',
+      t3: 's11_3.png',
+      t4: 's11_4.png',
+      t5: 's11_5.png',
+      t6: 's11_6.jpg',
+    };
+
+    function teamLogoSrc(teamId) {
+      if (!teamId) return '';
+      return TEAM_LOGO_SRC[teamId] || '';
+    }
+
+    function formatRosterTeamLogo(t, compact = false) {
+      const src = teamLogoSrc(t.id);
+      if (!src) return '';
+      const short =
+        (t.short && String(t.short).trim()) || (t.name && String(t.name).slice(0, 2)) || '?';
+      const title = escapeHtml(t.name || '');
+      const frameClass = compact
+        ? 'roster-team-logo-frame roster-team-logo-frame--sm relative inline-flex items-center justify-center'
+        : 'roster-team-logo-frame relative inline-flex items-center justify-center';
+      const wrapOpen = compact ? '' : '<div class="roster-team-logo-wrap">';
+      const wrapClose = compact ? '' : '</div>';
+      return `${wrapOpen}
+        <span class="${frameClass}" title="${title}">
+          <img src="${escapeHtml(src)}" alt="" class="roster-team-logo-img" decoding="async" onerror="this.classList.add('hidden'); this.nextElementSibling.classList.remove('hidden')" />
+          <span class="roster-team-logo-fallback hidden absolute inset-0 flex items-center justify-center bg-zinc-200">${escapeHtml(short)}</span>
+        </span>
+      ${wrapClose}`;
+    }
+
+    function isPlayerMainCaptain(meta, p) {
+      const t = (meta.teams || []).find((x) => x.id === p.teamId);
+      if (!t || t.mainCaptain == null) return false;
+      const main = String(t.mainCaptain).trim();
+      const name = String(p.displayName || '').trim();
+      return main && name && main === name;
+    }
+
+    function playerChip(meta, p) {
+      const mr = p.tierSheetMainRace || p.raceDefault || '';
+      const bg = raceRowClass(mr);
+      const pill = `<span class="${racePillClass(mr)}" title="메인 ${escapeHtml(raceKo(mr) || '—')}">${racePillLabel(mr)}</span>`;
+      const rule = formatOpponentPickRule(p);
+      const ruleHtml = rule
+        ? `<div class="text-[9px] text-violet-900 leading-snug mt-0.5 border-t border-violet-200/40 pt-0.5">${escapeHtml(rule)}</div>`
+        : '';
+      const pid = escapeHtml(p.id || '');
+      const capChip = p.isCaptain
+        ? '<span class="chip-cap-badge shrink-0">팀장</span>'
+        : '';
+      const mainChip = isPlayerMainCaptain(meta, p)
+        ? '<span class="chip-main-badge shrink-0">주장</span>'
+        : '';
+      return `<div class="rounded-md border px-1.5 py-1 mb-1 last:mb-0 ${bg}">
+        <div class="flex items-start gap-1.5">
+          ${pill}
+          <div class="min-w-0 flex-1 leading-snug">
+            <div class="flex flex-wrap items-center gap-x-1 gap-y-0.5">
+              <span class="font-semibold text-zinc-900">${escapeHtml(p.displayName)}</span>
+              <span class="text-[10px] font-medium text-indigo-600/85 font-mono tracking-tight">${pid ? '(' + pid + ')' : ''}</span>
+              ${capChip}${mainChip}
+            </div>
+            ${ruleHtml}
+          </div>
+        </div>
+      </div>`;
+    }
+
+    function sortPlayersByRaceName(a, b) {
+      const ra = MAIN_RACE_ORDER[a.tierSheetMainRace] ?? 9;
+      const rb = MAIN_RACE_ORDER[b.tierSheetMainRace] ?? 9;
+      if (ra !== rb) return ra - rb;
+      return a.displayName.localeCompare(b.displayName, 'ko');
+    }
+
+    function playersForTeamTier(list, teamId, tier) {
+      return list
+        .filter((p) => p.tier === tier && p.teamId === teamId)
+        .sort(sortPlayersByRaceName);
+    }
+
+    const ROSTER_MOBILE_CHEVRON =
+      '<svg class="roster-mobile-chevron" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.25a.75.75 0 01-1.06 0L5.21 8.27a.75.75 0 01.02-1.06z" clip-rule="evenodd" /></svg>';
+
+    function formatRosterMobileTeamPanel(meta, t, list, openFirst) {
+      const capP = teamCaptainPlayer(list, t.id);
+      const capName = capP ? escapeHtml(capP.displayName) : '<span class="text-zinc-400">—</span>';
+      const mainCapRaw = t.mainCaptain != null && String(t.mainCaptain).trim() ? String(t.mainCaptain).trim() : null;
+      const mainCap = mainCapRaw ? escapeHtml(mainCapRaw) : '<span class="text-zinc-400">미정</span>';
+      const playerCount = list.filter((p) => p.teamId === t.id).length;
+      const tiersHtml = TIER_ROWS.map((tier) => {
+        const ps = playersForTeamTier(list, t.id, tier);
+        const inner = ps.map((p) => playerChip(meta, p)).join('');
+        return `
+        <div class="mb-2.5 last:mb-0">
+          <div class="flex items-start gap-2">
+            <span class="roster-mobile-tier-label shrink-0">${tier}</span>
+            <div class="min-w-0 flex-1">${inner || '<span class="text-zinc-300 text-[11px]">—</span>'}</div>
+          </div>
+        </div>`;
+      }).join('');
+
+      return `
+    <details class="roster-mobile-team"${openFirst ? ' open' : ''}>
+      <summary>
+        <div class="flex items-center gap-3">
+          ${formatRosterTeamLogo(t, true)}
+          <div class="min-w-0 flex-1 text-left">
+            <div class="text-sm font-bold text-zinc-900 leading-snug">${formatTeamHeaderName(t)}</div>
+            <div class="text-[11px] text-zinc-500 tabular-nums mt-0.5">${playerCount}명</div>
+          </div>
+          ${ROSTER_MOBILE_CHEVRON}
+        </div>
+      </summary>
+      <div class="px-3 pb-3 pt-2 border-t border-zinc-100/90 bg-white">
+        <div class="flex flex-wrap gap-x-4 gap-y-2 mb-3 text-[11px] text-zinc-700">
+          <div class="flex items-center gap-1.5 min-w-0">
+            <span class="cap-badge cap-badge-team shrink-0">팀장</span>
+            <span class="font-semibold text-zinc-900">${capName}</span>
+          </div>
+          <div class="flex items-center gap-1.5 min-w-0">
+            <span class="cap-badge cap-badge-main shrink-0">주장</span>
+            <span class="font-semibold text-zinc-900">${mainCap}</span>
+          </div>
+        </div>
+        ${tiersHtml}
+      </div>
+    </details>`;
+    }
+
+    function renderRosterMobile(meta, players) {
+      const root = document.getElementById('rostersMobile');
+      if (!root) return;
+      const list = (players || []).filter((p) => p.teamId);
+      if (!list.length) {
+        root.innerHTML =
+          '<p class="rounded-xl border border-zinc-200 bg-white px-4 py-8 text-center text-zinc-400 text-sm">팀이 배정된 선수가 없습니다.</p>';
+        return;
+      }
+      root.innerHTML = meta.teams
+        .map((t, idx) => formatRosterMobileTeamPanel(meta, t, list, idx === 0))
+        .join('');
+    }
+
+    function renderRosterMatrix(meta, players) {
+      const thead = document.getElementById('rostersMatrixHead');
+      const tbody = document.getElementById('rostersMatrixBody');
+      const list = (players || []).filter((p) => p.teamId);
+
+      const cornerLogo = `
+          <th class="sticky left-0 z-20 border border-zinc-200 bg-gradient-to-b from-zinc-50 to-zinc-100/90 px-1.5 py-2 align-middle w-[5.25rem] min-w-[5.25rem] max-w-[5.25rem]">
+            <div class="lg-craft-lockup mx-auto" title="LG Craft">
+              <img src="LG_symbol.svg.png" alt="LG" class="mx-auto h-9 w-auto max-w-full object-contain" decoding="async" />
+              <div class="lg-craft-wordmark" lang="en"><span class="lg-red">LG</span> Craft</div>
+            </div>
+          </th>`;
+
+      thead.innerHTML = `
+        <tr>
+          ${cornerLogo}
+          ${meta.teams
+            .map((t) => {
+              const capP = teamCaptainPlayer(list, t.id);
+              const capName = capP ? escapeHtml(capP.displayName) : '<span class="text-zinc-400">—</span>';
+              const mainCapRaw = t.mainCaptain != null && String(t.mainCaptain).trim() ? String(t.mainCaptain).trim() : null;
+              const mainCap = mainCapRaw ? escapeHtml(mainCapRaw) : '<span class="text-zinc-400">미정</span>';
+              return `
+            <th class="border border-zinc-200 bg-gradient-to-b from-zinc-50 to-zinc-100/80 px-2 py-2 text-left align-top font-semibold text-zinc-800 min-w-[8.5rem]">
+              <div class="text-center text-sm tracking-tight pb-1 border-b border-zinc-200/90">${formatTeamHeaderName(t)}</div>
+              ${formatRosterTeamLogo(t)}
+              <div class="mt-2 space-y-1.5 text-[10px] font-normal text-zinc-700 leading-snug">
+                <div class="flex items-start gap-1">
+                  <span class="cap-badge cap-badge-team shrink-0 mt-0.5">팀장</span>
+                  <span class="font-semibold text-zinc-900 leading-tight pt-0.5">${capName}</span>
+                </div>
+                <div class="flex items-start gap-1">
+                  <span class="cap-badge cap-badge-main shrink-0 mt-0.5">주장</span>
+                  <span class="font-semibold text-zinc-900 leading-tight pt-0.5">${mainCap}</span>
+                </div>
+              </div>
+            </th>`;
+            })
+            .join('')}
+        </tr>`;
+
+      if (!list.length) {
+        tbody.innerHTML = `<tr><td colspan="${meta.teams.length + 1}" class="px-3 py-8 text-center text-zinc-400 border border-zinc-200">팀이 배정된 선수가 없습니다.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = TIER_ROWS.map((tier) => {
+        const cells = meta.teams
+          .map((tm) => {
+            const ps = list
+              .filter((p) => p.tier === tier && p.teamId === tm.id)
+              .sort((a, b) => {
+                const ra = MAIN_RACE_ORDER[a.tierSheetMainRace] ?? 9;
+                const rb = MAIN_RACE_ORDER[b.tierSheetMainRace] ?? 9;
+                if (ra !== rb) return ra - rb;
+                return a.displayName.localeCompare(b.displayName, 'ko');
+              });
+            const inner = ps.map((p) => playerChip(meta, p)).join('');
+            return `<td class="align-top border border-zinc-200 px-1.5 py-1.5 bg-white/80">${inner || '<span class="text-zinc-300 text-[11px]">—</span>'}</td>`;
+          })
+          .join('');
+        return `
+        <tr>
+          <th class="sticky left-0 z-10 bg-zinc-100 border border-zinc-200 px-2 py-2 text-center align-middle font-semibold text-zinc-700 w-[5.25rem] min-w-[5.25rem] max-w-[5.25rem]">${tier}</th>
+          ${cells}
+        </tr>`;
+      }).join('');
+    }
+
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        const [meta, playersData] = await Promise.all([
+          loadJson('data/s11/meta.json'),
+          loadJson('data/s11/players.json'),
+        ]);
+        renderRosterMatrix(meta, playersData.players || []);
+        renderRosterMobile(meta, playersData.players || []);
+      } catch (e) {
+        console.error(e);
+        document.getElementById('rostersMatrixBody').innerHTML =
+          `<tr><td colspan="99" class="px-4 py-4 text-red-600">${escapeHtml(e.message)}</td></tr>`;
+        const mobileRoot = document.getElementById('rostersMobile');
+        if (mobileRoot) {
+          mobileRoot.innerHTML = `<p class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">${escapeHtml(e.message)}</p>`;
+        }
+      }
+    });
+  </script>
+</body>
+</html>

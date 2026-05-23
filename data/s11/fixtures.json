@@ -1,0 +1,1010 @@
+{
+  "schemaVersion": 1,
+  "season": 11,
+  "phase": "first_half",
+  "matchupPreset": {
+    "description": "1~10라운드 팀대전 3경기(t6 포함). 라운드별 1~7경기 티어·맵·2v2/3v3 포인트 상한은 운영 확정 일정 반영. 대진·경기일은 운영 확정 홈·원정 표준안. pairsByRound[\"1\"]~\"10\"은 해당 라운드에서 날짜 열 순(왼쪽→오른쪽)과 같은 팀쌍 순서입니다.",
+    "pairsByRound": {
+      "1": [
+        [
+          "t5",
+          "t6"
+        ],
+        [
+          "t3",
+          "t4"
+        ],
+        [
+          "t1",
+          "t2"
+        ]
+      ],
+      "2": [
+        [
+          "t1",
+          "t3"
+        ],
+        [
+          "t4",
+          "t6"
+        ],
+        [
+          "t2",
+          "t5"
+        ]
+      ],
+      "3": [
+        [
+          "t3",
+          "t5"
+        ],
+        [
+          "t2",
+          "t6"
+        ],
+        [
+          "t1",
+          "t4"
+        ]
+      ],
+      "4": [
+        [
+          "t2",
+          "t4"
+        ],
+        [
+          "t1",
+          "t5"
+        ],
+        [
+          "t3",
+          "t6"
+        ]
+      ],
+      "5": [
+        [
+          "t1",
+          "t6"
+        ],
+        [
+          "t2",
+          "t3"
+        ],
+        [
+          "t4",
+          "t5"
+        ]
+      ],
+      "6": [
+        [
+          "t4",
+          "t5"
+        ],
+        [
+          "t1",
+          "t6"
+        ],
+        [
+          "t2",
+          "t3"
+        ]
+      ],
+      "7": [
+        [
+          "t3",
+          "t6"
+        ],
+        [
+          "t2",
+          "t4"
+        ],
+        [
+          "t1",
+          "t5"
+        ]
+      ],
+      "8": [
+        [
+          "t1",
+          "t4"
+        ],
+        [
+          "t3",
+          "t5"
+        ],
+        [
+          "t2",
+          "t6"
+        ]
+      ],
+      "9": [
+        [
+          "t2",
+          "t5"
+        ],
+        [
+          "t1",
+          "t3"
+        ],
+        [
+          "t4",
+          "t6"
+        ]
+      ],
+      "10": [
+        [
+          "t1",
+          "t2"
+        ],
+        [
+          "t5",
+          "t6"
+        ],
+        [
+          "t3",
+          "t4"
+        ]
+      ]
+    }
+  },
+  "tierRotation": [
+    "애니멀",
+    "휴먼",
+    "킹",
+    "갓",
+    "아메바"
+  ],
+  "mapRotation1v1": [
+    "애티튜드",
+    "녹아웃",
+    "폴스타",
+    "제인도",
+    "옥타곤",
+    "폴리포이드",
+    "매치포인트",
+    "투혼",
+    "실피드"
+  ],
+  "slotIndexes": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7
+  ],
+  "teamPlayMaps": {
+    "oddRounds": {
+      "2v2": "뱀파이어",
+      "3v3": "헌터"
+    },
+    "evenRounds": {
+      "2v2": "한니발",
+      "3v3": "빠무"
+    },
+    "_note": "라운드별 정확한 맵·상한은 rounds[].slotPlan 참고. 홀/짝 라운드 팀플 맵 교대 요약."
+  },
+  "rounds": [
+    {
+      "round": 1,
+      "slotPlan": [
+        {
+          "slot": 1,
+          "format": "1v1",
+          "tierLine": "애니멀",
+          "map": "애티튜드",
+          "notes": "개인전: race 생략 시 등록종족"
+        },
+        {
+          "slot": 2,
+          "format": "1v1",
+          "tierLine": "휴먼",
+          "map": "투혼",
+          "notes": "개인전: race 생략 시 등록종족"
+        },
+        {
+          "slot": 3,
+          "format": "2v2",
+          "tierLine": null,
+          "map": "뱀파이어",
+          "pointCapPerTeam": 7,
+          "notes": "각 팀 출전 2명의 티어 포인트 합 ≤ 7"
+        },
+        {
+          "slot": 4,
+          "format": "1v1",
+          "tierLine": "킹",
+          "map": "녹아웃",
+          "notes": "개인전: race 생략 시 등록종족"
+        },
+        {
+          "slot": 5,
+          "format": "1v1",
+          "tierLine": "갓",
+          "map": "옥타곤",
+          "notes": "개인전: race 생략 시 등록종족"
+        },
+        {
+          "slot": 6,
+          "format": "3v3",
+          "tierLine": null,
+          "map": "헌터",
+          "pointCapPerTeam": 8,
+          "notes": "각 팀 출전 3명의 티어 포인트 합 ≤ 8"
+        },
+        {
+          "slot": 7,
+          "format": "1v1",
+          "tierLine": "아메바",
+          "map": "실피드",
+          "notes": "개인전: race 생략 시 등록종족"
+        }
+      ],
+      "matchups": [
+        {
+          "id": "s11-r01-m1",
+          "teamIds": [
+            "t5",
+            "t6"
+          ],
+          "date": "5/26"
+        },
+        {
+          "id": "s11-r01-m2",
+          "teamIds": [
+            "t3",
+            "t4"
+          ],
+          "date": "5/28"
+        },
+        {
+          "id": "s11-r01-m3",
+          "teamIds": [
+            "t1",
+            "t2"
+          ],
+          "date": "5/31"
+        }
+      ]
+    },
+    {
+      "round": 2,
+      "slotPlan": [
+        {
+          "slot": 1,
+          "format": "1v1",
+          "tierLine": "휴먼",
+          "map": "녹아웃",
+          "notes": "개인전: race 생략 시 등록종족"
+        },
+        {
+          "slot": 2,
+          "format": "1v1",
+          "tierLine": "킹",
+          "map": "옥타곤",
+          "notes": "개인전: race 생략 시 등록종족"
+        },
+        {
+          "slot": 3,
+          "format": "2v2",
+          "tierLine": null,
+          "map": "한니발",
+          "pointCapPerTeam": 8,
+          "notes": "각 팀 출전 2명의 티어 포인트 합 ≤ 8"
+        },
+        {
+          "slot": 4,
+          "format": "1v1",
+          "tierLine": "갓",
+          "map": "폴스타",
+          "notes": "개인전: race 생략 시 등록종족"
+        },
+        {
+          "slot": 5,
+          "format": "1v1",
+          "tierLine": "아메바",
+          "map": "애티튜드",
+          "notes": "개인전: race 생략 시 등록종족"
+        },
+        {
+          "slot": 6,
+          "format": "3v3",
+          "tierLine": null,
+          "map": "빠무",
+          "pointCapPerTeam": 7,
+          "notes": "각 팀 출전 3명의 티어 포인트 합 ≤ 7"
+        },
+        {
+          "slot": 7,
+          "format": "1v1",
+          "tierLine": "애니멀",
+          "map": "투혼",
+          "notes": "개인전: race 생략 시 등록종족"
+        }
+      ],
+      "matchups": [
+        {
+          "id": "s11-r02-m1",
+          "teamIds": [
+            "t1",
+            "t3"
+          ],
+          "date": "6/2"
+        },
+        {
+          "id": "s11-r02-m2",
+          "teamIds": [
+            "t4",
+            "t6"
+          ],
+          "date": "6/4"
+        },
+        {
+          "id": "s11-r02-m3",
+          "teamIds": [
+            "t2",
+            "t5"
+          ],
+          "date": "6/7"
+        }
+      ]
+    },
+    {
+      "round": 3,
+      "slotPlan": [
+        {
+          "slot": 1,
+          "format": "1v1",
+          "tierLine": "킹",
+          "map": "폴스타",
+          "notes": "개인전: race 생략 시 등록종족"
+        },
+        {
+          "slot": 2,
+          "format": "1v1",
+          "tierLine": "갓",
+          "map": "폴리포이드",
+          "notes": "개인전: race 생략 시 등록종족"
+        },
+        {
+          "slot": 3,
+          "format": "2v2",
+          "tierLine": null,
+          "map": "뱀파이어",
+          "pointCapPerTeam": 5,
+          "notes": "각 팀 출전 2명의 티어 포인트 합 ≤ 5"
+        },
+        {
+          "slot": 4,
+          "format": "1v1",
+          "tierLine": "아메바",
+          "map": "투혼",
+          "notes": "개인전: race 생략 시 등록종족"
+        },
+        {
+          "slot": 5,
+          "format": "1v1",
+          "tierLine": "애니멀",
+          "map": "녹아웃",
+          "notes": "개인전: race 생략 시 등록종족"
+        },
+        {
+          "slot": 6,
+          "format": "3v3",
+          "tierLine": null,
+          "map": "헌터",
+          "pointCapPerTeam": 10,
+          "notes": "각 팀 출전 3명의 티어 포인트 합 ≤ 10"
+        },
+        {
+          "slot": 7,
+          "format": "1v1",
+          "tierLine": "휴먼",
+          "map": "옥타곤",
+          "notes": "개인전: race 생략 시 등록종족"
+        }
+      ],
+      "matchups": [
+        {
+          "id": "s11-r03-m1",
+          "teamIds": [
+            "t3",
+            "t5"
+          ],
+          "date": "6/9"
+        },
+        {
+          "id": "s11-r03-m2",
+          "teamIds": [
+            "t2",
+            "t6"
+          ],
+          "date": "6/11"
+        },
+        {
+          "id": "s11-r03-m3",
+          "teamIds": [
+            "t1",
+            "t4"
+          ],
+          "date": "6/14"
+        }
+      ]
+    },
+    {
+      "round": 4,
+      "slotPlan": [
+        {
+          "slot": 1,
+          "format": "1v1",
+          "tierLine": "갓",
+          "map": "제인도",
+          "notes": "개인전: race 생략 시 등록종족"
+        },
+        {
+          "slot": 2,
+          "format": "1v1",
+          "tierLine": "아메바",
+          "map": "녹아웃",
+          "notes": "개인전: race 생략 시 등록종족"
+        },
+        {
+          "slot": 3,
+          "format": "2v2",
+          "tierLine": null,
+          "map": "한니발",
+          "pointCapPerTeam": 6,
+          "notes": "각 팀 출전 2명의 티어 포인트 합 ≤ 6"
+        },
+        {
+          "slot": 4,
+          "format": "1v1",
+          "tierLine": "애니멀",
+          "map": "옥타곤",
+          "notes": "개인전: race 생략 시 등록종족"
+        },
+        {
+          "slot": 5,
+          "format": "1v1",
+          "tierLine": "휴먼",
+          "map": "폴스타",
+          "notes": "개인전: race 생략 시 등록종족"
+        },
+        {
+          "slot": 6,
+          "format": "3v3",
+          "tierLine": null,
+          "map": "빠무",
+          "pointCapPerTeam": 9,
+          "notes": "각 팀 출전 3명의 티어 포인트 합 ≤ 9"
+        },
+        {
+          "slot": 7,
+          "format": "1v1",
+          "tierLine": "킹",
+          "map": "폴리포이드",
+          "notes": "개인전: race 생략 시 등록종족"
+        }
+      ],
+      "matchups": [
+        {
+          "id": "s11-r04-m1",
+          "teamIds": [
+            "t2",
+            "t4"
+          ],
+          "date": "6/16"
+        },
+        {
+          "id": "s11-r04-m2",
+          "teamIds": [
+            "t1",
+            "t5"
+          ],
+          "date": "6/18"
+        },
+        {
+          "id": "s11-r04-m3",
+          "teamIds": [
+            "t3",
+            "t6"
+          ],
+          "date": "6/21"
+        }
+      ]
+    },
+    {
+      "round": 5,
+      "slotPlan": [
+        {
+          "slot": 1,
+          "format": "1v1",
+          "tierLine": "아메바",
+          "map": "옥타곤",
+          "notes": "개인전: race 생략 시 등록종족"
+        },
+        {
+          "slot": 2,
+          "format": "1v1",
+          "tierLine": "애니멀",
+          "map": "폴스타",
+          "notes": "개인전: race 생략 시 등록종족"
+        },
+        {
+          "slot": 3,
+          "format": "2v2",
+          "tierLine": null,
+          "map": "뱀파이어",
+          "pointCapPerTeam": 4,
+          "notes": "각 팀 출전 2명의 티어 포인트 합 ≤ 4"
+        },
+        {
+          "slot": 4,
+          "format": "1v1",
+          "tierLine": "휴먼",
+          "map": "폴리포이드",
+          "notes": "개인전: race 생략 시 등록종족"
+        },
+        {
+          "slot": 5,
+          "format": "1v1",
+          "tierLine": "킹",
+          "map": "제인도",
+          "notes": "개인전: race 생략 시 등록종족"
+        },
+        {
+          "slot": 6,
+          "format": "3v3",
+          "tierLine": null,
+          "map": "헌터",
+          "pointCapPerTeam": 11,
+          "notes": "각 팀 출전 3명의 티어 포인트 합 ≤ 11"
+        },
+        {
+          "slot": 7,
+          "format": "1v1",
+          "tierLine": "갓",
+          "map": "매치포인트",
+          "notes": "개인전: race 생략 시 등록종족"
+        }
+      ],
+      "matchups": [
+        {
+          "id": "s11-r05-m1",
+          "teamIds": [
+            "t1",
+            "t6"
+          ],
+          "date": "6/23"
+        },
+        {
+          "id": "s11-r05-m2",
+          "teamIds": [
+            "t2",
+            "t3"
+          ],
+          "date": "6/25"
+        },
+        {
+          "id": "s11-r05-m3",
+          "teamIds": [
+            "t4",
+            "t5"
+          ],
+          "date": "6/28"
+        }
+      ]
+    },
+    {
+      "round": 6,
+      "slotPlan": [
+        {
+          "slot": 1,
+          "format": "1v1",
+          "tierLine": "애니멀",
+          "map": "폴리포이드",
+          "notes": "개인전: race 생략 시 등록종족"
+        },
+        {
+          "slot": 2,
+          "format": "1v1",
+          "tierLine": "휴먼",
+          "map": "제인도",
+          "notes": "개인전: race 생략 시 등록종족"
+        },
+        {
+          "slot": 3,
+          "format": "2v2",
+          "tierLine": null,
+          "map": "한니발",
+          "pointCapPerTeam": 4,
+          "notes": "각 팀 출전 2명의 티어 포인트 합 ≤ 4"
+        },
+        {
+          "slot": 4,
+          "format": "1v1",
+          "tierLine": "킹",
+          "map": "매치포인트",
+          "notes": "개인전: race 생략 시 등록종족"
+        },
+        {
+          "slot": 5,
+          "format": "1v1",
+          "tierLine": "갓",
+          "map": "실피드",
+          "notes": "개인전: race 생략 시 등록종족"
+        },
+        {
+          "slot": 6,
+          "format": "3v3",
+          "tierLine": null,
+          "map": "빠무",
+          "pointCapPerTeam": 11,
+          "notes": "각 팀 출전 3명의 티어 포인트 합 ≤ 11"
+        },
+        {
+          "slot": 7,
+          "format": "1v1",
+          "tierLine": "아메바",
+          "map": "폴스타",
+          "notes": "개인전: race 생략 시 등록종족"
+        }
+      ],
+      "matchups": [
+        {
+          "id": "s11-r06-m1",
+          "teamIds": [
+            "t4",
+            "t5"
+          ],
+          "date": "6/30"
+        },
+        {
+          "id": "s11-r06-m2",
+          "teamIds": [
+            "t1",
+            "t6"
+          ],
+          "date": "7/2"
+        },
+        {
+          "id": "s11-r06-m3",
+          "teamIds": [
+            "t2",
+            "t3"
+          ],
+          "date": "7/5"
+        }
+      ]
+    },
+    {
+      "round": 7,
+      "slotPlan": [
+        {
+          "slot": 1,
+          "format": "1v1",
+          "tierLine": "휴먼",
+          "map": "매치포인트",
+          "notes": "개인전: race 생략 시 등록종족"
+        },
+        {
+          "slot": 2,
+          "format": "1v1",
+          "tierLine": "킹",
+          "map": "실피드",
+          "notes": "개인전: race 생략 시 등록종족"
+        },
+        {
+          "slot": 3,
+          "format": "2v2",
+          "tierLine": null,
+          "map": "뱀파이어",
+          "pointCapPerTeam": 6,
+          "notes": "각 팀 출전 2명의 티어 포인트 합 ≤ 6"
+        },
+        {
+          "slot": 4,
+          "format": "1v1",
+          "tierLine": "갓",
+          "map": "애티튜드",
+          "notes": "개인전: race 생략 시 등록종족"
+        },
+        {
+          "slot": 5,
+          "format": "1v1",
+          "tierLine": "아메바",
+          "map": "폴리포이드",
+          "notes": "개인전: race 생략 시 등록종족"
+        },
+        {
+          "slot": 6,
+          "format": "3v3",
+          "tierLine": null,
+          "map": "헌터",
+          "pointCapPerTeam": 9,
+          "notes": "각 팀 출전 3명의 티어 포인트 합 ≤ 9"
+        },
+        {
+          "slot": 7,
+          "format": "1v1",
+          "tierLine": "애니멀",
+          "map": "제인도",
+          "notes": "개인전: race 생략 시 등록종족"
+        }
+      ],
+      "matchups": [
+        {
+          "id": "s11-r07-m1",
+          "teamIds": [
+            "t3",
+            "t6"
+          ],
+          "date": "7/7"
+        },
+        {
+          "id": "s11-r07-m2",
+          "teamIds": [
+            "t2",
+            "t4"
+          ],
+          "date": "7/9"
+        },
+        {
+          "id": "s11-r07-m3",
+          "teamIds": [
+            "t1",
+            "t5"
+          ],
+          "date": "7/12"
+        }
+      ]
+    },
+    {
+      "round": 8,
+      "slotPlan": [
+        {
+          "slot": 1,
+          "format": "1v1",
+          "tierLine": "킹",
+          "map": "애티튜드",
+          "notes": "개인전: race 생략 시 등록종족"
+        },
+        {
+          "slot": 2,
+          "format": "1v1",
+          "tierLine": "갓",
+          "map": "투혼",
+          "notes": "개인전: race 생략 시 등록종족"
+        },
+        {
+          "slot": 3,
+          "format": "2v2",
+          "tierLine": null,
+          "map": "한니발",
+          "pointCapPerTeam": 7,
+          "notes": "각 팀 출전 2명의 티어 포인트 합 ≤ 7"
+        },
+        {
+          "slot": 4,
+          "format": "1v1",
+          "tierLine": "아메바",
+          "map": "제인도",
+          "notes": "개인전: race 생략 시 등록종족"
+        },
+        {
+          "slot": 5,
+          "format": "1v1",
+          "tierLine": "애니멀",
+          "map": "매치포인트",
+          "notes": "개인전: race 생략 시 등록종족"
+        },
+        {
+          "slot": 6,
+          "format": "3v3",
+          "tierLine": null,
+          "map": "빠무",
+          "pointCapPerTeam": 8,
+          "notes": "각 팀 출전 3명의 티어 포인트 합 ≤ 8"
+        },
+        {
+          "slot": 7,
+          "format": "1v1",
+          "tierLine": "휴먼",
+          "map": "실피드",
+          "notes": "개인전: race 생략 시 등록종족"
+        }
+      ],
+      "matchups": [
+        {
+          "id": "s11-r08-m1",
+          "teamIds": [
+            "t1",
+            "t4"
+          ],
+          "date": "7/14"
+        },
+        {
+          "id": "s11-r08-m2",
+          "teamIds": [
+            "t3",
+            "t5"
+          ],
+          "date": "7/16"
+        },
+        {
+          "id": "s11-r08-m3",
+          "teamIds": [
+            "t2",
+            "t6"
+          ],
+          "date": "7/19"
+        }
+      ]
+    },
+    {
+      "round": 9,
+      "slotPlan": [
+        {
+          "slot": 1,
+          "format": "1v1",
+          "tierLine": "갓",
+          "map": "녹아웃",
+          "notes": "개인전: race 생략 시 등록종족"
+        },
+        {
+          "slot": 2,
+          "format": "1v1",
+          "tierLine": "아메바",
+          "map": "매치포인트",
+          "notes": "개인전: race 생략 시 등록종족"
+        },
+        {
+          "slot": 3,
+          "format": "2v2",
+          "tierLine": null,
+          "map": "뱀파이어",
+          "pointCapPerTeam": 8,
+          "notes": "각 팀 출전 2명의 티어 포인트 합 ≤ 8"
+        },
+        {
+          "slot": 4,
+          "format": "1v1",
+          "tierLine": "애니멀",
+          "map": "실피드",
+          "notes": "개인전: race 생략 시 등록종족"
+        },
+        {
+          "slot": 5,
+          "format": "1v1",
+          "tierLine": "휴먼",
+          "map": "애티튜드",
+          "notes": "개인전: race 생략 시 등록종족"
+        },
+        {
+          "slot": 6,
+          "format": "3v3",
+          "tierLine": null,
+          "map": "헌터",
+          "pointCapPerTeam": 7,
+          "notes": "각 팀 출전 3명의 티어 포인트 합 ≤ 7"
+        },
+        {
+          "slot": 7,
+          "format": "1v1",
+          "tierLine": "킹",
+          "map": "투혼",
+          "notes": "개인전: race 생략 시 등록종족"
+        }
+      ],
+      "matchups": [
+        {
+          "id": "s11-r09-m1",
+          "teamIds": [
+            "t2",
+            "t5"
+          ],
+          "date": "7/21"
+        },
+        {
+          "id": "s11-r09-m2",
+          "teamIds": [
+            "t1",
+            "t3"
+          ],
+          "date": "7/23"
+        },
+        {
+          "id": "s11-r09-m3",
+          "teamIds": [
+            "t4",
+            "t6"
+          ],
+          "date": "7/26"
+        }
+      ]
+    },
+    {
+      "round": 10,
+      "slotPlan": [
+        {
+          "slot": 1,
+          "format": "1v1",
+          "tierLine": "아메바",
+          "map": "투혼",
+          "notes": "개인전: race 생략 시 등록종족"
+        },
+        {
+          "slot": 2,
+          "format": "1v1",
+          "tierLine": "애니멀",
+          "map": "폴스타",
+          "notes": "개인전: race 생략 시 등록종족"
+        },
+        {
+          "slot": 3,
+          "format": "2v2",
+          "tierLine": null,
+          "map": "한니발",
+          "pointCapPerTeam": 5,
+          "notes": "각 팀 출전 2명의 티어 포인트 합 ≤ 5"
+        },
+        {
+          "slot": 4,
+          "format": "1v1",
+          "tierLine": "휴먼",
+          "map": "실피드",
+          "notes": "개인전: race 생략 시 등록종족"
+        },
+        {
+          "slot": 5,
+          "format": "1v1",
+          "tierLine": "킹",
+          "map": "폴리포이드",
+          "notes": "개인전: race 생략 시 등록종족"
+        },
+        {
+          "slot": 6,
+          "format": "3v3",
+          "tierLine": null,
+          "map": "빠무",
+          "pointCapPerTeam": 10,
+          "notes": "각 팀 출전 3명의 티어 포인트 합 ≤ 10"
+        },
+        {
+          "slot": 7,
+          "format": "1v1",
+          "tierLine": "갓",
+          "map": "옥타곤",
+          "notes": "개인전: race 생략 시 등록종족"
+        }
+      ],
+      "matchups": [
+        {
+          "id": "s11-r10-m1",
+          "teamIds": [
+            "t1",
+            "t2"
+          ],
+          "date": "7/28"
+        },
+        {
+          "id": "s11-r10-m2",
+          "teamIds": [
+            "t5",
+            "t6"
+          ],
+          "date": "7/30"
+        },
+        {
+          "id": "s11-r10-m3",
+          "teamIds": [
+            "t3",
+            "t4"
+          ],
+          "date": "8/2"
+        }
+      ]
+    }
+  ]
+}
