@@ -208,10 +208,67 @@ function rateClass(rate) {
   return '';
 }
 
+function renderMapMatchupMobile(map, stats) {
+  const races = ['T', 'P', 'Z'];
+  const raceKo = { T: '테란', P: '토스', Z: '저그' };
+  const vsKo = { vsT: 'vs 테란', vsP: 'vs 토스', vsZ: 'vs 저그' };
+  const vsKey = { T: 'vsT', P: 'vsP', Z: 'vsZ' };
+
+  const cards = races
+    .map((race) => {
+      const s = stats[race];
+      const totalRate = getWinRate(s.total.w, s.total.l);
+      const matchups = races
+        .filter((opp) => opp !== race)
+        .map((opp) => {
+          const key = vsKey[opp];
+          const wr = getWinRate(s[key]?.w, s[key]?.l);
+          const wl =
+            wr !== -1
+              ? `${s[key].w}승 ${s[key].l}패 · <span class="font-bold tabular-nums ${rateClass(wr)}">${wr}%</span>`
+              : '—';
+          return `<div class="map-stats-mobile-matchup">
+          <span class="font-medium text-zinc-600">${vsKo[key]}</span>
+          <span class="tabular-nums text-zinc-800 text-right">${wl}</span>
+        </div>`;
+        })
+        .join('');
+
+      return `<article class="map-stats-mobile-card">
+      <div class="flex items-center gap-2 mb-2">
+        ${raceBadgeHtml(race)}
+        <span class="font-bold text-zinc-900">${race}</span>
+        <span class="text-xs text-zinc-500">${raceKo[race]}</span>
+      </div>
+      <div class="map-stats-mobile-overall">
+        <div class="map-stats-mobile-stat">
+          <span class="map-stats-mobile-stat-label">승</span>
+          <span class="font-bold tabular-nums text-zinc-900">${s.total.w}</span>
+        </div>
+        <div class="map-stats-mobile-stat">
+          <span class="map-stats-mobile-stat-label">패</span>
+          <span class="font-bold tabular-nums text-zinc-900">${s.total.l}</span>
+        </div>
+        <div class="map-stats-mobile-stat">
+          <span class="map-stats-mobile-stat-label">승률</span>
+          <span class="font-bold tabular-nums ${rateClass(totalRate)}">${totalRate !== -1 ? `${totalRate}%` : '—'}</span>
+        </div>
+      </div>
+      ${matchups}
+    </article>`;
+    })
+    .join('');
+
+  return `<div class="md:hidden space-y-3 mt-1">
+    ${cards}
+  </div>`;
+}
+
 function renderMapMatchupTable(map, stats) {
   const races = ['T', 'P', 'Z'];
-  let tableHtml = `<div class="bg-white p-4 rounded-xl border border-zinc-200/80 shadow-sm overflow-x-auto">
+  let tableHtml = `<div class="bg-white p-4 rounded-xl border border-zinc-200/80 shadow-sm">
     <h4 class="font-bold text-base mb-3 text-zinc-800">${escapeHtml(map)}</h4>
+    <div class="hidden md:block overflow-x-auto">
     <table class="w-full text-center text-xs border-collapse min-w-[640px]">
       <thead class="bg-zinc-50">
         <tr>
@@ -246,6 +303,8 @@ function renderMapMatchupTable(map, stats) {
     </tr>`;
   }
   tableHtml += '</tbody></table></div>';
+  tableHtml += renderMapMatchupMobile(map, stats);
+  tableHtml += '</div>';
   return tableHtml;
 }
 

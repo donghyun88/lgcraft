@@ -79,6 +79,25 @@
       letter-spacing: 0.02em;
       color: #52525b;
     }
+    @media (max-width: 767px) {
+      #roundTabs {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.375rem;
+      }
+      #roundTabs .sub-tab {
+        min-height: 2.75rem;
+        width: 100%;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
+        font-size: 0.8125rem;
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+      }
+      #roundTabs .sub-tab:nth-child(10):last-child {
+        grid-column: 2 / 3;
+      }
+    }
   </style>
 </head>
 <body class="bg-zinc-100 text-zinc-800 min-h-screen text-sm antialiased">
@@ -119,6 +138,8 @@
   </div>
 
   <script>
+    const SCHEDULE_DATE_YEAR = 2026;
+
     async function loadJson(path) {
       const res = await fetch(path);
       if (!res.ok) throw new Error(path + ' ' + res.status);
@@ -302,6 +323,78 @@
       return m;
     }
 
+    function parseScheduleMdDate(str, year) {
+      const m = String(str).trim().match(/^(\d{1,2})\/(\d{1,2})$/);
+      if (!m) return null;
+      const month = parseInt(m[1], 10) - 1;
+      const day = parseInt(m[2], 10);
+      if (month < 0 || month > 11 || day < 1 || day > 31) return null;
+      const d = new Date(year, month, day);
+      if (d.getFullYear() !== year || d.getMonth() !== month || d.getDate() !== day) return null;
+      return d;
+    }
+
+    function pairMod5KeyForRound(roundNum) {
+      const r = Number(roundNum);
+      if (!Number.isFinite(r)) return null;
+      const mod = ((r % 5) + 5) % 5;
+      return mod === 0 ? '0' : String(mod);
+    }
+
+    function presetPairRowsForRound(roundNum, matchupPreset) {
+      if (!matchupPreset) return null;
+      if (matchupPreset.pairsByRound && typeof matchupPreset.pairsByRound === 'object') {
+        const key = String(Number(roundNum));
+        const rows = matchupPreset.pairsByRound[key];
+        if (Array.isArray(rows)) return rows;
+      }
+      if (!matchupPreset.pairsByRoundMod5) return null;
+      const key = pairMod5KeyForRound(roundNum);
+      if (key == null) return null;
+      const rows = matchupPreset.pairsByRoundMod5[key];
+      return Array.isArray(rows) ? rows : null;
+    }
+
+    function unorderedPairKey(teamIds) {
+      const [a, b] = teamIds || [];
+      if (!a || !b) return '';
+      return a < b ? `${a}\u0000${b}` : `${b}\u0000${a}`;
+    }
+
+    function presetSlotIndexForTeams(teamIds, roundNum, matchupPreset) {
+      const rows = presetPairRowsForRound(roundNum, matchupPreset);
+      if (!rows) return 999;
+      const want = unorderedPairKey(teamIds);
+      if (!want) return 999;
+      for (let i = 0; i < rows.length; i++) {
+        if (unorderedPairKey(rows[i]) === want) return i;
+      }
+      return 999;
+    }
+
+    function matchupSortKeyFromId(id) {
+      const m = String(id || '').match(/-m(\d+)$/);
+      return m ? parseInt(m[1], 10) : 999;
+    }
+
+    /** index.html 일정표와 동일: pairsByRound 행 순 → 날짜 → fixture id */
+    function sortMatchupsForDisplay(matchups, roundNum, fixtures) {
+      const mp = fixtures && fixtures.matchupPreset;
+      return [...(matchups || [])].sort((a, b) => {
+        const ia = presetSlotIndexForTeams(a.teamIds, roundNum, mp);
+        const ib = presetSlotIndexForTeams(b.teamIds, roundNum, mp);
+        if (ia !== ib) return ia - ib;
+        const da = parseScheduleMdDate(String(a.date || '').trim(), SCHEDULE_DATE_YEAR);
+        const db = parseScheduleMdDate(String(b.date || '').trim(), SCHEDULE_DATE_YEAR);
+        const ta = da ? da.getTime() : null;
+        const tb = db ? db.getTime() : null;
+        if (ta != null && tb != null && ta !== tb) return ta - tb;
+        if (ta != null && tb == null) return -1;
+        if (ta == null && tb != null) return 1;
+        return matchupSortKeyFromId(a.id) - matchupSortKeyFromId(b.id);
+      });
+    }
+
     function resultMatchupByFixtureId(doc, fixtureId) {
       if (!doc || !doc.matchups) return null;
       return doc.matchups.find((x) => x.fixtureId === fixtureId) || null;
@@ -362,16 +455,18 @@
       const letter = resolvedRaceLetter(row, rosterMap);
       const bgLetter = letter || (p && String(p.tierSheetMainRace || p.raceDefault || '').toUpperCase().charAt(0)) || '';
       const accent = raceAccentBorder(bgLetter);
-      const colAlign = align === 'end' ? 'items-end text-right' : 'items-start text-left';
+      const colAlign =
+        align === 'end' ? 'items-end text-right' : align === 'center' ? 'items-center text-center' : 'items-start text-left';
       const pid = (p && p.id) || '';
       const pidEsc = escapeHtml(pid);
       const capMark = p && p.isCaptain ? '<span class="text-amber-500 text-[10px] font-bold" title="팀장">★</span>' : '';
       const tip = [raceKo(letter), dn].filter(Boolean).join(' · ');
-      const idAlign = align === 'end' ? 'text-right' : 'text-left';
+      const idAlign = align === 'end' ? 'text-right' : align === 'center' ? 'text-center' : 'text-left';
       const idLine = pid
         ? `<span class="text-[10px] font-mono text-zinc-400 tabular-nums tracking-tight max-w-full truncate block w-full ${idAlign}">${pidEsc}</span>`
         : `<span class="text-[10px] text-zinc-300 w-full ${idAlign}">—</span>`;
-      const rowJustify = align === 'end' ? 'justify-end' : 'justify-start';
+      const rowJustify =
+        align === 'end' ? 'justify-end' : align === 'center' ? 'justify-center' : 'justify-start';
       return `<div class="inline-flex flex-col gap-0.5 min-w-0 max-w-[14rem] rounded-lg border border-zinc-200/70 bg-white/95 px-2 py-1.5 shadow-sm ${accent} border-l-[3px] ${colAlign}" title="${escapeHtml(tip)}">
         <div class="flex ${rowJustify} items-center gap-1.5 min-w-0 w-full">
           ${racePill(letter)}
@@ -384,7 +479,8 @@
     function formatRoster(rows, rosterMap, align) {
       const list = (rows || []).filter((r) => (r.displayName || '').trim());
       if (!list.length) return '<span class="text-zinc-400 text-xs">—</span>';
-      const justify = align === 'end' ? 'justify-end' : 'justify-start';
+      const justify =
+        align === 'end' ? 'justify-end' : align === 'center' ? 'justify-center' : 'justify-start';
       const items = list.map((r) => slotPlayerCompact(r, rosterMap, align)).join('');
       return `<div class="flex flex-wrap gap-2 ${justify}">${items}</div>`;
     }
@@ -463,6 +559,8 @@
 
       const teamAHtml = formatTeamMatchupHeader(meta, tA, 'end', nameAcls);
       const teamBHtml = formatTeamMatchupHeader(meta, tB, 'start', nameBcls);
+      const teamAMobileHtml = formatTeamMatchupHeader(meta, tA, 'start', nameAcls);
+      const teamBMobileHtml = formatTeamMatchupHeader(meta, tB, 'start', nameBcls);
 
       let seriesNote = '';
       if (sw === 1 || sw === 2) {
@@ -484,19 +582,23 @@
       for (const plan of orderedPlans) {
         const sl = resMu && slotsRes.find((x) => x.slot === plan.slot);
         const w = sl && sl.winnerTeamIndex;
-        const t1Win = w === 1 ? 'bg-emerald-50/90 border-r-[4px] border-r-emerald-500' : 'bg-zinc-50/40';
-        const t2Win = w === 2 ? 'bg-emerald-50/90 border-l-[4px] border-l-emerald-500' : 'bg-zinc-50/40';
+        const t1Win = w === 1 ? 'bg-emerald-50/90 sm:border-r-[4px] sm:border-r-emerald-500' : 'bg-zinc-50/40';
+        const t2Win = w === 2 ? 'bg-emerald-50/90 sm:border-l-[4px] sm:border-l-emerald-500' : 'bg-zinc-50/40';
         const centerHtml = slotCenterBlock(plan, w, nameA, nameB);
         slotRows.push(`
-          <div class="grid grid-cols-1 sm:grid-cols-12 gap-0 items-stretch rounded-xl border border-zinc-200/50 bg-white shadow-sm overflow-hidden ring-1 ring-zinc-900/[0.03]">
-            <div class="sm:col-span-5 px-3 py-2.5 text-right ${t1Win} border-b sm:border-b-0 sm:border-r border-zinc-100">
-              <div class="w-full">${formatRoster(sl ? sl.teamA : null, rosterMap, 'end')}</div>
-            </div>
-            <div class="sm:col-span-2 px-2 py-2 flex flex-col items-center justify-center bg-zinc-50/90 border-y sm:border-y-0 sm:border-x border-zinc-100/90 text-center min-w-0">
+          <div class="flex flex-col sm:grid sm:grid-cols-12 gap-0 items-stretch rounded-xl border border-zinc-200/50 bg-white shadow-sm overflow-hidden ring-1 ring-zinc-900/[0.03]">
+            <div class="order-1 sm:order-2 sm:col-span-2 px-2 py-2.5 flex flex-col items-center justify-center bg-zinc-50/90 border-b sm:border-b-0 sm:border-x border-zinc-100/90 text-center min-w-0">
               ${centerHtml}
             </div>
-            <div class="sm:col-span-5 px-3 py-2.5 text-left ${t2Win}">
-              <div class="w-full">${formatRoster(sl ? sl.teamB : null, rosterMap, 'start')}</div>
+            <div class="order-2 sm:order-1 sm:col-span-5 px-3 py-2.5 text-center sm:text-right ${t1Win} border-b sm:border-b-0 sm:border-r border-zinc-100">
+              <div class="sm:hidden text-[10px] font-bold text-indigo-800/85 mb-1.5 truncate">${escapeHtml(nameA)}</div>
+              <div class="w-full sm:hidden">${formatRoster(sl ? sl.teamA : null, rosterMap, 'center')}</div>
+              <div class="hidden sm:block w-full">${formatRoster(sl ? sl.teamA : null, rosterMap, 'end')}</div>
+            </div>
+            <div class="order-3 sm:order-3 sm:col-span-5 px-3 py-2.5 text-center sm:text-left ${t2Win}">
+              <div class="sm:hidden text-[10px] font-bold text-indigo-800/85 mb-1.5 truncate">${escapeHtml(nameB)}</div>
+              <div class="w-full sm:hidden">${formatRoster(sl ? sl.teamB : null, rosterMap, 'center')}</div>
+              <div class="hidden sm:block w-full">${formatRoster(sl ? sl.teamB : null, rosterMap, 'start')}</div>
             </div>
           </div>`);
       }
@@ -504,13 +606,25 @@
       return `
         <article class="rounded-2xl border border-zinc-200/60 bg-white shadow-sm shadow-zinc-900/5 overflow-hidden mb-4 ring-1 ring-zinc-900/[0.04]" title="${escapeHtml(fixMu.id)}">
           <div class="px-4 py-3 sm:px-5 sm:py-4 bg-gradient-to-b from-zinc-50/80 to-white border-b border-zinc-100/90">
-            <div class="grid grid-cols-[1fr_auto_1fr] items-center gap-3 sm:gap-6">
+            <div class="sm:hidden">
+              <div class="flex flex-col items-center mb-3">
+                <div class="text-2xl font-black tabular-nums leading-none tracking-tight text-zinc-900">
+                  <span class="${scoreAcls}">${escapeHtml(scoreA)}</span><span class="text-zinc-300 mx-0.5 font-light">:</span><span class="${scoreBcls}">${escapeHtml(scoreB)}</span>
+                </div>
+                <div class="text-[10px] text-zinc-400 mt-1.5 font-medium tracking-wide">세트</div>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div class="min-w-0">${teamAMobileHtml}</div>
+                <div class="min-w-0">${teamBMobileHtml}</div>
+              </div>
+            </div>
+            <div class="hidden sm:grid sm:grid-cols-[1fr_auto_1fr] sm:items-center sm:gap-6">
               <div class="text-right min-w-0">
                 ${teamAHtml}
               </div>
               <div class="flex flex-col items-center shrink-0 px-1">
-                <div class="text-2xl sm:text-3xl font-black tabular-nums leading-none tracking-tight text-zinc-900">
-                  <span class="${scoreAcls}">${escapeHtml(scoreA)}</span><span class="text-zinc-300 mx-0.5 sm:mx-1 font-light">:</span><span class="${scoreBcls}">${escapeHtml(scoreB)}</span>
+                <div class="text-3xl font-black tabular-nums leading-none tracking-tight text-zinc-900">
+                  <span class="${scoreAcls}">${escapeHtml(scoreA)}</span><span class="text-zinc-300 mx-1 font-light">:</span><span class="${scoreBcls}">${escapeHtml(scoreB)}</span>
                 </div>
                 <div class="text-[10px] text-zinc-400 mt-1.5 font-medium tracking-wide">세트</div>
               </div>
@@ -524,12 +638,12 @@
         </article>`;
     }
 
-    function renderRoundPane(meta, fr, doc, isFirst, rosterMap) {
+    function renderRoundPane(meta, fr, doc, isFirst, rosterMap, fixtures) {
       const planBySlot = slotPlanBySlot(fr);
       const planSlotOrder = [...planBySlot.keys()].sort((a, b) => a - b);
       const metaLine = '';
 
-      const cards = (fr.matchups || [])
+      const cards = sortMatchupsForDisplay(fr.matchups, fr.round, fixtures)
         .map((m) => {
           const resMu = resultMatchupByFixtureId(doc, m.id);
           return renderMatchupCard(meta, m, planBySlot, planSlotOrder, resMu, !!doc, rosterMap);
@@ -575,7 +689,7 @@
           )
           .join('');
 
-        panesEl.innerHTML = rounds.map((fr, i) => renderRoundPane(meta, fr, docByRound.get(fr.round), i === 0, rosterMap)).join('');
+        panesEl.innerHTML = rounds.map((fr, i) => renderRoundPane(meta, fr, docByRound.get(fr.round), i === 0, rosterMap, fixtures)).join('');
 
         tabsEl.querySelectorAll('.sub-tab').forEach((tab) => {
           tab.addEventListener('click', () => {
