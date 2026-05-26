@@ -530,6 +530,8 @@
                                     <th data-sort="종족" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">종족</th>
                                     <th data-sort="티어" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">티어</th>
                                     <th data-sort-numeric="stats.total" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">전체</th>
+                                    <th data-sort-numeric="stats.개인전" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">1:1</th>
+                                    <th data-sort-numeric="stats.팀전" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">팀전</th>
                                     <th data-sort-numeric="elo" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ELO</th>
                                 </tr>
                                 <tr class="bg-gray-100">
@@ -555,6 +557,8 @@
                                     </th>
                                     <th class="px-2 py-1"></th>
                                     <th class="px-2 py-1"></th>
+                                    <th class="px-2 py-1"></th>
+                                    <th class="px-2 py-1"></th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">`;
@@ -576,6 +580,8 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${getRaceIcon(p.종족)} ${p.종족}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${p.티어}</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${p.stats.total.w}승 ${p.stats.total.l}패</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${p.stats.개인전.w}승 ${p.stats.개인전.l}패</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${p.stats.팀전.w}승 ${p.stats.팀전.l}패</td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-700">${p.elo}</td>
                         </tr>`;
             });

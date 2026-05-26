@@ -3,8 +3,8 @@
   "season": 11,
   "phase": "first_half",
   "round": 1,
-  "recordedAt": "2026-05-16",
-  "author": "me",
+  "recordedAt": "2026-05-26",
+  "author": "",
   "notes": "match-input",
   "matchups": [
     {
@@ -14,16 +14,19 @@
         "setScoreTeamA": null,
         "setScoreTeamB": null,
         "decidedBy": "sets",
-        "notes": ""
+        "notes": "",
+        "mvp": {
+          "displayName": "이윤호"
+        }
       },
       "playedOrder": null,
       "slots": [
         {
           "slot": 1,
-          "winnerTeamIndex": 1,
+          "winnerTeamIndex": 2,
           "teamA": [
             {
-              "displayName": "공동건",
+              "displayName": "정주오",
               "race": null
             }
           ],
@@ -52,34 +55,34 @@
         },
         {
           "slot": 3,
-          "winnerTeamIndex": 1,
+          "winnerTeamIndex": 2,
           "teamA": [
             {
-              "displayName": "김동현",
-              "race": null
+              "displayName": "남상원",
+              "race": "Z"
             },
             {
-              "displayName": "김재준",
-              "race": null
+              "displayName": "정주오",
+              "race": "P"
             }
           ],
           "teamB": [
             {
-              "displayName": "김종성",
-              "race": null
+              "displayName": "강응선",
+              "race": "P"
             },
             {
               "displayName": "김현기",
-              "race": null
+              "race": "Z"
             }
           ]
         },
         {
           "slot": 4,
-          "winnerTeamIndex": 1,
+          "winnerTeamIndex": 2,
           "teamA": [
             {
-              "displayName": "이봉철",
+              "displayName": "정재영",
               "race": null
             }
           ],
@@ -95,7 +98,7 @@
           "winnerTeamIndex": 1,
           "teamA": [
             {
-              "displayName": "남상원",
+              "displayName": "이철훈",
               "race": null
             }
           ],
@@ -108,33 +111,33 @@
         },
         {
           "slot": 6,
-          "winnerTeamIndex": 2,
+          "winnerTeamIndex": 1,
           "teamA": [
             {
-              "displayName": "공동건",
-              "race": null
-            },
-            {
               "displayName": "김동현",
-              "race": null
+              "race": "R"
             },
             {
               "displayName": "김민중",
-              "race": null
+              "race": "Z"
+            },
+            {
+              "displayName": "양시찬",
+              "race": "P"
             }
           ],
           "teamB": [
             {
-              "displayName": "강응선",
-              "race": null
+              "displayName": "김태준",
+              "race": "P"
             },
             {
-              "displayName": "김경식",
-              "race": null
+              "displayName": "손정곤",
+              "race": "R"
             },
             {
-              "displayName": "설재근",
-              "race": null
+              "displayName": "주효진",
+              "race": "Z"
             }
           ]
         },
@@ -143,13 +146,13 @@
           "winnerTeamIndex": 1,
           "teamA": [
             {
-              "displayName": "양시찬",
+              "displayName": "이윤호",
               "race": null
             }
           ],
           "teamB": [
             {
-              "displayName": "설재근",
+              "displayName": "임채현",
               "race": null
             }
           ]

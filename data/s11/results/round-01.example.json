@@ -14,7 +14,8 @@
         "setScoreTeamA": 4,
         "setScoreTeamB": 3,
         "decidedBy": "sets",
-        "notes": ""
+        "notes": "",
+        "mvp": { "displayName": "예시선수A" }
       },
       "playedOrder": null,
       "_playedOrderExplain": "실제 진행 순서가 규칙 슬롯 순서와 다르면 [3,1,2,4,5,6,7] 같이 적습니다. 통계는 slot 번호 기준입니다.",

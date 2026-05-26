@@ -422,6 +422,29 @@
       return [ca, cb];
     }
 
+    function matchupMvpName(resMu) {
+      const raw = resMu?.series?.mvp ?? resMu?.mvp ?? null;
+      if (!raw) return '';
+      if (typeof raw === 'string') return raw.trim();
+      return String(raw.displayName || raw.playerName || '').trim();
+    }
+
+    function formatMvpBadge(resMu, rosterMap) {
+      const name = matchupMvpName(resMu);
+      if (!name) return '';
+      const p = rosterMap.get(name);
+      const race = p && String(p.tierSheetMainRace || p.raceDefault || '').toUpperCase().charAt(0);
+      const id = p && p.id ? `<span class="font-mono text-[10px] text-amber-700/70">${escapeHtml(p.id)}</span>` : '';
+      return `<div class="px-4 py-2 border-b border-amber-100 bg-amber-50/70 text-center">
+        <span class="inline-flex flex-wrap items-center justify-center gap-1.5 rounded-full border border-amber-200 bg-white/85 px-3 py-1 text-xs font-bold text-amber-900 shadow-sm">
+          <span class="text-amber-500">MVP</span>
+          ${racePill(race)}
+          <span>${escapeHtml(name)}</span>
+          ${id}
+        </span>
+      </div>`;
+    }
+
     function rosterByDisplayName(players) {
       const m = new Map();
       for (const p of players || []) {
@@ -561,6 +584,7 @@
       const teamBHtml = formatTeamMatchupHeader(meta, tB, 'start', nameBcls);
       const teamAMobileHtml = formatTeamMatchupHeader(meta, tA, 'start', nameAcls);
       const teamBMobileHtml = formatTeamMatchupHeader(meta, tB, 'start', nameBcls);
+      const mvpHtml = formatMvpBadge(resMu, rosterMap);
 
       let seriesNote = '';
       if (sw === 1 || sw === 2) {
@@ -633,6 +657,7 @@
               </div>
             </div>
           </div>
+          ${mvpHtml}
           ${showMetaRow ? `<div class="px-4 py-1.5 border-b border-zinc-100 bg-amber-50/40 text-right text-xs">${seriesNote}</div>` : ''}
           <div class="p-2.5 space-y-2">${slotRows.join('')}</div>
         </article>`;

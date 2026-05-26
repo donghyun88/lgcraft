@@ -1063,6 +1063,67 @@
       </div>`;
     }
 
+    function countMatchupSetWins(mu) {
+      let a = 0;
+      let b = 0;
+      for (const sl of mu?.slots || []) {
+        if (sl.winnerTeamIndex === 1) a++;
+        else if (sl.winnerTeamIndex === 2) b++;
+      }
+      return [a, b];
+    }
+
+    function displayedScheduleSetScores(mu) {
+      const s = mu && mu.series;
+      const [ca, cb] = countMatchupSetWins(mu);
+      if (s && s.setScoreTeamA != null && s.setScoreTeamB != null) {
+        const na = Number(s.setScoreTeamA);
+        const nb = Number(s.setScoreTeamB);
+        if (!Number.isNaN(na) && !Number.isNaN(nb)) return [na, nb];
+      }
+      return [ca, cb];
+    }
+
+    function matchupMvpName(mu) {
+      const raw = mu?.series?.mvp ?? mu?.mvp ?? null;
+      if (!raw) return '';
+      if (typeof raw === 'string') return raw.trim();
+      return String(raw.displayName || raw.playerName || '').trim();
+    }
+
+    function formatScheduleResultHtml(meta, m, mu) {
+      if (!mu) return '';
+      const sw = mu.series && mu.series.winnerTeamIndex;
+      const [scoreA, scoreB] = displayedScheduleSetScores(mu);
+      const hasScore = scoreA + scoreB > 0;
+      if (sw !== 1 && sw !== 2 && !hasScore) return '';
+
+      const [tidA, tidB] = m.teamIds || [];
+      const winnerName = sw === 1 ? teamName(meta, tidA) : sw === 2 ? teamName(meta, tidB) : '';
+      const scoreAClass = sw === 1 || (!sw && scoreA > scoreB) ? 'text-emerald-700' : 'text-zinc-500';
+      const scoreBClass = sw === 2 || (!sw && scoreB > scoreA) ? 'text-emerald-700' : 'text-zinc-500';
+      const mvp = matchupMvpName(mu);
+      const mvpHtml = mvp
+        ? `<span class="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-bold text-amber-800 border border-amber-200"><span>MVP</span><span>${escapeHtml(mvp)}</span></span>`
+        : '';
+      const winnerHtml = winnerName
+        ? `<span class="text-[10px] font-semibold text-emerald-700">${escapeHtml(winnerName)} 승</span>`
+        : '<span class="text-[10px] font-semibold text-amber-700">결과 입력 중</span>';
+
+      return `<div class="mt-2 pt-2 border-t border-zinc-100 flex flex-col items-center gap-1.5">
+        <div class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 border border-emerald-100 px-2.5 py-1">
+          <span class="text-[10px] font-bold text-emerald-700">결과</span>
+          <span class="text-sm font-black tabular-nums leading-none">
+            <span class="${scoreAClass}">${scoreA}</span><span class="text-zinc-300 mx-0.5">:</span><span class="${scoreBClass}">${scoreB}</span>
+          </span>
+        </div>
+        <div class="flex flex-wrap items-center justify-center gap-1.5">
+          ${winnerHtml}
+          ${mvpHtml}
+        </div>
+      </div>`;
+    }
+
     function renderScheduleSlotPlanCard(slots) {
       const headerRow = `<div class="schedule-slot-grid schedule-slot-grid--head" role="row">
         <div class="schedule-slot-cell schedule-slot-cell--seq">순서</div>
@@ -1081,19 +1142,21 @@
         </div>`;
     }
 
-    function renderScheduleMatchupCard(meta, m, rankMap, index1, h2hWins) {
+    function renderScheduleMatchupCard(meta, m, rankMap, index1, h2hWins, resultMu) {
       const inner = formatScheduleMatchupWithRanks(meta, m, rankMap);
       const [tid0, tid1] = m.teamIds || [];
       const h2hHtml = formatScheduleHeadToHeadHtml(meta, tid0, tid1, h2hWins);
+      const resultHtml = formatScheduleResultHtml(meta, m, resultMu);
       const raw = m.date != null && String(m.date).trim() ? String(m.date).trim() : '';
       const head = raw
-        ? `<div class="text-center leading-tight">${formatScheduleMatchupDateHeading(raw)}</div>`
+        ? `<div class="text-center leading-tight flex items-center justify-center gap-1.5">${formatScheduleMatchupDateHeading(raw)}${resultHtml ? '<span class="rounded-full bg-emerald-100 text-emerald-800 px-1.5 py-0.5 text-[9px] font-bold">완료</span>' : ''}</div>`
         : `<div class="text-center text-[11px] font-bold text-zinc-500">대전 ${index1}</div>`;
       return `
         <div class="schedule-card schedule-card--match px-3 py-3.5 flex flex-col justify-center min-h-[5.5rem] items-stretch text-center">
           <div class="mb-1.5">${head}</div>
           <div class="min-w-0 flex justify-center w-full">${inner}</div>
           ${h2hHtml}
+          ${resultHtml}
         </div>`;
     }
 
@@ -1112,8 +1175,10 @@
       const effectiveRankMap = showRanks ? rankMap : {};
       const mapCard = renderScheduleSlotPlanCard(slots);
       const h2hWins = buildSeriesHeadToHeadBeforeRound(fixtures, roundDocs, r.round);
+      const roundDoc = (roundDocs || []).find((doc) => doc && doc.round === r.round);
+      const resultByFixture = new Map((roundDoc?.matchups || []).map((mu) => [mu.fixtureId, mu]));
       const matchCards = matchups
-        .map((m, i) => renderScheduleMatchupCard(meta, m, effectiveRankMap, i + 1, h2hWins))
+        .map((m, i) => renderScheduleMatchupCard(meta, m, effectiveRankMap, i + 1, h2hWins, resultByFixture.get(m.id)))
         .join('');
       const rankNote = showRanks
         ? '<p class="text-[10px] text-zinc-500 leading-snug text-center">숫자 뱃지: 직전 라까지 확정된 순위.</p>'

@@ -34,6 +34,7 @@ function emptyMu(fid, plan) {
       setScoreTeamB: null,
       decidedBy: 'sets',
       notes: '',
+      mvp: null,
     },
     playedOrder: null,
     slots: (plan || []).map((sp) => ({
