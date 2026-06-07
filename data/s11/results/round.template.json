@@ -19,7 +19,7 @@
         "notes": ""
       },
       "playedOrder": null,
-      "_playedOrderHint": null,
+      "_playedOrderHint": "실제 진행 순서가 규칙과 다르면 [3,1,2,4,5,6,7] — ELO 반영 순서. null 이면 슬롯 번호 순",
       "slots": [
         {
           "slot": 1,

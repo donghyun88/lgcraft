@@ -213,6 +213,25 @@ export function opponentRacesFromSlotRows(slotRows, nameList, rosterMap) {
   });
 }
 
+/** ELO 반영 순서: playedOrder 가 있으면 실제 진행 순, 없으면 슬롯 번호 순 */
+export function slotsInPlayedOrder(mu) {
+  const slots = [...(mu.slots || [])];
+  const po = mu.playedOrder;
+  if (!Array.isArray(po) || !po.length) {
+    return slots.sort((a, b) => (a.slot || 0) - (b.slot || 0));
+  }
+  const bySlot = new Map(slots.map((s) => [s.slot, s]));
+  const ordered = [];
+  for (const slotNum of po) {
+    const sl = bySlot.get(slotNum);
+    if (sl) ordered.push(sl);
+  }
+  for (const sl of slots) {
+    if (!ordered.includes(sl)) ordered.push(sl);
+  }
+  return ordered;
+}
+
 /**
  * @returns {{ statsByName: object, stateByName: Map }}
  */
@@ -253,7 +272,7 @@ export function simulateSeason(fixtures, roundDocs, rosterPlayers) {
       const fix = byId.get(mu.fixtureId);
       if (!fix || !fix.teamIds || fix.teamIds.length < 2) continue;
       const [tA, tB] = fix.teamIds;
-      const slots = [...(mu.slots || [])].sort((a, b) => (a.slot || 0) - (b.slot || 0));
+      const slots = slotsInPlayedOrder(mu);
 
       for (const sl of slots) {
         const w = sl.winnerTeamIndex;
