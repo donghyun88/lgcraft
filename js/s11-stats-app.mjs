@@ -132,12 +132,13 @@ function raceBadgeHtml(race) {
   return `<span class="race-icon race-${safe}" title="${escapeHtml(safe)}">${escapeHtml(safe)}</span>`;
 }
 
-function renderLeaderboardCard(title, rows) {
+function renderLeaderboardCard(title, rows, { wlHint = '' } = {}) {
   let html = `<div class="bg-white p-4 rounded-xl border border-zinc-200/80 shadow-sm">
     <h4 class="font-bold text-base mb-3 border-b border-zinc-100 pb-2 text-zinc-800">${escapeHtml(title)}</h4>
     <ul class="space-y-2.5">`;
   rows.forEach((row, index) => {
     const idLine = row.playerId ? escapeHtml(row.playerId) : '—';
+    const wlExtra = wlHint ? ` <span class="text-zinc-400">${escapeHtml(wlHint)}</span>` : '';
     html += `<li class="flex items-start justify-between gap-2 text-sm">
       <span class="flex items-start gap-2 min-w-0 flex-1">
         <span class="font-bold w-6 shrink-0 text-center text-zinc-400 leading-6">${index + 1}</span>
@@ -149,12 +150,39 @@ function renderLeaderboardCard(title, rows) {
       </span>
       <div class="shrink-0 text-right">
         <span class="font-bold tabular-nums text-indigo-600">${row.elo}</span>
-        <div class="text-[10px] text-zinc-500">${row.w}승 ${row.l}패</div>
+        <div class="text-[10px] text-zinc-500">${row.w}승 ${row.l}패${wlExtra}</div>
       </div>
     </li>`;
   });
   html += '</ul></div>';
   return html;
+}
+
+function topFormatLeaderboardRows(meta, roster, stateByName, statsByName, { statKey, eloKey, minGames = 1, limit = 10 }) {
+  const teamName = (tid) => meta.teams.find((t) => t.id === tid)?.name || tid;
+  return roster
+    .filter((p) => p.teamId)
+    .map((p) => {
+      const dn = (p.displayName || '').trim();
+      const st = stateByName.get(dn);
+      const stt = statsByName[dn] || emptyStats();
+      const wl = stt[statKey] || { w: 0, l: 0 };
+      return {
+        name: dn,
+        playerId: (p.id && String(p.id).trim()) || '',
+        team: teamName(p.teamId),
+        elo: st?.[eloKey] ?? 1000,
+        w: wl.w,
+        l: wl.l,
+        race: getRaceLetter(p),
+      };
+    })
+    .filter((r) => r.w + r.l >= minGames)
+    .sort((a, b) => {
+      if (b.elo !== a.elo) return b.elo - a.elo;
+      return b.w + b.l - (a.w + a.l);
+    })
+    .slice(0, limit);
 }
 
 function renderLeaderboards(meta, roster, stateByName, statsByName) {
@@ -183,6 +211,21 @@ function renderLeaderboards(meta, roster, stateByName, statsByName) {
     });
 
   let html = '';
+  const soloTop = topFormatLeaderboardRows(meta, roster, stateByName, statsByName, {
+    statKey: '개인전',
+    eloKey: 'elo1v1',
+    minGames: 1,
+    limit: 10,
+  });
+  const teamTop = topFormatLeaderboardRows(meta, roster, stateByName, statsByName, {
+    statKey: '팀전',
+    eloKey: 'eloTeam',
+    minGames: 1,
+    limit: 10,
+  });
+  if (soloTop.length) html += renderLeaderboardCard('개인전 ELO (상위 10)', soloTop, { wlHint: '개인전' });
+  if (teamTop.length) html += renderLeaderboardCard('팀전 ELO (상위 10)', teamTop, { wlHint: '팀전' });
+
   const tiers = [...new Set(rows.map((r) => r.tier).filter(Boolean))].sort();
   for (const tier of tiers) {
     const top = rows.filter((r) => r.tier === tier).sort((a, b) => b.elo - a.elo).slice(0, 5);
@@ -312,7 +355,7 @@ function renderMapTables(mapStats) {
   const el = document.getElementById('map-stats-grid');
   if (!el) return;
   const names = Object.keys(mapStats).sort();
-  el.innerHTML = names.length ? names.map((m) => renderMapMatchupTable(m, mapStats[m])).join('') : '<p class="text-sm text-zinc-500">1:1 맵 통계가 없습니다.</p>';
+  el.innerHTML = names.length ? names.map((m) => renderMapMatchupTable(m, mapStats[m])).join('') : '<p class="text-sm text-zinc-500">개인전 맵 통계가 없습니다.</p>';
 }
 
 /** 맵 표 전체를 합쳐 PvT / TvZ / ZvP 한쪽 종족 기준 승률(동족전 제외, 맵별 표와 동일 원천) */
@@ -476,7 +519,7 @@ function makeHorizontalPercentBar(canvasId, labels, data, metaRows) {
       type: 'bar',
       data: {
         labels,
-        datasets: [{ label, data, backgroundColor: 'rgba(79, 70, 229, 0.82)', borderRadius: 4 }],
+        datasets: [{ label: '승률', data, backgroundColor: 'rgba(79, 70, 229, 0.82)', borderRadius: 4 }],
       },
       options: {
         indexAxis: 'y',

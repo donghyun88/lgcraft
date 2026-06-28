@@ -142,7 +142,7 @@
     }
     @media (min-width: 1024px) {
       .schedule-round-body {
-        grid-template-columns: minmax(15rem, 0.92fr) minmax(0, 1.18fr);
+        grid-template-columns: minmax(10.5rem, 0.52fr) minmax(0, 1.48fr);
         gap: 0.75rem;
       }
     }
@@ -166,6 +166,75 @@
     }
     .schedule-card--maps .schedule-slot-line:last-child {
       border-bottom: 0;
+    }
+    .schedule-card--maps .schedule-slot-grid {
+      grid-template-columns: 1.5rem minmax(0, 0.9fr) minmax(0, 1fr);
+    }
+    .schedule-card--maps .schedule-slot-cell {
+      padding: 0.28rem 0.2rem;
+      font-size: 10px;
+      line-height: 1.3;
+    }
+    .schedule-card--maps .schedule-slot-grid--head .schedule-slot-cell {
+      padding-top: 0.25rem;
+      padding-bottom: 0.3rem;
+      font-size: 8px;
+    }
+    .schedule-card--maps .schedule-slot-cell--map .font-semibold {
+      font-weight: 600;
+    }
+    .schedule-card--match {
+      padding: 1rem 0.875rem;
+    }
+    @media (min-width: 640px) {
+      .schedule-card--match {
+        padding: 1.125rem 1rem;
+      }
+    }
+    .schedule-result-block {
+      margin-top: 0.625rem;
+      padding-top: 0.625rem;
+      border-top: 1px solid rgba(244, 244, 245, 0.95);
+    }
+    .schedule-result-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      border-radius: 9999px;
+      background: #ecfdf5;
+      border: 1px solid #d1fae5;
+      padding: 0.375rem 0.875rem;
+    }
+    .schedule-result-label {
+      font-size: 10px;
+      font-weight: 800;
+      color: #047857;
+      letter-spacing: 0.02em;
+    }
+    @media (min-width: 640px) {
+      .schedule-result-label {
+        font-size: 11px;
+      }
+    }
+    .schedule-result-score {
+      font-size: 1.25rem;
+      font-weight: 900;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+    @media (min-width: 640px) {
+      .schedule-result-score {
+        font-size: 1.5rem;
+      }
+    }
+    .schedule-result-winner {
+      font-size: 11px;
+      font-weight: 700;
+    }
+    @media (min-width: 640px) {
+      .schedule-result-winner {
+        font-size: 12px;
+      }
     }
     /* 세트맵: 3열(순서·티어·맵) — 눈에 띄지 않는 세로 구분 */
     .schedule-slot-grid {
@@ -326,13 +395,15 @@
     <section id="standings" class="mb-10 scroll-mt-8">
       <h2 class="text-base font-semibold text-zinc-900 mb-2">팀 순위</h2>
       <div class="hidden md:block standings-wrap bg-white rounded-xl border border-zinc-200/90 overflow-x-auto">
-        <table class="min-w-[700px] w-full text-xs sm:text-sm">
+        <table class="min-w-[880px] w-full text-xs sm:text-sm">
           <thead>
             <tr class="bg-gradient-to-b from-zinc-100 to-zinc-50/95 text-left text-zinc-600 text-[11px] sm:text-xs font-semibold uppercase tracking-wide border-b border-zinc-200/90">
               <th class="px-2 sm:px-3 py-2.5 w-9 text-center" rowspan="2" valign="bottom">#</th>
               <th class="px-2 sm:px-3 py-2.5 min-w-[11.5rem]" rowspan="2" valign="bottom">팀</th>
               <th class="px-2 sm:px-3 py-1.5 text-center border-b border-indigo-100/80 text-indigo-800/90 normal-case" colspan="3" title="라운드에서 팀 vs 팀으로 치른 한 번(예: 3대전 1회)">대전</th>
-              <th class="px-2 sm:px-3 py-2.5 text-center text-violet-800/90 normal-case min-w-[5.5rem]" rowspan="2" valign="middle" title="세트 승·패">세트</th>
+              <th class="px-2 sm:px-3 py-2.5 text-center text-violet-800/90 normal-case min-w-[5.5rem]" rowspan="2" valign="middle" title="전체 세트 승·패 (개인전 + 팀전)">세트</th>
+              <th class="px-2 sm:px-3 py-2.5 text-center text-zinc-600 normal-case min-w-[4.5rem]" rowspan="2" valign="middle" title="개인전 세트 승·패">개인전</th>
+              <th class="px-2 sm:px-3 py-2.5 text-center text-zinc-600 normal-case min-w-[4.5rem]" rowspan="2" valign="middle" title="2v2·3v3 세트 승·패">팀전</th>
               <th class="px-2 sm:px-3 py-2.5 text-right whitespace-nowrap" rowspan="2" valign="bottom" title="세트 득실">득실</th>
               <th class="px-2 sm:px-3 py-2.5 text-center" rowspan="2" valign="bottom" title="최근 대전 결과 (과거→최근)">최근</th>
               <th class="px-2 sm:px-3 py-2.5 text-center min-w-[6.25rem]" rowspan="2" valign="bottom" title="일정상 다음 팀 대전 상대 (미종료 대전 중 가장 빠른 일정)">다음 대전</th>
@@ -621,10 +692,31 @@
       return standingsRankMapFromRows(rows);
     }
 
+    function emptyTeamStandingAcc(teamId) {
+      return { teamId, seriesW: 0, seriesL: 0, setW: 0, setL: 0, soloW: 0, soloL: 0, teamW: 0, teamL: 0 };
+    }
+
+    function slotPlanBySlot(fixtures, roundNum) {
+      const rd = (fixtures.rounds || []).find((x) => x.round === roundNum);
+      const m = new Map();
+      if (!rd || !rd.slotPlan) return m;
+      for (const s of rd.slotPlan) m.set(s.slot, s);
+      return m;
+    }
+
+    function slotFormatFromPlan(metaSlot, sl) {
+      if (metaSlot && metaSlot.format) return metaSlot.format;
+      const n = Math.max((sl.teamA || []).length, (sl.teamB || []).length);
+      if (n >= 3) return '3v3';
+      if (n >= 2) return '2v2';
+      return '1v1';
+    }
+
     /** 한 라운드 결과 문서를 누적 표에 반영 (순위표·일정 순위 공통) */
     function applyRoundDocToAcc(acc, fixtures, doc, recent) {
       const rd = (fixtures.rounds || []).find((x) => x.round === doc.round);
       if (!rd) return;
+      const planBySlot = slotPlanBySlot(fixtures, doc.round);
       const byFixture = new Map((doc.matchups || []).map((m) => [m.fixtureId, m]));
       for (const fm of rd.matchups || []) {
         const mu = byFixture.get(fm.id);
@@ -649,12 +741,29 @@
         }
         for (const sl of mu.slots || []) {
           const w = sl.winnerTeamIndex;
+          if (w !== 1 && w !== 2) continue;
+          const format = slotFormatFromPlan(planBySlot.get(sl.slot), sl);
+          const isSolo = format === '1v1';
           if (w === 1) {
             acc[tA].setW++;
             acc[tB].setL++;
-          } else if (w === 2) {
+            if (isSolo) {
+              acc[tA].soloW++;
+              acc[tB].soloL++;
+            } else {
+              acc[tA].teamW++;
+              acc[tB].teamL++;
+            }
+          } else {
             acc[tB].setW++;
             acc[tA].setL++;
+            if (isSolo) {
+              acc[tB].soloW++;
+              acc[tA].soloL++;
+            } else {
+              acc[tB].teamW++;
+              acc[tA].teamL++;
+            }
           }
         }
       }
@@ -663,7 +772,7 @@
     /** throughRound 라운드까지 누적한 뒤 순위 맵 */
     function standingsAfterThroughRound(meta, fixtures, roundDocs, throughRound) {
       const acc = {};
-      for (const t of meta.teams) acc[t.id] = { teamId: t.id, seriesW: 0, seriesL: 0, setW: 0, setL: 0 };
+      for (const t of meta.teams) acc[t.id] = emptyTeamStandingAcc(t.id);
       const docs = [...(roundDocs || [])].filter((d) => d && d.round != null).sort((a, b) => a.round - b.round);
       for (const doc of docs) {
         if (doc.round > throughRound) break;
@@ -685,7 +794,7 @@
       const recent = {};
       const rankHist = {};
       for (const t of meta.teams) {
-        acc[t.id] = { teamId: t.id, seriesW: 0, seriesL: 0, setW: 0, setL: 0 };
+        acc[t.id] = emptyTeamStandingAcc(t.id);
         recent[t.id] = [];
         rankHist[t.id] = [];
       }
@@ -891,7 +1000,7 @@
         <div class="min-w-0 flex-1">${formatStandingsTeamCell(meta, t)}</div>
         ${isPo ? '<span class="shrink-0 text-[9px] font-bold uppercase tracking-wide text-indigo-700 bg-indigo-50 border border-indigo-200/80 px-1.5 py-0.5 rounded">PO</span>' : ''}
       </div>
-      <div class="grid grid-cols-3 gap-2 mb-3">
+      <div class="grid grid-cols-3 gap-2 mb-2">
         <div class="standings-mobile-stat">
           <span class="standings-mobile-stat-label">대전</span>
           <span class="text-sm font-bold text-zinc-900 tabular-nums">${t.seriesW}<span class="text-zinc-400 font-medium">승</span> ${t.seriesL}<span class="text-zinc-400 font-medium">패</span></span>
@@ -904,6 +1013,16 @@
         <div class="standings-mobile-stat">
           <span class="standings-mobile-stat-label">득실</span>
           <div class="text-sm">${formatSetDiffHtml(t.setW, t.setL)}</div>
+        </div>
+      </div>
+      <div class="grid grid-cols-2 gap-2 mb-3">
+        <div class="standings-mobile-stat">
+          <span class="standings-mobile-stat-label">개인전</span>
+          <div class="text-sm">${formatSetRecordHtml(t.soloW, t.soloL)}</div>
+        </div>
+        <div class="standings-mobile-stat">
+          <span class="standings-mobile-stat-label">팀전</span>
+          <div class="text-sm">${formatSetRecordHtml(t.teamW, t.teamL)}</div>
         </div>
       </div>
       <div class="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-zinc-100">
@@ -950,6 +1069,8 @@
           <td class="px-2 sm:px-3 py-2.5 text-center align-middle tabular-nums text-zinc-800 font-medium">${t.seriesW}</td>
           <td class="px-2 sm:px-3 py-2.5 text-center align-middle tabular-nums text-zinc-500">${t.seriesL}</td>
           <td class="px-2 sm:px-3 py-2.5 text-center align-middle">${formatSetRecordHtml(t.setW, t.setL)}</td>
+          <td class="px-2 sm:px-3 py-2.5 text-center align-middle">${formatSetRecordHtml(t.soloW, t.soloL)}</td>
+          <td class="px-2 sm:px-3 py-2.5 text-center align-middle">${formatSetRecordHtml(t.teamW, t.teamL)}</td>
           <td class="px-2 sm:px-3 py-2.5 text-right align-middle">${formatSetDiffHtml(t.setW, t.setL)}</td>
           <td class="px-2 sm:px-3 py-2.5 align-middle">${formatRecentSeriesHtml(t.recentWL)}</td>
           ${formatNextOpponentCell(meta, nextByTeam[t.id])}
@@ -1089,7 +1210,7 @@
         </div>`;
       }
       return `<div class="schedule-slot-grid schedule-slot-grid--row">
-        <div class="schedule-slot-cell schedule-slot-cell--seq"><span class="font-mono font-bold text-indigo-700 tabular-nums text-sm">${s.slot}</span></div>
+        <div class="schedule-slot-cell schedule-slot-cell--seq"><span class="font-mono font-bold text-indigo-700 tabular-nums text-[11px]">${s.slot}</span></div>
         <div class="schedule-slot-cell schedule-slot-cell--tier">${formatScheduleSlotTierCell(s)}</div>
         <div class="schedule-slot-cell schedule-slot-cell--map">${formatScheduleSlotMapCell(s)}</div>
       </div>`;
@@ -1167,17 +1288,17 @@
       const scoreBClass = sw === 2 || (!sw && scoreB > scoreA) ? 'text-emerald-700' : 'text-zinc-500';
       const mvp = matchupMvpName(mu);
       const mvpHtml = mvp
-        ? `<span class="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-bold text-amber-800 border border-amber-200"><span>MVP</span><span>${escapeHtml(mvp)}</span></span>`
+        ? `<span class="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-[10px] sm:text-[11px] font-bold text-amber-800 border border-amber-200"><span>MVP</span><span>${escapeHtml(mvp)}</span></span>`
         : '';
       const winnerHtml = winnerName
-        ? `<span class="text-[10px] font-semibold text-emerald-700">${escapeHtml(winnerName)} 승</span>`
-        : '<span class="text-[10px] font-semibold text-amber-700">결과 입력 중</span>';
+        ? `<span class="schedule-result-winner text-emerald-700">${escapeHtml(winnerName)} 승</span>`
+        : '<span class="schedule-result-winner text-amber-700">결과 입력 중</span>';
 
-      return `<div class="mt-2 pt-2 border-t border-zinc-100 flex flex-col items-center gap-1.5">
-        <div class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 border border-emerald-100 px-2.5 py-1">
-          <span class="text-[10px] font-bold text-emerald-700">결과</span>
-          <span class="text-sm font-black tabular-nums leading-none">
-            <span class="${scoreAClass}">${scoreA}</span><span class="text-zinc-300 mx-0.5">:</span><span class="${scoreBClass}">${scoreB}</span>
+      return `<div class="schedule-result-block flex flex-col items-center gap-2">
+        <div class="schedule-result-pill">
+          <span class="schedule-result-label">결과</span>
+          <span class="schedule-result-score">
+            <span class="${scoreAClass}">${scoreA}</span><span class="text-zinc-300 mx-1">:</span><span class="${scoreBClass}">${scoreB}</span>
           </span>
         </div>
         <div class="flex flex-wrap items-center justify-center gap-1.5">
@@ -1199,7 +1320,7 @@
         .join('');
       return `
         <div class="schedule-card schedule-card--maps overflow-hidden">
-          <div class="px-3 py-2 text-[11px] font-bold text-indigo-900 bg-indigo-50/95 border-b border-indigo-100/80 text-center">세트 · 맵</div>
+          <div class="px-2.5 py-1.5 text-[10px] font-bold text-indigo-900/90 bg-indigo-50/95 border-b border-indigo-100/80 text-center">세트 · 맵</div>
           ${headerRow}
           <div>${lines || '<div class="px-3 py-6 text-center text-xs text-zinc-400">세트 구성 없음</div>'}</div>
         </div>`;
@@ -1215,7 +1336,7 @@
         ? `<div class="text-center leading-tight flex items-center justify-center gap-1.5">${formatScheduleMatchupDateHeading(raw)}${resultHtml ? '<span class="rounded-full bg-emerald-100 text-emerald-800 px-1.5 py-0.5 text-[9px] font-bold">완료</span>' : ''}</div>`
         : `<div class="text-center text-[11px] font-bold text-zinc-500">대전 ${index1}</div>`;
       return `
-        <div class="schedule-card schedule-card--match px-3 py-3.5 flex flex-col justify-center min-h-[5.5rem] items-stretch text-center">
+        <div class="schedule-card schedule-card--match flex flex-col justify-center min-h-[6.25rem] items-stretch text-center">
           <div class="mb-1.5">${head}</div>
           <div class="min-w-0 flex justify-center w-full">${inner}</div>
           ${h2hHtml}

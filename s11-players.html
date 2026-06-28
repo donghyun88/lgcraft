@@ -47,6 +47,82 @@
     .chip-1v1 { background: #dbeafe; color: #1e40af; }
     .chip-22 { background: #fce7f3; color: #9d174d; }
     .chip-33 { background: #ede9fe; color: #5b21b6; }
+    .player-elo-rings {
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+    }
+    @media (min-width: 640px) {
+      .player-elo-rings { gap: 1.25rem; }
+    }
+    .player-elo-ring {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.3rem;
+      min-width: 4.75rem;
+    }
+    .player-elo-ring__circle {
+      width: 4.5rem;
+      height: 4.5rem;
+      border-radius: 9999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 3px solid #e4e4e7;
+      background: linear-gradient(180deg, #fafafa 0%, #fff 100%);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    }
+    @media (min-width: 640px) {
+      .player-elo-ring__circle {
+        width: 5rem;
+        height: 5rem;
+      }
+    }
+    .player-elo-ring--primary .player-elo-ring__circle {
+      border-color: #818cf8;
+      background: linear-gradient(180deg, #eef2ff 0%, #fff 55%);
+      box-shadow: 0 0 0 1px rgba(99, 102, 241, 0.12), 0 2px 8px rgba(79, 70, 229, 0.08);
+    }
+    .player-elo-ring__score {
+      font-size: 1.05rem;
+      font-weight: 800;
+      line-height: 1;
+      color: #3f3f46;
+      letter-spacing: -0.02em;
+    }
+    @media (min-width: 640px) {
+      .player-elo-ring__score { font-size: 1.125rem; }
+    }
+    .player-elo-ring--primary .player-elo-ring__score {
+      font-size: 1.15rem;
+      color: #4338ca;
+    }
+    @media (min-width: 640px) {
+      .player-elo-ring--primary .player-elo-ring__score { font-size: 1.25rem; }
+    }
+    .player-elo-ring__rank {
+      font-size: 0.6875rem;
+      font-weight: 800;
+      color: #6366f1;
+      line-height: 1.2;
+    }
+    .player-elo-ring--primary .player-elo-ring__rank { color: #4f46e5; }
+    .player-elo-ring__rank--na {
+      color: #d4d4d8;
+      font-weight: 600;
+    }
+    .player-elo-ring__label {
+      font-size: 0.625rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #a1a1aa;
+    }
+    .player-elo-ring--primary .player-elo-ring__label { color: #6366f1; }
   </style>
 </head>
 <body class="bg-zinc-100 text-zinc-800 min-h-screen antialiased">
@@ -312,7 +388,7 @@
       if (!chips) return '';
       const note = p.raceNotes && String(p.raceNotes).trim() ? `<p class="mt-1.5 text-[10px] text-violet-700/90 leading-snug">${escapeHtml(p.raceNotes.trim())}</p>` : '';
       return `<div class="mt-2 pt-2 border-t border-violet-100/80">
-        <p class="text-[10px] font-bold uppercase tracking-wide text-violet-600 mb-1">1:1 초이스</p>
+        <p class="text-[10px] font-bold uppercase tracking-wide text-violet-600 mb-1">개인전 초이스</p>
         <div class="flex flex-wrap gap-1">${chips}</div>${note}</div>`;
     }
 
@@ -437,6 +513,8 @@
             displayName: n,
             player,
             elo: 1000,
+            elo1v1: 1000,
+            eloTeam: 1000,
             history: [],
             mapStats: {},
             vsOppRace: emptyVsOppRace(),
@@ -517,7 +595,12 @@
               const s2 = ensure(n2);
               const e1 = s1.elo;
               const e2 = s2.elo;
+              const e1solo = s1.elo1v1;
+              const e2solo = s2.elo1v1;
               const { d1, d2 } = updateEloPair(e1, e2, team1Won ? 1 : 0, k);
+              const { d1: d1solo, d2: d2solo } = updateEloPair(e1solo, e2solo, team1Won ? 1 : 0, k);
+              s1.elo1v1 = e1solo + d1solo;
+              s2.elo1v1 = e2solo + d2solo;
               bumpMapSimple(s1.mapStats, mapName, team1Won);
               bumpMapSimple(s2.mapStats, mapName, !team1Won);
               const roppFor1 = oppRaceZtp(sl.teamB[0], rosterMap, n2);
@@ -527,19 +610,24 @@
               record(n1, e1, d1, team1Won, [n2], [roppFor1 || '']);
               record(n2, e2, d2, !team1Won, [n1], [roppFor2 || '']);
             } else if ((format === '2v2' || format === '3v3') && namesA.length && namesB.length) {
-              const snapA = namesA.map((nm) => ({ nm, eloBefore: ensure(nm).elo }));
-              const snapB = namesB.map((nm) => ({ nm, eloBefore: ensure(nm).elo }));
+              const snapA = namesA.map((nm) => ({ nm, eloBefore: ensure(nm).elo, eloTeamBefore: ensure(nm).eloTeam }));
+              const snapB = namesB.map((nm) => ({ nm, eloBefore: ensure(nm).elo, eloTeamBefore: ensure(nm).eloTeam }));
               const racesB = opponentRacesFromSlotRows(sl.teamB, namesB, rosterMap);
               const racesA = opponentRacesFromSlotRows(sl.teamA, namesA, rosterMap);
               const aAvg = snapA.reduce((s, x) => s + x.eloBefore, 0) / snapA.length;
               const bAvg = snapB.reduce((s, x) => s + x.eloBefore, 0) / snapB.length;
+              const aTeamAvg = snapA.reduce((s, x) => s + x.eloTeamBefore, 0) / snapA.length;
+              const bTeamAvg = snapB.reduce((s, x) => s + x.eloTeamBefore, 0) / snapB.length;
               const { d1, d2 } = updateEloPair(aAvg, bAvg, team1Won ? 1 : 0, k);
-              for (const { nm, eloBefore } of snapA) {
+              const { d1: d1team, d2: d2team } = updateEloPair(aTeamAvg, bTeamAvg, team1Won ? 1 : 0, k);
+              for (const { nm, eloBefore, eloTeamBefore } of snapA) {
                 record(nm, eloBefore, d1, team1Won, namesB, racesB);
+                ensure(nm).eloTeam = eloTeamBefore + d1team;
                 bumpTeamMap(ensure(nm).teamMapStats, format, mapName, team1Won);
               }
-              for (const { nm, eloBefore } of snapB) {
+              for (const { nm, eloBefore, eloTeamBefore } of snapB) {
                 record(nm, eloBefore, d2, !team1Won, namesA, racesA);
+                ensure(nm).eloTeam = eloTeamBefore + d2team;
                 bumpTeamMap(ensure(nm).teamMapStats, format, mapName, !team1Won);
               }
             }
@@ -612,7 +700,7 @@
                 <th data-sort="tier" class="px-4 py-3.5 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">티어</th>
                 <th data-sort-numeric="elo" class="px-4 py-3.5 text-left text-xs font-semibold text-indigo-700 uppercase tracking-wider">ELO</th>
                 <th data-sort-numeric="total" class="px-4 py-3.5 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">전체</th>
-                <th data-sort-numeric="1v1" class="px-4 py-3.5 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">1:1</th>
+                <th data-sort-numeric="1v1" class="px-4 py-3.5 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">개인전</th>
                 <th data-sort-numeric="team" class="px-4 py-3.5 text-left text-xs font-semibold text-zinc-500 uppercase tracking-wider">팀전</th>
               </tr>
               <tr class="bg-zinc-50 border-t border-zinc-100">
@@ -698,7 +786,7 @@
             </div>
             <div class="mt-3 grid grid-cols-3 gap-2 text-center text-xs border-t border-zinc-100 pt-3">
               <div><span class="font-semibold text-zinc-800">${wlCell(st.total)}</span><div class="text-zinc-400">전체 ${totalWinRate ? totalWinRate + '%' : ''}</div></div>
-              <div><span class="font-semibold">${wlCell(st.개인전)}</span><div class="text-zinc-400">1:1</div></div>
+              <div><span class="font-semibold">${wlCell(st.개인전)}</span><div class="text-zinc-400">개인전</div></div>
               <div><span class="font-semibold">${wlCell(st.팀전)}</span><div class="text-zinc-400">팀전</div></div>
             </div>
           </div>`;
@@ -806,7 +894,7 @@
     let mobilePlayerDetailViaList = false;
 
     function formatChip(format) {
-      if (format === '1v1') return '<span class="chip chip-1v1">1:1</span>';
+      if (format === '1v1') return '<span class="chip chip-1v1">개인전</span>';
       if (format === '2v2') return '<span class="chip chip-22">2:2</span>';
       if (format === '3v3') return '<span class="chip chip-33">3:3</span>';
       return `<span class="chip bg-zinc-200 text-zinc-700">${escapeHtml(format)}</span>`;
@@ -819,15 +907,25 @@
       }
     }
 
+    function buildEloRoundSeries(history) {
+      const sorted = [...(history || [])].sort((a, b) => a.seq - b.seq);
+      const eloByRound = new Map();
+      for (const h of sorted) {
+        if (h.round == null) continue;
+        eloByRound.set(h.round, h.eloAfter);
+      }
+      const rounds = [...eloByRound.keys()].sort((a, b) => a - b);
+      const points = [{ round: null, elo: 1000 }];
+      for (const r of rounds) points.push({ round: r, elo: eloByRound.get(r) });
+      return points;
+    }
+
     function mountEloLineChart(canvasId, history) {
       const canvas = document.getElementById(canvasId);
       if (!canvas || typeof Chart === 'undefined') return null;
-      const labels = ['0'];
-      const data = [1000];
-      for (let i = 0; i < history.length; i++) {
-        labels.push(String(i + 1));
-        data.push(history[i].eloAfter);
-      }
+      const points = buildEloRoundSeries(history);
+      const labels = points.map((p) => (p.round == null ? '시작' : `${p.round}R`));
+      const data = points.map((p) => p.elo);
       return new Chart(canvas.getContext('2d'), {
         type: 'line',
         data: {
@@ -839,8 +937,8 @@
               borderColor: '#4f46e5',
               backgroundColor: 'rgba(79, 70, 229, 0.06)',
               fill: true,
-              tension: 0.3,
-              pointRadius: 2,
+              tension: 0.25,
+              pointRadius: points.length <= 12 ? 3 : 2,
               pointHoverRadius: 5,
               borderWidth: 2,
             },
@@ -856,7 +954,7 @@
               ticks: { font: { size: 11 } },
             },
             x: {
-              title: { display: true, text: '세트 순번 (툴팁에 라운드·맵)', font: { size: 10 } },
+              title: { display: true, text: '라운드', font: { size: 10 } },
               ticks: { maxTicksLimit: 14, font: { size: 9 } },
               grid: { display: false },
             },
@@ -867,11 +965,18 @@
               callbacks: {
                 title: (items) => {
                   const idx = items[0].dataIndex;
-                  if (idx <= 0) return '시작 · 1000';
-                  const h = history[idx - 1];
-                  return `R${h.round} · ${h.fixtureId} · 슬롯${h.slot} · ${h.format} · ${h.map}`;
+                  const pt = points[idx];
+                  if (!pt || pt.round == null) return '시작 · 1000';
+                  return `${pt.round}R 종료`;
                 },
-                label: (item) => `ELO ${item.raw}`,
+                label: (item) => {
+                  const idx = item.dataIndex;
+                  const pt = points[idx];
+                  const prev = idx > 0 ? points[idx - 1].elo : null;
+                  const delta = prev != null ? pt.elo - prev : 0;
+                  const deltaStr = delta > 0 ? ` (+${delta})` : delta < 0 ? ` (${delta})` : '';
+                  return `ELO ${item.raw}${deltaStr}`;
+                },
               },
             },
           },
@@ -879,11 +984,88 @@
       });
     }
 
+    function assignEloRankMap(rows, eloKey) {
+      const sorted = [...rows].sort((a, b) => {
+        if (b[eloKey] !== a[eloKey]) return b[eloKey] - a[eloKey];
+        return a.dn.localeCompare(b.dn, 'ko');
+      });
+      const map = {};
+      let i = 0;
+      while (i < sorted.length) {
+        const rank = i + 1;
+        let j = i + 1;
+        while (j < sorted.length && sorted[j][eloKey] === sorted[i][eloKey]) j++;
+        for (let k = i; k < j; k++) map[sorted[k].dn] = rank;
+        i = j;
+      }
+      return map;
+    }
+
+    function computeEloRankMaps(roster, stateByName, statsByName) {
+      const rows = (roster || [])
+        .filter((p) => p.teamId)
+        .map((p) => {
+          const dn = (p.displayName || '').trim();
+          const st = stateByName.get(dn);
+          const stats = statsByName[dn] || emptyStats();
+          return {
+            dn,
+            elo: st?.elo ?? 1000,
+            elo1v1: st?.elo1v1 ?? 1000,
+            eloTeam: st?.eloTeam ?? 1000,
+            soloG: (stats.개인전?.w || 0) + (stats.개인전?.l || 0),
+            teamG: (stats.팀전?.w || 0) + (stats.팀전?.l || 0),
+            totalG: (stats.total?.w || 0) + (stats.total?.l || 0),
+          };
+        });
+      const withGames = rows.filter((r) => r.totalG > 0);
+      const soloRows = rows.filter((r) => r.soloG > 0);
+      const teamRows = rows.filter((r) => r.teamG > 0);
+      return {
+        total: assignEloRankMap(withGames.length ? withGames : rows, 'elo'),
+        solo: assignEloRankMap(soloRows, 'elo1v1'),
+        team: assignEloRankMap(teamRows, 'eloTeam'),
+      };
+    }
+
+    function formatPlayerEloDetailHtml(pst, ranks, stats) {
+      const total = pst?.elo ?? 1000;
+      const solo = pst?.elo1v1 ?? 1000;
+      const team = pst?.eloTeam ?? 1000;
+      const soloG = (stats?.개인전?.w || 0) + (stats?.개인전?.l || 0);
+      const teamG = (stats?.팀전?.w || 0) + (stats?.팀전?.l || 0);
+      const totalG = (stats?.total?.w || 0) + (stats?.total?.l || 0);
+
+      function ring(label, score, rank, hasGames, tone) {
+        const rankHtml =
+          hasGames && rank != null
+            ? `<span class="player-elo-ring__rank">${rank}위</span>`
+            : '<span class="player-elo-ring__rank player-elo-ring__rank--na">—</span>';
+        const toneClass = tone === 'primary' ? ' player-elo-ring--primary' : '';
+        return `<div class="player-elo-ring${toneClass}">
+          <div class="player-elo-ring__circle"><span class="player-elo-ring__score">${score}</span></div>
+          ${rankHtml}
+          <span class="player-elo-ring__label">${escapeHtml(label)}</span>
+        </div>`;
+      }
+
+      return `<div class="player-elo-rings">
+        ${ring('종합', total, ranks?.total, totalG > 0, 'primary')}
+        ${ring('개인전', solo, ranks?.solo, soloG > 0)}
+        ${ring('팀전', team, ranks?.team, teamG > 0)}
+      </div>`;
+    }
+
     function buildPlayerDetailInnerHTML(meta, p, chartCanvasId) {
       const dn = (p.displayName || '').trim();
       const st = lastStatsByName[dn] || emptyStats();
       const pst = lastStateByName.get(dn);
-      const elo = pst?.elo ?? 1000;
+      const rankMaps = computeEloRankMaps(lastPlayers, lastStateByName, lastStatsByName);
+      const ranks = {
+        total: rankMaps.total[dn],
+        solo: rankMaps.solo[dn],
+        team: rankMaps.team[dn],
+      };
       const history = [...(pst?.history || [])].sort((a, b) => a.seq - b.seq);
       const race = getRaceLetter(p);
 
@@ -913,35 +1095,17 @@
             <p class="text-sm mt-1"><span class="text-zinc-500">종족</span> ${getRaceIcon(race)}<span class="font-medium">${escapeHtml(race || '—')}</span></p>
             <p class="text-sm mt-1"><span class="text-zinc-500">티어</span> <span class="font-medium">${escapeHtml(p.tier || '—')}</span></p>
             ${renderRaceVsOpponentBlock(p)}
-            <div class="mt-4 flex items-end gap-2">
-              <span class="text-4xl font-extrabold text-indigo-700 tabular-nums">${elo}</span>
-              <span class="text-sm font-semibold text-indigo-500 pb-1">ELO</span>
-            </div>
+            ${formatPlayerEloDetailHtml(pst, ranks, st)}
           </div>
           <div class="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
             <h4 class="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-3">세트 요약</h4>
             <p class="text-sm"><span class="text-zinc-500">전체</span> <strong>${wlCell(st.total)}</strong>
               <span class="text-zinc-400">(${st.total.w + st.total.l > 0 ? ((st.total.w / (st.total.w + st.total.l)) * 100).toFixed(1) : '0'}%)</span></p>
-            <p class="text-sm mt-1"><span class="text-zinc-500">1:1</span> <strong>${wlCell(st.개인전)}</strong></p>
+            <p class="text-sm mt-1"><span class="text-zinc-500">개인전</span> <strong>${wlCell(st.개인전)}</strong></p>
             <p class="text-sm mt-1"><span class="text-zinc-500">팀전</span> <strong>${wlCell(st.팀전)}</strong></p>
             <p class="text-sm mt-1"><span class="text-zinc-500">2:2 / 3:3</span> <strong>${wlCell(st['22'])}</strong> · <strong>${wlCell(st['33'])}</strong></p>
           </div>
         </div>
-
-        <div class="mt-6 rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
-          <h4 class="text-sm font-bold text-zinc-800 mb-3">ELO 변화</h4>
-          <div class="h-52 sm:h-64"><canvas id="${escapeHtml(chartCanvasId)}"></canvas></div>
-        </div>
-
-        <div class="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <div class="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
-            <h4 class="text-sm font-bold text-zinc-800 mb-3">맵별 1:1</h4>
-            ${renderMapSection(pst?.mapStats)}
-          </div>
-          ${renderVsOppRaceSection(pst?.vsOppRace)}
-        </div>
-
-        <div class="mt-4">${renderTeamMapSection(pst?.teamMapStats)}</div>
 
         <div class="mt-6 rounded-xl border border-zinc-200 bg-white p-4 shadow-sm overflow-hidden">
           <h4 class="text-sm font-bold text-zinc-800 mb-3">세트 기록</h4>
@@ -962,6 +1126,21 @@
               <tbody>${histRows || '<tr><td colspan="8" class="p-4 text-zinc-400">기록 없음</td></tr>'}</tbody>
             </table>
           </div>
+        </div>
+
+        <div class="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div class="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
+            <h4 class="text-sm font-bold text-zinc-800 mb-3">맵별 개인전</h4>
+            ${renderMapSection(pst?.mapStats)}
+          </div>
+          ${renderVsOppRaceSection(pst?.vsOppRace)}
+        </div>
+
+        <div class="mt-4">${renderTeamMapSection(pst?.teamMapStats)}</div>
+
+        <div class="mt-6 rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
+          <h4 class="text-sm font-bold text-zinc-800 mb-2">ELO 변화 <span class="text-xs font-normal text-zinc-400">(라운드 종료 시점)</span></h4>
+          <div class="h-36 sm:h-40"><canvas id="${escapeHtml(chartCanvasId)}"></canvas></div>
         </div>`;
     }
 
@@ -981,7 +1160,7 @@
         </tr>`;
       }
       return `<div class="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
-        <h4 class="text-sm font-bold text-zinc-800 mb-2">1:1 · 상대 종족별</h4>
+        <h4 class="text-sm font-bold text-zinc-800 mb-2">개인전 · 상대 종족별</h4>
         <p class="text-xs text-zinc-500 mb-3">슬롯에 적힌 상대 race가 있으면 우선, 없으면 선수 명단의 등록 종족을 사용합니다. Z / T / P만 집계합니다.</p>
         <table class="w-full text-sm"><thead><tr class="text-left text-zinc-500 border-b border-zinc-200">
           <th class="py-2">상대</th><th class="py-2 text-right">승</th><th class="py-2 text-right">패</th><th class="py-2 text-right">승률</th>
@@ -1102,7 +1281,7 @@
     function renderMapSection(mapStats) {
       const maps = Object.keys(mapStats || {}).sort();
       if (!maps.length) {
-        return '<p class="text-sm text-zinc-500">1:1 세트가 입력되면 맵별 승패가 표시됩니다.</p>';
+        return '<p class="text-sm text-zinc-500">개인전 세트가 입력되면 맵별 승패가 표시됩니다.</p>';
       }
       let html = '<table class="w-full text-sm"><thead><tr class="text-left text-zinc-500 border-b border-zinc-200">';
       html += '<th class="py-2 pr-2">맵</th><th class="py-2 text-right">승</th><th class="py-2 text-right">패</th><th class="py-2 text-right">승률</th></tr></thead><tbody>';

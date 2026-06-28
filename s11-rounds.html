@@ -509,23 +509,56 @@
     }
 
     function formatChip(format) {
-      if (format === '1v1') return '<span class="inline-flex rounded-full bg-sky-100/90 text-sky-800 px-2 py-0.5 text-[10px] font-semibold leading-none ring-1 ring-inset ring-sky-200/60">1:1</span>';
+      if (format === '1v1') return '<span class="inline-flex rounded-full bg-sky-100/90 text-sky-800 px-2 py-0.5 text-[10px] font-semibold leading-none ring-1 ring-inset ring-sky-200/60">개인전</span>';
       if (format === '2v2') return '<span class="inline-flex rounded-full bg-fuchsia-50 text-fuchsia-800 px-2 py-0.5 text-[10px] font-semibold leading-none ring-1 ring-inset ring-fuchsia-200/50">2:2</span>';
       if (format === '3v3') return '<span class="inline-flex rounded-full bg-violet-50 text-violet-800 px-2 py-0.5 text-[10px] font-semibold leading-none ring-1 ring-inset ring-violet-200/50">3:3</span>';
       return `<span class="inline-flex rounded-full bg-zinc-100 text-zinc-700 px-2 py-0.5 text-[10px] font-semibold leading-none ring-1 ring-inset ring-zinc-200/70">${escapeHtml(format || '—')}</span>`;
     }
 
+    /** 세트 표시 순: playedOrder 가 있으면 실제 진행 순, 없으면 슬롯 번호 순 */
+    function defaultSlotOrder(planBySlot) {
+      return [...planBySlot.keys()].sort((a, b) => a - b);
+    }
+
+    function isCustomPlayedOrder(playedOrder, planBySlot) {
+      const def = defaultSlotOrder(planBySlot);
+      if (!Array.isArray(playedOrder) || !playedOrder.length) return false;
+      if (playedOrder.length !== def.length) return true;
+      for (let i = 0; i < def.length; i++) {
+        if (playedOrder[i] !== def[i]) return true;
+      }
+      return false;
+    }
+
+    function slotDisplayOrder(resMu, planBySlot) {
+      const def = defaultSlotOrder(planBySlot);
+      const po = resMu?.playedOrder;
+      if (!Array.isArray(po) || !po.length) return def;
+      const ordered = [];
+      for (const slotNum of po) {
+        if (planBySlot.has(slotNum) && !ordered.includes(slotNum)) ordered.push(slotNum);
+      }
+      for (const s of def) {
+        if (!ordered.includes(s)) ordered.push(s);
+      }
+      return ordered;
+    }
+
     /** 세트 가운데: 맵·승자 한 덩어리 */
-    function slotCenterBlock(plan, w, nameA, nameB) {
+    function slotCenterBlock(plan, w, nameA, nameB, playIndex) {
       if (!plan) return '—';
       const slotNum = plan.slot != null ? plan.slot : '—';
+      const playBadge =
+        playIndex != null
+          ? `<span class="text-zinc-300">·</span><span class="text-indigo-600/85 font-bold tabular-nums">${playIndex}번째</span>`
+          : '';
       const tierPart = plan.tierLine
         ? `<span class="text-zinc-300">·</span><span class="text-zinc-500 font-normal">${escapeHtml(plan.tierLine)}</span>`
         : '';
       const top = `<div class="flex flex-wrap items-center justify-center gap-x-1 text-[10px] text-zinc-500 leading-none">
         <span class="font-bold text-indigo-600/90 tabular-nums">#${slotNum}</span>
         <span class="text-zinc-200 select-none">|</span>
-        ${formatChip(plan.format)}${tierPart}
+        ${formatChip(plan.format)}${tierPart}${playBadge}
       </div>`;
       const mapName = plan.map ? escapeHtml(plan.map) : '—';
       const mapEl = `<div class="mt-1 text-[11px] font-semibold text-zinc-700 leading-snug tracking-tight">${mapName}</div>`;
@@ -540,11 +573,12 @@
       return top + mapEl + winEl;
     }
 
-    function renderMatchupCard(meta, fixMu, planBySlot, planSlotOrder, resMu, hasRoundDoc, rosterMap) {
+    function renderMatchupCard(meta, fixMu, planBySlot, resMu, hasRoundDoc, rosterMap) {
       const [tA, tB] = fixMu.teamIds || [];
       const nameA = teamName(meta, tA);
       const nameB = teamName(meta, tB);
-      const slotsRes = resMu && resMu.slots ? [...resMu.slots].sort((a, b) => (a.slot || 0) - (b.slot || 0)) : [];
+      const slotsRes = resMu && resMu.slots ? [...resMu.slots] : [];
+      const customPlayOrder = isCustomPlayedOrder(resMu?.playedOrder, planBySlot);
       const [cntA, cntB] = resMu ? countSlotWins(slotsRes) : [0, 0];
       const [dispA, dispB] = resMu ? displayedSetScores(resMu) : [0, 0];
       const sw = resMu && resMu.series && resMu.series.winnerTeamIndex;
@@ -598,17 +632,22 @@
       } else {
         seriesNote = '<span class="text-[10px] text-zinc-400">결과 대기</span>';
       }
-      const showMetaRow = Boolean(seriesNote);
+      const showMetaRow = Boolean(seriesNote) || customPlayOrder;
+      const playOrderNote = customPlayOrder
+        ? '<span class="text-[10px] font-medium text-indigo-700/90">세트 표시 · 실제 진행 순</span>'
+        : '';
 
-      const order = planSlotOrder && planSlotOrder.length ? planSlotOrder : [...planBySlot.keys()].sort((a, b) => a - b);
+      const order = slotDisplayOrder(resMu, planBySlot);
       const orderedPlans = order.map((slot) => planBySlot.get(slot)).filter(Boolean);
       const slotRows = [];
-      for (const plan of orderedPlans) {
+      for (let pi = 0; pi < orderedPlans.length; pi++) {
+        const plan = orderedPlans[pi];
         const sl = resMu && slotsRes.find((x) => x.slot === plan.slot);
         const w = sl && sl.winnerTeamIndex;
+        const playIndex = customPlayOrder ? pi + 1 : null;
         const t1Win = w === 1 ? 'bg-emerald-50/90 sm:border-r-[4px] sm:border-r-emerald-500' : 'bg-zinc-50/40';
         const t2Win = w === 2 ? 'bg-emerald-50/90 sm:border-l-[4px] sm:border-l-emerald-500' : 'bg-zinc-50/40';
-        const centerHtml = slotCenterBlock(plan, w, nameA, nameB);
+        const centerHtml = slotCenterBlock(plan, w, nameA, nameB, playIndex);
         slotRows.push(`
           <div class="flex flex-col sm:grid sm:grid-cols-12 gap-0 items-stretch rounded-xl border border-zinc-200/50 bg-white shadow-sm overflow-hidden ring-1 ring-zinc-900/[0.03]">
             <div class="order-1 sm:order-2 sm:col-span-2 px-2 py-2.5 flex flex-col items-center justify-center bg-zinc-50/90 border-b sm:border-b-0 sm:border-x border-zinc-100/90 text-center min-w-0">
@@ -658,20 +697,19 @@
             </div>
           </div>
           ${mvpHtml}
-          ${showMetaRow ? `<div class="px-4 py-1.5 border-b border-zinc-100 bg-amber-50/40 text-right text-xs">${seriesNote}</div>` : ''}
+          ${showMetaRow ? `<div class="px-4 py-1.5 border-b border-zinc-100 bg-amber-50/40 text-right text-xs flex flex-wrap justify-end gap-x-3 gap-y-1">${playOrderNote}${seriesNote}</div>` : ''}
           <div class="p-2.5 space-y-2">${slotRows.join('')}</div>
         </article>`;
     }
 
     function renderRoundPane(meta, fr, doc, isFirst, rosterMap, fixtures) {
       const planBySlot = slotPlanBySlot(fr);
-      const planSlotOrder = [...planBySlot.keys()].sort((a, b) => a - b);
       const metaLine = '';
 
       const cards = sortMatchupsForDisplay(fr.matchups, fr.round, fixtures)
         .map((m) => {
           const resMu = resultMatchupByFixtureId(doc, m.id);
-          return renderMatchupCard(meta, m, planBySlot, planSlotOrder, resMu, !!doc, rosterMap);
+          return renderMatchupCard(meta, m, planBySlot, resMu, !!doc, rosterMap);
         })
         .join('');
 

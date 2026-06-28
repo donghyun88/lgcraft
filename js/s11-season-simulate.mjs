@@ -249,6 +249,8 @@ export function simulateSeason(fixtures, roundDocs, rosterPlayers) {
         displayName: n,
         player,
         elo: 1000,
+        elo1v1: 1000,
+        eloTeam: 1000,
         history: [],
         mapStats: {},
         vsOppRace: emptyVsOppRace(),
@@ -329,7 +331,12 @@ export function simulateSeason(fixtures, roundDocs, rosterPlayers) {
           const s2 = ensure(n2);
           const e1 = s1.elo;
           const e2 = s2.elo;
+          const e1solo = s1.elo1v1;
+          const e2solo = s2.elo1v1;
           const { d1, d2 } = updateEloPair(e1, e2, team1Won ? 1 : 0, k);
+          const { d1: d1solo, d2: d2solo } = updateEloPair(e1solo, e2solo, team1Won ? 1 : 0, k);
+          s1.elo1v1 = e1solo + d1solo;
+          s2.elo1v1 = e2solo + d2solo;
           bumpMapSimple(s1.mapStats, mapName, team1Won);
           bumpMapSimple(s2.mapStats, mapName, !team1Won);
           const roppFor1 = oppRaceZtp(sl.teamB[0], rosterMap, n2);
@@ -339,19 +346,24 @@ export function simulateSeason(fixtures, roundDocs, rosterPlayers) {
           record(n1, e1, d1, team1Won, [n2], [roppFor1 || '']);
           record(n2, e2, d2, !team1Won, [n1], [roppFor2 || '']);
         } else if ((format === '2v2' || format === '3v3') && namesA.length && namesB.length) {
-          const snapA = namesA.map((nm) => ({ nm, eloBefore: ensure(nm).elo }));
-          const snapB = namesB.map((nm) => ({ nm, eloBefore: ensure(nm).elo }));
+          const snapA = namesA.map((nm) => ({ nm, eloBefore: ensure(nm).elo, eloTeamBefore: ensure(nm).eloTeam }));
+          const snapB = namesB.map((nm) => ({ nm, eloBefore: ensure(nm).elo, eloTeamBefore: ensure(nm).eloTeam }));
           const racesB = opponentRacesFromSlotRows(sl.teamB, namesB, rosterMap);
           const racesA = opponentRacesFromSlotRows(sl.teamA, namesA, rosterMap);
           const aAvg = snapA.reduce((s, x) => s + x.eloBefore, 0) / snapA.length;
           const bAvg = snapB.reduce((s, x) => s + x.eloBefore, 0) / snapB.length;
+          const aTeamAvg = snapA.reduce((s, x) => s + x.eloTeamBefore, 0) / snapA.length;
+          const bTeamAvg = snapB.reduce((s, x) => s + x.eloTeamBefore, 0) / snapB.length;
           const { d1, d2 } = updateEloPair(aAvg, bAvg, team1Won ? 1 : 0, k);
-          for (const { nm, eloBefore } of snapA) {
+          const { d1: d1team, d2: d2team } = updateEloPair(aTeamAvg, bTeamAvg, team1Won ? 1 : 0, k);
+          for (const { nm, eloBefore, eloTeamBefore } of snapA) {
             record(nm, eloBefore, d1, team1Won, namesB, racesB);
+            ensure(nm).eloTeam = eloTeamBefore + d1team;
             bumpTeamMap(ensure(nm).teamMapStats, format, mapName, team1Won);
           }
-          for (const { nm, eloBefore } of snapB) {
+          for (const { nm, eloBefore, eloTeamBefore } of snapB) {
             record(nm, eloBefore, d2, !team1Won, namesA, racesA);
+            ensure(nm).eloTeam = eloTeamBefore + d2team;
             bumpTeamMap(ensure(nm).teamMapStats, format, mapName, !team1Won);
           }
         }
