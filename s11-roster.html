@@ -162,6 +162,8 @@
       font-weight: 600;
       color: #52525b;
       transition: background 0.15s ease, color 0.15s ease;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
     }
     .coin-half-tab:hover { color: #312e81; background: #eef2ff; }
     .coin-half-tab.is-active {
@@ -331,11 +333,23 @@
       players: [],
       fixtures: null,
       coinUsage: null,
-      roundDocs: [],
+      roundDocsByRound: new Map(),
       activeHalf: 'first_half',
-      loadedHalves: new Set(),
+      coinDataReady: false,
       coinLoading: false,
     };
+
+    function mergeRoundDocsIntoCache(docs) {
+      for (const doc of docs || []) {
+        if (doc && doc.round != null) appState.roundDocsByRound.set(doc.round, doc);
+      }
+    }
+
+    function rebuildCoinUsage() {
+      appState.coinUsage = buildCoinUsageByHalf(appState.fixtures, [
+        ...appState.roundDocsByRound.values(),
+      ]);
+    }
 
     function isMobileRosterView() {
       return window.matchMedia('(max-width: 767px)').matches;
@@ -410,46 +424,44 @@
       const el = document.getElementById('coinReflectNote');
       if (!el) return;
       const range = HALF_RANGES[appState.activeHalf];
-      if (appState.coinLoading || !appState.loadedHalves.has(appState.activeHalf)) {
+      if (!appState.coinUsage) {
         el.textContent = `${range.label} 코인 불러오는 중…`;
         return;
       }
-      const maxR = appState.coinUsage?.maxRoundByHalf[appState.activeHalf] || 0;
-      el.textContent = maxR
+      const maxR = appState.coinUsage.maxRoundByHalf[appState.activeHalf] || 0;
+      const base = maxR
         ? `${range.label} · ${maxR}라운드까지 결과 반영`
         : `${range.label} · 출전 기록 없음`;
+      el.textContent = appState.coinLoading ? `${base} (추가 로딩 중…)` : base;
     }
 
-    async function ensureCoinHalfLoaded(halfKey) {
-      if (!appState.fixtures || appState.loadedHalves.has(halfKey)) return;
-      const range = HALF_RANGES[halfKey];
+    async function loadAllCoinData() {
+      if (!appState.fixtures || appState.coinDataReady || appState.coinLoading) return;
       appState.coinLoading = true;
       updateCoinReflectNote();
       try {
-        const docs = await loadAllRoundResults(range.max, appState.fixtures, range.min);
-        appState.roundDocs.push(...docs);
-        appState.coinUsage = buildCoinUsageByHalf(appState.fixtures, appState.roundDocs);
-        appState.loadedHalves.add(halfKey);
+        const firstDocs = await loadAllRoundResults(10, appState.fixtures, 1);
+        mergeRoundDocsIntoCache(firstDocs);
+        rebuildCoinUsage();
+        renderAll();
+
+        const secondDocs = await loadAllRoundResults(20, appState.fixtures, 11);
+        mergeRoundDocsIntoCache(secondDocs);
+        rebuildCoinUsage();
+        appState.coinDataReady = true;
       } finally {
         appState.coinLoading = false;
+        renderAll();
       }
-      renderAll();
     }
 
     function wireHalfTabs() {
       document.querySelectorAll('[data-coin-half]').forEach((btn) => {
-        btn.addEventListener('click', async () => {
+        btn.addEventListener('click', () => {
           const half = btn.dataset.coinHalf;
           if (half === appState.activeHalf) return;
           appState.activeHalf = half;
           renderAll();
-          try {
-            await ensureCoinHalfLoaded(half);
-          } catch (e) {
-            console.error(e);
-            const note = document.getElementById('coinReflectNote');
-            if (note) note.textContent = '코인 데이터를 불러오지 못했습니다.';
-          }
         });
       });
     }
@@ -745,8 +757,12 @@
         appState.activeHalf = defaultHalfKey(fixtures);
         wireHalfTabs();
         renderAll();
-        window.matchMedia('(max-width: 767px)').addEventListener('change', () => renderAll());
-        ensureCoinHalfLoaded(appState.activeHalf).catch((e) => {
+        let layoutTimer = null;
+        window.matchMedia('(max-width: 767px)').addEventListener('change', () => {
+          clearTimeout(layoutTimer);
+          layoutTimer = setTimeout(() => renderAll(), 120);
+        });
+        loadAllCoinData().catch((e) => {
           console.error(e);
           const note = document.getElementById('coinReflectNote');
           if (note) note.textContent = '코인 데이터를 불러오지 못했습니다.';

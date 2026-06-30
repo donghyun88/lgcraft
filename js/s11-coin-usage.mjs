@@ -44,6 +44,26 @@ function ensurePlayerCoin(map, name) {
   return map.get(name);
 }
 
+function uniqueMatchups(matchups) {
+  const seen = new Set();
+  const out = [];
+  for (const mu of matchups || []) {
+    const fid = mu?.fixtureId;
+    if (!fid || seen.has(fid)) continue;
+    seen.add(fid);
+    out.push(mu);
+  }
+  return out;
+}
+
+export function dedupeRoundDocs(roundDocs) {
+  const byRound = new Map();
+  for (const doc of roundDocs || []) {
+    if (doc && doc.round != null) byRound.set(doc.round, doc);
+  }
+  return [...byRound.values()].sort((a, b) => (a.round || 0) - (b.round || 0));
+}
+
 /**
  * @param {object} fixtures
  * @param {object[]} roundDocs
@@ -56,7 +76,7 @@ export function buildCoinUsageByHalf(fixtures, roundDocs) {
   };
   const maxRoundByHalf = { first_half: 0, second_half: 0 };
 
-  for (const doc of roundDocs || []) {
+  for (const doc of dedupeRoundDocs(roundDocs)) {
     const rnum = doc.round;
     const half = halfKeyForRound(rnum);
     if (!half) continue;
@@ -71,7 +91,7 @@ export function buildCoinUsageByHalf(fixtures, roundDocs) {
     const byId = fixtureRoundMap(fixtures, rnum);
     const planBySlot = slotPlanBySlot(fixtures, rnum);
 
-    for (const mu of doc.matchups || []) {
+    for (const mu of uniqueMatchups(doc.matchups)) {
       if (!byId.has(mu.fixtureId)) continue;
       for (const sl of mu.slots || []) {
         const metaSlot = planBySlot.get(sl.slot) || {};
@@ -109,7 +129,9 @@ export function defaultHalfKey(fixtures) {
 export function coinUsageForPlayer(byHalf, halfKey, displayName) {
   const name = (displayName || '').trim();
   if (!name) return emptyPlayerCoin();
-  return byHalf[halfKey]?.get(name) || emptyPlayerCoin();
+  const rec = byHalf[halfKey]?.get(name);
+  if (!rec) return emptyPlayerCoin();
+  return { solo: rec.solo, team: rec.team, log: rec.log.slice() };
 }
 
 export function coinMeterTone(used, cap, kind = 'solo') {
