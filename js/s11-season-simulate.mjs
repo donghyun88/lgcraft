@@ -125,13 +125,13 @@ export async function loadRoundResultDocMerged(roundNum, fixtures) {
   return mergePerMatchOverlaysIntoRoundDoc(base, roundNum, fixtures);
 }
 
-export async function loadAllRoundResults(maxRound, fixtures) {
-  const docs = [];
-  for (let r = 1; r <= maxRound; r++) {
-    const doc = await loadRoundResultDocMerged(r, fixtures);
-    if (doc) docs.push(doc);
-  }
-  return docs;
+export async function loadAllRoundResults(maxRound, fixtures, minRound = 1) {
+  const start = Math.max(1, minRound | 0);
+  const end = Math.max(start, maxRound | 0);
+  const docs = await Promise.all(
+    Array.from({ length: end - start + 1 }, (_, i) => loadRoundResultDocMerged(start + i, fixtures)),
+  );
+  return docs.filter(Boolean);
 }
 
 export function fixtureRoundMap(fixtures, roundNum) {

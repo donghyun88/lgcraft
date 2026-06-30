@@ -329,9 +329,17 @@
     const appState = {
       meta: null,
       players: [],
+      fixtures: null,
       coinUsage: null,
+      roundDocs: [],
       activeHalf: 'first_half',
+      loadedHalves: new Set(),
+      coinLoading: false,
     };
+
+    function isMobileRosterView() {
+      return window.matchMedia('(max-width: 767px)').matches;
+    }
 
     async function loadJson(path) {
       const res = await fetch(path);
@@ -400,28 +408,61 @@
 
     function updateCoinReflectNote() {
       const el = document.getElementById('coinReflectNote');
-      if (!el || !appState.coinUsage) return;
+      if (!el) return;
       const range = HALF_RANGES[appState.activeHalf];
-      const maxR = appState.coinUsage.maxRoundByHalf[appState.activeHalf] || 0;
+      if (appState.coinLoading || !appState.loadedHalves.has(appState.activeHalf)) {
+        el.textContent = `${range.label} 코인 불러오는 중…`;
+        return;
+      }
+      const maxR = appState.coinUsage?.maxRoundByHalf[appState.activeHalf] || 0;
       el.textContent = maxR
         ? `${range.label} · ${maxR}라운드까지 결과 반영`
         : `${range.label} · 출전 기록 없음`;
     }
 
+    async function ensureCoinHalfLoaded(halfKey) {
+      if (!appState.fixtures || appState.loadedHalves.has(halfKey)) return;
+      const range = HALF_RANGES[halfKey];
+      appState.coinLoading = true;
+      updateCoinReflectNote();
+      try {
+        const docs = await loadAllRoundResults(range.max, appState.fixtures, range.min);
+        appState.roundDocs.push(...docs);
+        appState.coinUsage = buildCoinUsageByHalf(appState.fixtures, appState.roundDocs);
+        appState.loadedHalves.add(halfKey);
+      } finally {
+        appState.coinLoading = false;
+      }
+      renderAll();
+    }
+
     function wireHalfTabs() {
       document.querySelectorAll('[data-coin-half]').forEach((btn) => {
-        btn.addEventListener('click', () => {
-          appState.activeHalf = btn.dataset.coinHalf;
+        btn.addEventListener('click', async () => {
+          const half = btn.dataset.coinHalf;
+          if (half === appState.activeHalf) return;
+          appState.activeHalf = half;
           renderAll();
+          try {
+            await ensureCoinHalfLoaded(half);
+          } catch (e) {
+            console.error(e);
+            const note = document.getElementById('coinReflectNote');
+            if (note) note.textContent = '코인 데이터를 불러오지 못했습니다.';
+          }
         });
       });
     }
 
     function renderAll() {
+      if (!appState.meta) return;
       updateHalfTabs();
       updateCoinReflectNote();
-      renderRosterMatrix(appState.meta, appState.players);
-      renderRosterMobile(appState.meta, appState.players);
+      if (isMobileRosterView()) {
+        renderRosterMobile(appState.meta, appState.players);
+      } else {
+        renderRosterMatrix(appState.meta, appState.players);
+      }
     }
 
     function raceKo(letter) {
@@ -698,13 +739,18 @@
           loadJson('data/s11/players.json'),
           loadJson('data/s11/fixtures.json'),
         ]);
-        const roundDocs = await loadAllRoundResults(20, fixtures);
         appState.meta = meta;
         appState.players = playersData.players || [];
-        appState.coinUsage = buildCoinUsageByHalf(fixtures, roundDocs);
+        appState.fixtures = fixtures;
         appState.activeHalf = defaultHalfKey(fixtures);
         wireHalfTabs();
         renderAll();
+        window.matchMedia('(max-width: 767px)').addEventListener('change', () => renderAll());
+        ensureCoinHalfLoaded(appState.activeHalf).catch((e) => {
+          console.error(e);
+          const note = document.getElementById('coinReflectNote');
+          if (note) note.textContent = '코인 데이터를 불러오지 못했습니다.';
+        });
       } catch (e) {
         console.error(e);
         document.getElementById('rostersMatrixBody').innerHTML =
