@@ -29,10 +29,14 @@
     .race-mini-T { background: linear-gradient(145deg, #0369a1, #0c4a6e); }
     .race-mini-P { background: linear-gradient(145deg, #ca8a04, #854d0e); }
     .race-mini-R { background: linear-gradient(145deg, #57534e, #292524); font-size: 0.5rem; }
+    .summary-slot-win { box-shadow: inset 3px 0 0 #10b981; }
+    @media (min-width: 1024px) {
+      .summary-sticky { position: sticky; top: 1rem; max-height: calc(100vh - 2rem); overflow-y: auto; }
+    }
   </style>
 </head>
 <body class="bg-zinc-100 text-zinc-800 min-h-screen text-sm">
-  <div class="max-w-4xl mx-auto px-4 py-8">
+  <div class="max-w-6xl mx-auto px-4 py-8">
     <header class="mb-6">
       <h1 class="text-xl font-bold text-zinc-900">시즌11 · 경기 결과 입력</h1>
       <p class="mt-2 text-xs">
@@ -42,6 +46,8 @@
       </p>
     </header>
     <div id="loadErr" class="hidden mb-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-800"></div>
+    <div class="lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(280px,340px)] lg:gap-5 lg:items-start">
+    <div class="min-w-0">
     <section class="bg-white rounded-lg border border-zinc-200 p-4 mb-4 space-y-4">
       <div class="grid gap-3 sm:grid-cols-2 relative z-10">
         <label class="block" for="selRound"><span class="text-xs font-medium text-zinc-600">라운드</span><select id="selRound" disabled class="mt-1 w-full rounded-md border border-zinc-300 px-2 py-2 text-sm bg-white"></select></label>
@@ -67,6 +73,15 @@
       <button type="button" id="btnClearRound" class="rounded-md border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-900">이 라운드 초안 삭제</button>
     </section>
     <p id="msg" class="mt-2 text-xs text-zinc-600 min-h-[1.25rem]"></p>
+    </div>
+    <aside id="summaryPanel" class="mt-5 lg:mt-0 summary-sticky rounded-lg border border-indigo-200 bg-white shadow-sm overflow-hidden hidden">
+      <div class="px-4 py-3 border-b border-indigo-100 bg-indigo-50/80">
+        <h2 class="text-sm font-bold text-indigo-950">결과 요약</h2>
+        <p class="mt-0.5 text-[11px] text-indigo-800/75">입력 내용을 실시간으로 확인합니다. 저장·다운로드 전에 검토하세요.</p>
+      </div>
+      <div id="summaryBody" class="p-4 text-xs space-y-3"></div>
+    </aside>
+    </div>
   </div>
   <script>
 const DATA={fixtures:null,meta:null,players:null,jsonRoot:null};
@@ -306,6 +321,7 @@ function render(){
  }).join('');
  syncRacePills(fm);
  syncPlayOrderUi();
+ scheduleSummary();
  document.getElementById('btnSaveMatch').disabled=false;
  document.getElementById('btnDlMatch').disabled=false;
  document.getElementById('btnDlRound').disabled=false;
@@ -360,6 +376,11 @@ async function loadRoundFromServer(){
  setMsg(n?('라운드 '+r+': results/ 에서 '+n+'개 대전 불러옴'):('라운드 '+r+': results/ 에 저장된 대전 없음'),n>0);
 }
 function readMu(r,mi){
+ const {mu}=collectMatchupFromForm(r,mi,{validate:true});
+ return mu;
+}
+function collectMatchupFromForm(r,mi,{validate=false}={}){
+ const errors=[],warnings=[];
  const d=rndSorted(r),m=d.matchups[mi],plan=d.slotPlan||[],pid=domId(m.id),tid=m.teamIds,slots=[];
  const mvp=(document.getElementById(pid+'_mvp')?.value||'').trim();
  for(const sp of plan){
@@ -376,20 +397,35 @@ function readMu(r,mi){
  for(const sp of plan){
   const s=slots.find(x=>x.slot===sp.slot),n=nFmt(sp.format);
   const cA=s.teamA.filter(x=>lineName(x)).length,cB=s.teamB.filter(x=>lineName(x)).length,any=cA>0||cB>0;
-  if(s.winnerTeamIndex!=null&&(cA!==n||cB!==n))throw new Error('세트 '+sp.slot+': 승자 선택 시 양 팀 '+n+'명 필요');
-  if(any&&(cA!==n||cB!==n))throw new Error('세트 '+sp.slot+': 양 팀 '+n+'명');
-  if(any&&s.winnerTeamIndex==null)throw new Error('세트 '+sp.slot+': 승자 선택');
+  if(s.winnerTeamIndex!=null&&(cA!==n||cB!==n)){
+   const msg='세트 '+sp.slot+': 승자 선택 시 양 팀 '+n+'명 필요';
+   if(validate)errors.push(msg);else warnings.push(msg);
+  }
+  if(any&&(cA!==n||cB!==n)){
+   const msg='세트 '+sp.slot+': 양 팀 '+n+'명';
+   if(validate)errors.push(msg);else warnings.push(msg);
+  }
+  if(any&&s.winnerTeamIndex==null){
+   const msg='세트 '+sp.slot+': 승자 미선택';
+   if(validate)errors.push(msg);else warnings.push(msg);
+  }
  }
  const participants=new Set();
  for(const s of slots)for(const side of ['teamA','teamB']){
   const arr=s[side],ti=side==='teamA'?0:1,ex=tid[ti];
-  for(const c of arr){const nm=lineName(c);if(!nm)continue;participants.add(nm);const pl=DATA.players.find(p=>p.displayName===nm);if(!pl)throw new Error('세트 '+s.slot+': 등록되지 않은 이름: '+nm);if(pl.teamId!==ex)throw new Error('세트 '+s.slot+': '+pl.displayName+' 팀 불일치');}
+  for(const c of arr){
+   const nm=lineName(c);if(!nm)continue;
+   participants.add(nm);
+   const pl=DATA.players.find(p=>p.displayName===nm);
+   if(!pl){const msg='세트 '+s.slot+': 등록되지 않은 이름: '+nm;if(validate)errors.push(msg);else warnings.push(msg);continue;}
+   if(pl.teamId!==ex){const msg='세트 '+s.slot+': '+pl.displayName+' 팀 불일치';if(validate)errors.push(msg);else warnings.push(msg);}
+  }
  }
  if(mvp){
   const pl=DATA.players.find(p=>p.displayName===mvp);
-  if(!pl)throw new Error('MVP: 등록되지 않은 이름: '+mvp);
-  if(!tid.includes(pl.teamId))throw new Error('MVP: 이 대전 팀 선수가 아닙니다: '+mvp);
-  if(!participants.has(mvp))throw new Error('MVP: 출전 선수 중에서 선택하세요: '+mvp);
+  if(!pl){const msg='MVP: 등록되지 않은 이름: '+mvp;if(validate)errors.push(msg);else warnings.push(msg);}
+  else if(!tid.includes(pl.teamId)){const msg='MVP: 이 대전 팀 선수가 아닙니다: '+mvp;if(validate)errors.push(msg);else warnings.push(msg);}
+  else if(!participants.has(mvp)){const msg='MVP: 출전 선수 중에서 선택하세요: '+mvp;if(validate)errors.push(msg);else warnings.push(msg);}
  }
  let playedOrder=null;
  const customOrder=!!document.getElementById(pid+'_customOrder')?.checked;
@@ -397,16 +433,117 @@ function readMu(r,mi){
   const positions=[];
   for(const sp of plan){
    const v=+(document.getElementById(pid+'_s'+sp.slot+'_playpos')?.value||0);
-   if(!v||v<1||v>plan.length)throw new Error('세트 '+sp.slot+': 진행 순서는 1~'+plan.length+' 사이');
+   if(!v||v<1||v>plan.length){const msg='세트 '+sp.slot+': 진행 순서는 1~'+plan.length+' 사이';if(validate)errors.push(msg);else warnings.push(msg);continue;}
    positions.push({slot:sp.slot,pos:v});
   }
   const seen=new Set(positions.map((p)=>p.pos));
-  if(seen.size!==plan.length)throw new Error('진행 순서는 1~'+plan.length+' 중복 없이 지정하세요');
-  positions.sort((a,b)=>a.pos-b.pos);
-  playedOrder=positions.map((p)=>p.slot);
-  if(!isCustomPlayedOrder(playedOrder,plan))playedOrder=null;
+  if(seen.size!==plan.length){const msg='진행 순서는 1~'+plan.length+' 중복 없이 지정하세요';if(validate)errors.push(msg);else warnings.push(msg);}
+  else{
+   positions.sort((a,b)=>a.pos-b.pos);
+   playedOrder=positions.map((p)=>p.slot);
+   if(!isCustomPlayedOrder(playedOrder,plan))playedOrder=null;
+  }
  }
- return{fixtureId:m.id,series:{winnerTeamIndex:seriesW(slots),setScoreTeamA:null,setScoreTeamB:null,decidedBy:'sets',notes:'',mvp:mvp?{displayName:mvp}:null},playedOrder,slots};
+ const filledSlots=slots.filter((s)=>s.winnerTeamIndex!=null||s.teamA.some(lineName)||s.teamB.some(lineName));
+ if(filledSlots.length&&!mvp)warnings.push('MVP 미선택');
+ const mu={fixtureId:m.id,series:{winnerTeamIndex:seriesW(slots),setScoreTeamA:null,setScoreTeamB:null,decidedBy:'sets',notes:'',mvp:mvp?{displayName:mvp}:null},playedOrder,slots};
+ if(validate&&errors.length)throw new Error(errors[0]);
+ return{mu,errors,warnings,plan,tid,nameA:tn(tid[0]),nameB:tn(tid[1])};
+}
+function slotSummaryOrder(mu,plan){
+ const def=defaultPlayedOrder(plan);
+ const po=mu?.playedOrder;
+ if(!Array.isArray(po)||!po.length)return def.map((slot)=>({slot,playIndex:null}));
+ const planSlots=new Set(plan.map((sp)=>sp.slot));
+ const ordered=[];
+ for(let i=0;i<po.length;i++){
+  const slot=po[i];
+  if(planSlots.has(slot))ordered.push({slot,playIndex:i+1});
+ }
+ for(const slot of def){if(!ordered.some((x)=>x.slot===slot))ordered.push({slot,playIndex:null});}
+ return ordered;
+}
+function fmtPlayerChip(c){
+ const nm=lineName(c);
+ if(!nm)return '<span class="text-zinc-400">—</span>';
+ const rc=(c.race==null?'':String(c.race)).trim().toUpperCase();
+ const pill=rc?'<span class="'+raceMiniClass(rc)+' ml-1 align-middle">'+esc(raceMiniLabel(rc))+'</span>':'';
+ return '<span class="font-medium text-zinc-800">'+esc(nm)+'</span>'+pill;
+}
+function fmtFormatLabel(f){return f==='1v1'?'개인전':f==='2v2'?'2v2':f==='3v3'?'3v3':esc(f||'');}
+function renderMatchSummary(r,mi){
+ const panel=document.getElementById('summaryPanel'),body=document.getElementById('summaryBody');
+ const d=rndSorted(r);
+ if(!d||!Number.isFinite(mi)||mi<0||!document.getElementById('slotForm')||document.getElementById('slotForm').classList.contains('hidden')){
+  panel.classList.add('hidden');body.innerHTML='';return;
+ }
+ panel.classList.remove('hidden');
+ let data;
+ try{data=collectMatchupFromForm(r,mi,{validate:false});}
+ catch(e){body.innerHTML='<p class="text-red-600">'+esc(e.message||String(e))+'</p>';return;}
+ const {mu,errors,warnings,plan,tid,nameA,nameB}=data;
+ const [cntA,cntB]=countSlotWins(mu.slots);
+ const sw=mu.series.winnerTeamIndex;
+ const customOrder=isCustomPlayedOrder(mu.playedOrder,plan);
+ const mvpNm=mvpName(mu);
+ const order=slotSummaryOrder(mu,plan);
+ const filled=mu.slots.filter((s)=>s.winnerTeamIndex!=null||s.teamA.some(lineName)||s.teamB.some(lineName)).length;
+ let headClsA='text-zinc-800',headClsB='text-zinc-800',scoreClsA='text-zinc-700',scoreClsB='text-zinc-700';
+ if(sw===1){headClsA='text-emerald-700 font-bold';scoreClsA='text-emerald-600 font-black';}
+ else if(sw===2){headClsB='text-emerald-700 font-bold';scoreClsB='text-emerald-600 font-black';}
+ else if(cntA>cntB){scoreClsA='text-emerald-600 font-bold';}
+ else if(cntB>cntA){scoreClsB='text-emerald-600 font-bold';}
+ const statusBadge=errors.length
+  ?'<span class="inline-flex items-center rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-semibold text-red-800">저장 불가</span>'
+  :filled===plan.length&&warnings.length===0
+   ?'<span class="inline-flex items-center rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-800">입력 완료</span>'
+   :filled>0
+    ?'<span class="inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-900">작성 중</span>'
+    :'<span class="inline-flex items-center rounded-full bg-zinc-100 px-2 py-0.5 text-[10px] font-semibold text-zinc-600">미입력</span>';
+ const playOrderLine=customOrder
+  ?'<p class="text-[11px] text-indigo-800/90"><span class="font-semibold">실제 진행 순</span> · #'+mu.playedOrder.join(' → #')+'</p>'
+  :'';
+ const slotHtml=order.map(({slot,playIndex})=>{
+  const sp=plan.find((x)=>x.slot===slot)||{};
+  const sl=mu.slots.find((x)=>x.slot===slot)||{teamA:[],teamB:[],winnerTeamIndex:null};
+  const w=sl.winnerTeamIndex;
+  const winName=w===1?nameA:w===2?nameB:null;
+  const rowCls=w? ' summary-slot-win bg-emerald-50/40':' bg-zinc-50/50';
+  const tier=sp.tierLine?esc(sp.tierLine)+' · ':'';
+  const posBadge=playIndex!=null?'<span class="font-bold text-indigo-700">'+playIndex+'번째</span><span class="text-zinc-300">·</span>':'';
+  const teamBlock=(side,label,cls)=>'<div class="'+cls+'"><div class="text-[10px] font-semibold '+label+' mb-0.5">'+esc(side)+'</div><div class="space-y-0.5">'+((sl[label==='text-indigo-800'?'teamA':'teamB']||[]).map(fmtPlayerChip).join('')||'<span class="text-zinc-400">—</span>')+'</div></div>';
+  return '<div class="rounded-lg border border-zinc-200 p-2.5'+rowCls+'">'
+   +'<div class="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-[11px] text-zinc-500 mb-1.5">'+posBadge+'<span class="font-bold text-indigo-700">#'+slot+'</span><span class="text-zinc-300">·</span><span>'+tier+esc(sp.map||'—')+'</span><span class="text-zinc-300">·</span><span>'+fmtFormatLabel(sp.format)+'</span></div>'
+   +'<div class="grid grid-cols-2 gap-2">'
+   +'<div><div class="text-[10px] font-semibold text-indigo-800 mb-0.5">'+esc(nameA)+'</div><div class="space-y-0.5">'+(sl.teamA.length?sl.teamA.map(fmtPlayerChip).join('<br/>'):'<span class="text-zinc-400">—</span>')+'</div></div>'
+   +'<div><div class="text-[10px] font-semibold text-rose-800 mb-0.5">'+esc(nameB)+'</div><div class="space-y-0.5">'+(sl.teamB.length?sl.teamB.map(fmtPlayerChip).join('<br/>'):'<span class="text-zinc-400">—</span>')+'</div></div>'
+   +'</div>'
+   +(winName?'<div class="mt-1.5 text-[11px] font-semibold text-emerald-700">승: '+esc(winName)+'</div>':'<div class="mt-1.5 text-[11px] text-zinc-400">승자 미정</div>')
+   +'</div>';
+ }).join('');
+ const issueHtml=(errors.length||warnings.length)
+  ?'<div class="rounded-md border px-2.5 py-2 space-y-1 '+(errors.length?'border-red-200 bg-red-50/80':'border-amber-200 bg-amber-50/70')+'">'
+   +(errors.length?'<p class="text-[10px] font-bold text-red-800">저장·다운로드 전 수정</p><ul class="list-disc pl-4 text-[11px] text-red-700 space-y-0.5">'+errors.map((x)=>'<li>'+esc(x)+'</li>').join('')+'</ul>':'')
+   +(warnings.length?'<p class="text-[10px] font-bold text-amber-900">확인</p><ul class="list-disc pl-4 text-[11px] text-amber-900/90 space-y-0.5">'+warnings.map((x)=>'<li>'+esc(x)+'</li>').join('')+'</ul>':'')
+   +'</div>'
+  :'<p class="text-[11px] text-emerald-700">검증 통과 — 저장·다운로드 가능합니다.</p>';
+ body.innerHTML='<div class="flex flex-wrap items-center justify-between gap-2">'
+  +'<code class="text-[10px] bg-zinc-100 px-1.5 py-0.5 rounded text-zinc-600">'+esc(mu.fixtureId)+'</code>'+statusBadge+'</div>'
+  +'<div class="flex items-center justify-center gap-2 py-2 text-sm"><span class="'+headClsA+' truncate max-w-[38%] text-right">'+esc(nameA)+'</span><span class="tabular-nums font-black '+scoreClsA+'">'+cntA+'</span><span class="text-zinc-300 font-bold">:</span><span class="tabular-nums font-black '+scoreClsB+'">'+cntB+'</span><span class="'+headClsB+' truncate max-w-[38%] text-left">'+esc(nameB)+'</span></div>'
+  +(sw?'<p class="text-center text-[11px] font-semibold text-emerald-700">시리즈 승 · '+(sw===1?esc(nameA):esc(nameB))+'</p>':'<p class="text-center text-[11px] text-zinc-400">시리즈 승 · 미정</p>')
+  +(mvpNm?'<p class="text-center text-[11px]"><span class="text-zinc-500">MVP</span> <span class="font-bold text-amber-800">'+esc(mvpNm)+'</span></p>':'<p class="text-center text-[11px] text-zinc-400">MVP · 미정</p>')
+  +playOrderLine
+  +'<div class="pt-1 space-y-2"><p class="text-[10px] font-bold text-zinc-500 uppercase tracking-wide">세트 '+filled+'/'+plan.length+'</p>'+slotHtml+'</div>'
+  +issueHtml;
+}
+function countSlotWins(slots){let a=0,b=0;for(const s of slots||[]){if(s.winnerTeamIndex===1)a++;else if(s.winnerTeamIndex===2)b++;}return[a,b];}
+let summaryTimer=null;
+function scheduleSummary(){
+ clearTimeout(summaryTimer);
+ summaryTimer=setTimeout(()=>{
+  const r=+document.getElementById('selRound').value,mi=+document.getElementById('selMatch').value;
+  renderMatchSummary(r,mi);
+ },120);
 }
 function dl(name,obj){const b=new Blob([JSON.stringify(obj,null,2)],{type:'application/json;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=name;a.click();URL.revokeObjectURL(a.href);}
 function fillMatch(){
@@ -464,10 +601,11 @@ document.addEventListener('DOMContentLoaded',()=>{
  wireControls();
  document.getElementById('btnLoadMatch').addEventListener('click',()=>{loadCurrentMatchFromServer();});
  document.getElementById('btnLoadRound').addEventListener('click',()=>{loadRoundFromServer();});
- document.getElementById('slotForm').addEventListener('change',(e)=>{const t=e.target;if(t&&t.id&&t.id.endsWith('_r'))syncRacePills(t.closest('#slotForm')||document.getElementById('slotForm'));if(t&&t.id&&t.id.endsWith('_customOrder'))syncPlayOrderUi();});
+ document.getElementById('slotForm').addEventListener('change',(e)=>{const t=e.target;if(t&&t.id&&t.id.endsWith('_r'))syncRacePills(t.closest('#slotForm')||document.getElementById('slotForm'));if(t&&t.id&&t.id.endsWith('_customOrder'))syncPlayOrderUi();scheduleSummary();});
+ document.getElementById('slotForm').addEventListener('input',()=>{scheduleSummary();});
  document.getElementById('btnSaveMatch').addEventListener('click',()=>{
    try{const r=+document.getElementById('selRound').value,mi=+document.getElementById('selMatch').value,mu=readMu(r,mi);
-    if(!DRAFT[r])DRAFT[r]={};DRAFT[r][mu.fixtureId]=mu;saveLS();bar();setMsg('브라우저 초안에 저장됨: '+mu.fixtureId+' (이 PC·이 브라우저만). 파일로 내려받으려면 「이 대전만 JSON」 또는 라운드 합본 「round-NN.json」을 누르세요.',true);
+    if(!DRAFT[r])DRAFT[r]={};DRAFT[r][mu.fixtureId]=mu;saveLS();bar();scheduleSummary();setMsg('브라우저 초안에 저장됨: '+mu.fixtureId+' (이 PC·이 브라우저만). 파일로 내려받으려면 「이 대전만 JSON」 또는 라운드 합본 「round-NN.json」을 누르세요.',true);
    }catch(e){setMsg(e.message||String(e),false);}
   });
   document.getElementById('btnDlMatch').addEventListener('click',()=>{

@@ -155,6 +155,107 @@
       background: #f4f4f5;
       border: 1px solid #e4e4e7;
     }
+    .coin-half-tab {
+      border-radius: 0.375rem;
+      padding: 0.35rem 0.75rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #52525b;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+    .coin-half-tab:hover { color: #312e81; background: #eef2ff; }
+    .coin-half-tab.is-active {
+      background: linear-gradient(135deg, #4f46e5, #4338ca);
+      color: #fff;
+      box-shadow: 0 1px 2px rgba(79, 70, 229, 0.35);
+    }
+    .coin-meter {
+      margin-top: 0.25rem;
+      padding: 0.2rem 0.28rem;
+      border-radius: 0.3rem;
+      background: rgba(255, 255, 255, 0.82);
+      border: 1px solid rgba(99, 102, 241, 0.16);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.15rem 0.3rem;
+      line-height: 1;
+    }
+    .coin-seg {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.15rem;
+      min-width: 0;
+    }
+    .coin-inline-sep {
+      color: #d4d4d8;
+      font-size: 0.5rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+    .coin-dot-label {
+      flex-shrink: 0;
+      font-size: 0.5rem;
+      font-weight: 800;
+      line-height: 1;
+    }
+    .coin-dot-label--solo { color: #4338ca; }
+    .coin-dot-label--team { color: #c2410c; }
+    .coin-dots {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.1rem;
+    }
+    .coin-dot {
+      display: block;
+      width: 0.375rem;
+      height: 0.375rem;
+      border-radius: 9999px;
+      flex-shrink: 0;
+    }
+    .coin-dot-empty {
+      background: #fafafa;
+      box-shadow: 0 0 0 1px #d4d4d8 inset;
+    }
+    .coin-dot-filled.coin-ok { background: #4f46e5; }
+    .coin-dot-filled.coin-warn { background: #ea580c; }
+    .coin-dot-filled.coin-cap { background: #dc2626; }
+    .coin-dot-count {
+      flex-shrink: 0;
+      font-size: 0.5rem;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.02em;
+    }
+    .coin-dot-count.coin-ok { color: #4338ca; }
+    .coin-dot-count.coin-warn { color: #c2410c; }
+    .coin-dot-count.coin-cap { color: #b91c1c; }
+    .coin-cap-pill {
+      display: inline-flex;
+      align-items: center;
+      border-radius: 0.2rem;
+      padding: 0.05rem 0.25rem;
+      font-size: 0.5rem;
+      font-weight: 800;
+      letter-spacing: 0.03em;
+      color: #fff;
+      background: #dc2626;
+      line-height: 1.1;
+    }
+    @media (max-width: 767px) {
+      .coin-meter {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.2rem;
+        padding: 0.28rem 0.32rem;
+      }
+      .coin-inline-sep { display: none; }
+      .coin-seg { width: 100%; justify-content: flex-start; }
+      .coin-dot { width: 0.4375rem; height: 0.4375rem; }
+      .coin-dots { gap: 0.14rem; flex: 1; }
+      .coin-dot-count { margin-left: auto; font-size: 0.5625rem; }
+      .coin-dot-label { font-size: 0.5625rem; min-width: 0.75rem; }
+    }
   </style>
 </head>
 <body class="bg-zinc-100 text-zinc-800 min-h-screen text-sm">
@@ -189,7 +290,17 @@
     </nav>
 
     <section id="rosters" class="mb-10 scroll-mt-8">
-      <h2 class="text-base font-semibold text-zinc-900 mb-2">로스터</h2>
+      <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between mb-3">
+        <h2 class="text-base font-semibold text-zinc-900">로스터</h2>
+        <p class="text-xs text-zinc-600 leading-snug font-medium">코인 = 세트 출전 1회 · 개인전 <span class="text-indigo-700">5</span> · 팀전 <span class="text-orange-700">6</span> (반기별)</p>
+      </div>
+      <div class="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between mb-3">
+        <div class="inline-flex rounded-lg border border-zinc-200 bg-white p-0.5 shadow-sm" role="tablist" aria-label="출전 코인 반기">
+          <button type="button" class="coin-half-tab is-active" data-coin-half="first_half" role="tab" aria-selected="true">상반기 <span class="hidden sm:inline">(1R~10R)</span></button>
+          <button type="button" class="coin-half-tab" data-coin-half="second_half" role="tab" aria-selected="false">하반기 <span class="hidden sm:inline">(11R~20R)</span></button>
+        </div>
+        <p id="coinReflectNote" class="text-[11px] text-zinc-500 tabular-nums">결과 불러오는 중…</p>
+      </div>
       <div class="hidden md:block bg-white rounded-lg border border-zinc-200 overflow-x-auto">
         <table id="rostersMatrix" class="min-w-full border-collapse text-xs">
           <thead id="rostersMatrixHead"></thead>
@@ -200,8 +311,26 @@
     </section>
   </div>
 
-  <script>
+  <script type="module">
+    import { loadAllRoundResults } from './js/s11-season-simulate.mjs';
+    import {
+      COIN_CAPS,
+      HALF_RANGES,
+      buildCoinUsageByHalf,
+      coinUsageForPlayer,
+      coinMeterTone,
+      defaultHalfKey,
+      formatAppearanceTooltip,
+    } from './js/s11-coin-usage.mjs';
+
     const TIER_ROWS = ['갓', '킹', '휴먼', '애니멀', '아메바'];
+
+    const appState = {
+      meta: null,
+      players: [],
+      coinUsage: null,
+      activeHalf: 'first_half',
+    };
 
     async function loadJson(path) {
       const res = await fetch(path);
@@ -216,6 +345,82 @@
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;');
+    }
+
+    function escapeAttr(s) {
+      return escapeHtml(s).replace(/\n/g, '&#10;');
+    }
+
+    function playerCoinRec(p) {
+      if (!appState.coinUsage) return { solo: 0, team: 0, log: [] };
+      return coinUsageForPlayer(appState.coinUsage.byHalf, appState.activeHalf, p.displayName);
+    }
+
+    function renderCoinSeg(kind, used, cap, tone) {
+      const labelClass = kind === 'solo' ? 'coin-dot-label--solo' : 'coin-dot-label--team';
+      const label = kind === 'solo' ? '개' : '팀';
+      let dots = '<span class="coin-dots">';
+      for (let i = 0; i < cap; i++) {
+        const filled = i < used;
+        dots += filled
+          ? `<span class="coin-dot coin-dot-filled coin-${tone}"></span>`
+          : '<span class="coin-dot coin-dot-empty"></span>';
+      }
+      dots += '</span>';
+      return `<span class="coin-seg">
+      <span class="coin-dot-label ${labelClass}">${label}</span>
+      ${dots}
+      <span class="coin-dot-count coin-${tone}">${used}/${cap}</span>
+    </span>`;
+    }
+
+    function formatCoinMeterHtml(rec) {
+      const soloTone = coinMeterTone(rec.solo, COIN_CAPS.solo, 'solo');
+      const teamTone = coinMeterTone(rec.team, COIN_CAPS.team, 'team');
+      const atCap = rec.solo >= COIN_CAPS.solo || rec.team >= COIN_CAPS.team;
+      const tip = escapeAttr(formatAppearanceTooltip(rec.log));
+      const capBadge = atCap ? '<span class="coin-cap-pill">한도</span>' : '';
+      const aria = escapeAttr(`개인전 ${rec.solo}/${COIN_CAPS.solo}, 팀전 ${rec.team}/${COIN_CAPS.team}`);
+      return `<div class="coin-meter cursor-help" title="${tip}" aria-label="${aria}">
+    ${renderCoinSeg('solo', rec.solo, COIN_CAPS.solo, soloTone)}
+    <span class="coin-inline-sep" aria-hidden="true">·</span>
+    ${renderCoinSeg('team', rec.team, COIN_CAPS.team, teamTone)}
+    ${capBadge}
+  </div>`;
+    }
+
+    function updateHalfTabs() {
+      document.querySelectorAll('[data-coin-half]').forEach((btn) => {
+        const on = btn.dataset.coinHalf === appState.activeHalf;
+        btn.classList.toggle('is-active', on);
+        btn.setAttribute('aria-selected', on ? 'true' : 'false');
+      });
+    }
+
+    function updateCoinReflectNote() {
+      const el = document.getElementById('coinReflectNote');
+      if (!el || !appState.coinUsage) return;
+      const range = HALF_RANGES[appState.activeHalf];
+      const maxR = appState.coinUsage.maxRoundByHalf[appState.activeHalf] || 0;
+      el.textContent = maxR
+        ? `${range.label} · ${maxR}라운드까지 결과 반영`
+        : `${range.label} · 출전 기록 없음`;
+    }
+
+    function wireHalfTabs() {
+      document.querySelectorAll('[data-coin-half]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          appState.activeHalf = btn.dataset.coinHalf;
+          renderAll();
+        });
+      });
+    }
+
+    function renderAll() {
+      updateHalfTabs();
+      updateCoinReflectNote();
+      renderRosterMatrix(appState.meta, appState.players);
+      renderRosterMobile(appState.meta, appState.players);
     }
 
     function raceKo(letter) {
@@ -323,6 +528,7 @@
       const mainChip = isPlayerMainCaptain(meta, p)
         ? '<span class="chip-main-badge shrink-0">주장</span>'
         : '';
+      const coinHtml = formatCoinMeterHtml(playerCoinRec(p));
       return `<div class="rounded-md border px-1.5 py-1 mb-1 last:mb-0 ${bg}">
         <div class="flex items-start gap-1.5">
           ${pill}
@@ -332,6 +538,7 @@
               <span class="text-[10px] font-medium text-indigo-600/85 font-mono tracking-tight">${pid ? '(' + pid + ')' : ''}</span>
               ${capChip}${mainChip}
             </div>
+            ${coinHtml}
             ${ruleHtml}
           </div>
         </div>
@@ -437,7 +644,7 @@
               const mainCapRaw = t.mainCaptain != null && String(t.mainCaptain).trim() ? String(t.mainCaptain).trim() : null;
               const mainCap = mainCapRaw ? escapeHtml(mainCapRaw) : '<span class="text-zinc-400">미정</span>';
               return `
-            <th class="border border-zinc-200 bg-gradient-to-b from-zinc-50 to-zinc-100/80 px-2 py-2 text-left align-top font-semibold text-zinc-800 min-w-[8.5rem]">
+            <th class="border border-zinc-200 bg-gradient-to-b from-zinc-50 to-zinc-100/80 px-1.5 py-2 text-left align-top font-semibold text-zinc-800 min-w-[7.75rem]">
               <div class="text-center text-sm tracking-tight pb-1 border-b border-zinc-200/90">${formatTeamHeaderName(t)}</div>
               ${formatRosterTeamLogo(t)}
               <div class="mt-2 space-y-1.5 text-[10px] font-normal text-zinc-700 leading-snug">
@@ -472,7 +679,7 @@
                 return a.displayName.localeCompare(b.displayName, 'ko');
               });
             const inner = ps.map((p) => playerChip(meta, p)).join('');
-            return `<td class="align-top border border-zinc-200 px-1.5 py-1.5 bg-white/80">${inner || '<span class="text-zinc-300 text-[11px]">—</span>'}</td>`;
+            return `<td class="align-top border border-zinc-200 px-1 py-1.5 bg-white/80">${inner || '<span class="text-zinc-300 text-[11px]">—</span>'}</td>`;
           })
           .join('');
         return `
@@ -485,12 +692,18 @@
 
     document.addEventListener('DOMContentLoaded', async () => {
       try {
-        const [meta, playersData] = await Promise.all([
+        const [meta, playersData, fixtures] = await Promise.all([
           loadJson('data/s11/meta.json'),
           loadJson('data/s11/players.json'),
+          loadJson('data/s11/fixtures.json'),
         ]);
-        renderRosterMatrix(meta, playersData.players || []);
-        renderRosterMobile(meta, playersData.players || []);
+        const roundDocs = await loadAllRoundResults(20, fixtures);
+        appState.meta = meta;
+        appState.players = playersData.players || [];
+        appState.coinUsage = buildCoinUsageByHalf(fixtures, roundDocs);
+        appState.activeHalf = defaultHalfKey(fixtures);
+        wireHalfTabs();
+        renderAll();
       } catch (e) {
         console.error(e);
         document.getElementById('rostersMatrixBody').innerHTML =
@@ -499,6 +712,8 @@
         if (mobileRoot) {
           mobileRoot.innerHTML = `<p class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">${escapeHtml(e.message)}</p>`;
         }
+        const note = document.getElementById('coinReflectNote');
+        if (note) note.textContent = '결과를 불러오지 못했습니다.';
       }
     });
   </script>
