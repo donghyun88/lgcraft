@@ -39,6 +39,25 @@ function emptyPlayerCoin() {
   return { solo: 0, team: 0, log: [] };
 }
 
+/** displayName → players.json tier */
+export function tierByDisplayName(players) {
+  const m = new Map();
+  for (const p of players || []) {
+    const n = (p.displayName || '').trim();
+    if (n) m.set(n, (p.tier || '').trim());
+  }
+  return m;
+}
+
+/** 개인전: 슬롯 tierLine 과 선수 tier 가 같을 때만 개인코인 +1 */
+function countsSoloCoin(metaSlot, playerName, tierMap) {
+  if (!metaSlot || metaSlot.format !== '1v1') return false;
+  const tierLine = (metaSlot.tierLine || '').trim();
+  if (!tierLine) return true;
+  const playerTier = tierMap.get(playerName) || '';
+  return Boolean(playerTier && playerTier === tierLine);
+}
+
 function ensurePlayerCoin(map, name) {
   if (!map.has(name)) map.set(name, emptyPlayerCoin());
   return map.get(name);
@@ -67,9 +86,11 @@ export function dedupeRoundDocs(roundDocs) {
 /**
  * @param {object} fixtures
  * @param {object[]} roundDocs
+ * @param {object[]} [players] — players.json 항목 (개인전 tierLine 일치 판별)
  * @returns {{ byHalf: { first_half: Map, second_half: Map }, maxRoundByHalf: { first_half: number, second_half: number } }}
  */
-export function buildCoinUsageByHalf(fixtures, roundDocs) {
+export function buildCoinUsageByHalf(fixtures, roundDocs, players) {
+  const tierMap = tierByDisplayName(players);
   const byHalf = {
     first_half: new Map(),
     second_half: new Map(),
@@ -106,14 +127,25 @@ export function buildCoinUsageByHalf(fixtures, roundDocs) {
 
         for (const nm of names) {
           const rec = ensurePlayerCoin(byHalf[half], nm);
-          if (isSolo) rec.solo++;
-          else rec.team++;
-          rec.log.push({
+          const entry = {
             round: rnum,
             slot: sl.slot,
             format,
             fixtureId: mu.fixtureId,
-          });
+          };
+          if (isSolo) {
+            if (countsSoloCoin(metaSlot, nm, tierMap)) {
+              rec.solo++;
+              entry.countsSolo = true;
+            } else {
+              entry.countsSolo = false;
+              entry.crossTier = true;
+            }
+          } else {
+            rec.team++;
+            entry.countsTeam = true;
+          }
+          rec.log.push(entry);
         }
       }
     }
@@ -143,5 +175,11 @@ export function coinMeterTone(used, cap, kind = 'solo') {
 
 export function formatAppearanceTooltip(log) {
   if (!Array.isArray(log) || !log.length) return '출전 기록 없음';
-  return log.map((e) => `${e.round}R #${e.slot} ${formatLabel(e.format)}`).join('\n');
+  return log
+    .map((e) => {
+      let line = `${e.round}R #${e.slot} ${formatLabel(e.format)}`;
+      if (e.crossTier) line += ' (상위티어 출전)';
+      return line;
+    })
+    .join('\n');
 }
