@@ -138,94 +138,15 @@
     </div>
   </div>
 
-  <script>
+  <script type="module">
+    import { loadSingleRoundDoc } from './js/s11-data-loader.mjs';
+
     const SCHEDULE_DATE_YEAR = 2026;
 
     async function loadJson(path) {
       const res = await fetch(path);
       if (!res.ok) throw new Error(path + ' ' + res.status);
       return res.json();
-    }
-
-    async function loadRoundResultDoc(roundNum) {
-      const p = String(roundNum).padStart(2, '0');
-      const urls = [`data/s11/results/round-${p}.json`, `data/s11/results/round-${p}.sample.json`];
-      for (const url of urls) {
-        const res = await fetch(url, { cache: 'no-store' });
-        if (res.ok) return res.json();
-      }
-      return null;
-    }
-
-    async function fetchPerMatchResultDoc(fixtureId) {
-      const url = `data/s11/results/${fixtureId}.json`;
-      const res = await fetch(url, { cache: 'no-store' });
-      if (!res.ok) return null;
-      return res.json();
-    }
-
-    function matchupFromPerMatchDoc(doc, fixtureId) {
-      if (!doc || !Array.isArray(doc.matchups)) return null;
-      return doc.matchups.find((x) => x.fixtureId === fixtureId) || null;
-    }
-
-    /** `s11-rNN-mM.json` 한 대전 파일이 있으면 합본(round-NN)의 동일 fixtureId 를 덮어씁니다. */
-    async function mergePerMatchOverlaysIntoRoundDoc(baseDoc, roundNum, fixtures) {
-      const rd = (fixtures.rounds || []).find((x) => x.round === roundNum);
-      const fixtureIds = (rd && rd.matchups ? rd.matchups.map((m) => m.id).filter(Boolean) : []) || [];
-      const overlays = new Map();
-      await Promise.all(
-        fixtureIds.map(async (fid) => {
-          const pm = await fetchPerMatchResultDoc(fid);
-          const mu = matchupFromPerMatchDoc(pm, fid);
-          if (mu) overlays.set(fid, mu);
-        }),
-      );
-      if (!overlays.size && !baseDoc) return null;
-
-      const out = baseDoc
-        ? JSON.parse(JSON.stringify(baseDoc))
-        : {
-            schemaVersion: 1,
-            season: 11,
-            phase: fixtures.phase || 'first_half',
-            round: roundNum,
-            recordedAt: '',
-            author: '',
-            notes: '',
-            matchups: [],
-          };
-      if (!Array.isArray(out.matchups)) out.matchups = [];
-
-      if (baseDoc) {
-        for (const [fid, mu] of overlays) {
-          const idx = out.matchups.findIndex((x) => x.fixtureId === fid);
-          if (idx >= 0) out.matchups[idx] = mu;
-          else out.matchups.push(mu);
-        }
-      } else {
-        const ordered = [];
-        for (const fid of fixtureIds) {
-          const mu = overlays.get(fid);
-          if (mu) ordered.push(mu);
-        }
-        out.matchups = ordered;
-      }
-      return out;
-    }
-
-    async function loadRoundResultDocMerged(roundNum, fixtures) {
-      const base = await loadRoundResultDoc(roundNum);
-      return mergePerMatchOverlaysIntoRoundDoc(base, roundNum, fixtures);
-    }
-
-    async function loadAllRoundResults(maxRound, fixtures) {
-      const docs = [];
-      for (let r = 1; r <= maxRound; r++) {
-        const doc = await loadRoundResultDocMerged(r, fixtures);
-        if (doc) docs.push(doc);
-      }
-      return docs;
     }
 
     function escapeHtml(s) {
@@ -715,10 +636,18 @@
         .join('');
 
       return `
-        <section class="round-pane ${isFirst ? '' : 'hidden'}" id="round-pane-${fr.round}" data-round="${fr.round}">
+        <section class="round-pane ${isFirst ? '' : 'hidden'}" id="round-pane-${fr.round}" data-round="${fr.round}" data-loaded="1">
           <h2 class="text-lg font-semibold text-zinc-900 mb-0.5 tracking-tight">${fr.round}라운드</h2>
           ${metaLine}
           ${cards || '<p class="text-zinc-400 text-sm">대전 정보가 없습니다.</p>'}
+        </section>`;
+    }
+
+    function renderRoundPanePlaceholder(fr, isFirst) {
+      return `
+        <section class="round-pane ${isFirst ? '' : 'hidden'}" id="round-pane-${fr.round}" data-round="${fr.round}" data-loaded="0">
+          <h2 class="text-lg font-semibold text-zinc-900 mb-0.5 tracking-tight">${fr.round}라운드</h2>
+          <p class="text-zinc-400 text-sm py-6 text-center">불러오는 중…</p>
         </section>`;
     }
 
@@ -735,15 +664,13 @@
           loadJson('data/s11/players.json'),
         ]);
         const rosterMap = rosterByDisplayName(playersData.players || []);
-        const maxR = Math.max(10, ...(fixtures.rounds || []).map((r) => r.round || 0));
-        const roundDocs = await loadAllRoundResults(maxR, fixtures);
-        const docByRound = new Map();
-        for (const d of roundDocs) {
-          if (d.round != null) docByRound.set(d.round, d);
-        }
 
         const rounds = [...(fixtures.rounds || [])].sort((a, b) => (a.round || 0) - (b.round || 0));
         if (!rounds.length) throw new Error('fixtures.json에 rounds가 없습니다.');
+
+        const firstRound = rounds[0].round;
+        const firstDoc = await loadSingleRoundDoc(fixtures, firstRound);
+        const loadingRounds = new Set();
 
         tabsEl.className = 'mb-5 flex flex-wrap gap-1 p-1 rounded-xl bg-zinc-200/35 border border-zinc-200/60';
         tabsEl.innerHTML = rounds
@@ -753,14 +680,42 @@
           )
           .join('');
 
-        panesEl.innerHTML = rounds.map((fr, i) => renderRoundPane(meta, fr, docByRound.get(fr.round), i === 0, rosterMap, fixtures)).join('');
+        panesEl.innerHTML = rounds
+          .map((fr, i) => {
+            if (fr.round === firstRound) {
+              return renderRoundPane(meta, fr, firstDoc, i === 0, rosterMap, fixtures);
+            }
+            return renderRoundPanePlaceholder(fr, i === 0);
+          })
+          .join('');
+
+        async function ensureRoundPane(roundNum) {
+          const pane = panesEl.querySelector(`#round-pane-${roundNum}`);
+          if (!pane || pane.dataset.loaded === '1') return;
+          if (loadingRounds.has(roundNum)) return;
+          loadingRounds.add(roundNum);
+          try {
+            const fr = rounds.find((x) => x.round === roundNum);
+            const doc = await loadSingleRoundDoc(fixtures, roundNum);
+            const isVisible = !pane.classList.contains('hidden');
+            const html = renderRoundPane(meta, fr, doc, isVisible, rosterMap, fixtures);
+            const wrap = document.createElement('div');
+            wrap.innerHTML = html.trim();
+            const newPane = wrap.firstElementChild;
+            if (!isVisible) newPane.classList.add('hidden');
+            pane.replaceWith(newPane);
+          } finally {
+            loadingRounds.delete(roundNum);
+          }
+        }
 
         tabsEl.querySelectorAll('.sub-tab').forEach((tab) => {
-          tab.addEventListener('click', () => {
+          tab.addEventListener('click', async () => {
             const r = tab.dataset.round;
             tabsEl.querySelectorAll('.sub-tab').forEach((t) => t.classList.remove('active'));
             panesEl.querySelectorAll('.round-pane').forEach((p) => p.classList.add('hidden'));
             tab.classList.add('active');
+            await ensureRoundPane(Number(r));
             const pane = panesEl.querySelector(`#round-pane-${r}`);
             if (pane) pane.classList.remove('hidden');
           });

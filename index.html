@@ -392,6 +392,10 @@
       <a href="s11-stats.html" class="s11-site-nav-link">통계 차트</a>
     </nav>
 
+    <div id="dataLoadingBanner" class="mb-6 rounded-xl border border-indigo-200/80 bg-indigo-50/90 px-4 py-3 text-sm text-indigo-900" role="status" aria-live="polite">
+      결과 데이터 불러오는 중…
+    </div>
+
     <!-- 팀 순위 -->
     <section id="standings" class="mb-10 scroll-mt-8">
       <h2 class="text-base font-semibold text-zinc-900 mb-2">팀 순위</h2>
@@ -429,7 +433,9 @@
     </section>
   </div>
 
-  <script>
+  <script type="module">
+    import { loadRoundDocsForRange } from './js/s11-data-loader.mjs';
+
     const PLAYOFF_SPOTS = 4;
     /** fixtures `matchups[].date` 가 "M/D" 일 때 사용하는 연도(요일 계산) */
     const SCHEDULE_DATE_YEAR = 2026;
@@ -561,88 +567,23 @@
       return out;
     }
 
-    /** 한 라운드 문서: round-NN.json 또는 round-NN.sample.json */
-    async function loadRoundResultDoc(roundNum) {
-      const p = String(roundNum).padStart(2, '0');
-      const urls = [
-        `data/s11/results/round-${p}.json`,
-        `data/s11/results/round-${p}.sample.json`,
-      ];
-      for (const url of urls) {
-        const res = await fetch(url, { cache: 'no-store' });
-        if (res.ok) return res.json();
+    function showPageLoadingSkeleton() {
+      document.getElementById('standingsBody').innerHTML =
+        '<tr><td colspan="11" class="px-4 py-8 text-center text-zinc-500 text-sm">결과 데이터 불러오는 중…</td></tr>';
+      const mobileRoot = document.getElementById('standingsMobile');
+      if (mobileRoot) {
+        mobileRoot.innerHTML =
+          '<p class="rounded-xl border border-zinc-200 bg-zinc-50 px-4 py-6 text-center text-sm text-zinc-500">결과 데이터 불러오는 중…</p>';
       }
-      return null;
-    }
-
-    async function fetchPerMatchResultDoc(fixtureId) {
-      const url = `data/s11/results/${fixtureId}.json`;
-      const res = await fetch(url, { cache: 'no-store' });
-      if (!res.ok) return null;
-      return res.json();
-    }
-
-    function matchupFromPerMatchDoc(doc, fixtureId) {
-      if (!doc || !Array.isArray(doc.matchups)) return null;
-      return doc.matchups.find((x) => x.fixtureId === fixtureId) || null;
-    }
-
-    async function mergePerMatchOverlaysIntoRoundDoc(baseDoc, roundNum, fixtures) {
-      const rd = (fixtures.rounds || []).find((x) => x.round === roundNum);
-      const fixtureIds = (rd && rd.matchups ? rd.matchups.map((m) => m.id).filter(Boolean) : []) || [];
-      const overlays = new Map();
-      await Promise.all(
-        fixtureIds.map(async (fid) => {
-          const pm = await fetchPerMatchResultDoc(fid);
-          const mu = matchupFromPerMatchDoc(pm, fid);
-          if (mu) overlays.set(fid, mu);
-        }),
-      );
-      if (!overlays.size && !baseDoc) return null;
-
-      const out = baseDoc
-        ? JSON.parse(JSON.stringify(baseDoc))
-        : {
-            schemaVersion: 1,
-            season: 11,
-            phase: fixtures.phase || 'first_half',
-            round: roundNum,
-            recordedAt: '',
-            author: '',
-            notes: '',
-            matchups: [],
-          };
-      if (!Array.isArray(out.matchups)) out.matchups = [];
-
-      if (baseDoc) {
-        for (const [fid, mu] of overlays) {
-          const idx = out.matchups.findIndex((x) => x.fixtureId === fid);
-          if (idx >= 0) out.matchups[idx] = mu;
-          else out.matchups.push(mu);
-        }
-      } else {
-        const ordered = [];
-        for (const fid of fixtureIds) {
-          const mu = overlays.get(fid);
-          if (mu) ordered.push(mu);
-        }
-        out.matchups = ordered;
+      const scheduleRoot = document.getElementById('scheduleRoot');
+      if (scheduleRoot) {
+        scheduleRoot.innerHTML = '<p class="text-sm text-zinc-500">일정·결과 불러오는 중…</p>';
       }
-      return out;
     }
 
-    async function loadRoundResultDocMerged(roundNum, fixtures) {
-      const base = await loadRoundResultDoc(roundNum);
-      return mergePerMatchOverlaysIntoRoundDoc(base, roundNum, fixtures);
-    }
-
-    async function loadAllRoundResults(maxRound, fixtures) {
-      const docs = [];
-      for (let r = 1; r <= maxRound; r++) {
-        const doc = await loadRoundResultDocMerged(r, fixtures);
-        if (doc) docs.push(doc);
-      }
-      return docs;
+    function hidePageLoadingBanner() {
+      const banner = document.getElementById('dataLoadingBanner');
+      if (banner) banner.classList.add('hidden');
     }
 
     function compareStandingRow(a, b) {
@@ -1421,18 +1362,21 @@
     }
 
     document.addEventListener('DOMContentLoaded', async () => {
+      showPageLoadingSkeleton();
       try {
         const [meta, fixtures] = await Promise.all([
           loadJson('data/s11/meta.json'),
           loadJson('data/s11/fixtures.json'),
         ]);
-        const roundDocs = await loadAllRoundResults(10, fixtures);
+        const roundDocs = await loadRoundDocsForRange(fixtures, 10);
+        hidePageLoadingBanner();
         const analysis = buildStandingsAnalysis(meta, fixtures, roundDocs);
         const nextByTeam = computeNextOpponents(meta, fixtures, roundDocs);
         renderStandings(meta, analysis, nextByTeam);
         renderSchedule(meta, fixtures, roundDocs);
       } catch (e) {
         console.error(e);
+        hidePageLoadingBanner();
         document.getElementById('standingsBody').innerHTML =
           `<tr><td colspan="11" class="px-4 py-4 text-red-600">${escapeHtml(e.message)}</td></tr>`;
         const mobileRoot = document.getElementById('standingsMobile');

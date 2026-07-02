@@ -3,6 +3,8 @@
 import { fixtureRoundMap, slotPlanBySlot } from './s11-season-simulate.mjs';
 
 export const COIN_CAPS = { solo: 5, team: 6 };
+/** coin-usage.json 과 집계 로직 동기화용 — 규칙 변경 시 증가 */
+export const COIN_LOGIC_VERSION = 1;
 
 export const HALF_RANGES = {
   first_half: { min: 1, max: 10, label: '상반기', roundLabel: '1R~10R' },
@@ -182,4 +184,50 @@ export function formatAppearanceTooltip(log) {
       return line;
     })
     .join('\n');
+}
+
+/** buildCoinUsageByHalf 결과 → coin-usage.json */
+export function coinUsageToJson({ byHalf, maxRoundByHalf }) {
+  const out = {
+    schemaVersion: 1,
+    coinLogicVersion: COIN_LOGIC_VERSION,
+    generatedAt: new Date().toISOString(),
+    byHalf: {},
+  };
+  for (const half of ['first_half', 'second_half']) {
+    const players = {};
+    for (const [name, rec] of byHalf[half].entries()) {
+      players[name] = {
+        solo: rec.solo,
+        team: rec.team,
+        log: rec.log,
+      };
+    }
+    out.byHalf[half] = {
+      maxRound: maxRoundByHalf[half] || 0,
+      players,
+    };
+  }
+  return out;
+}
+
+/** coin-usage.json → buildCoinUsageByHalf 와 동일한 구조 (실패 시 null) */
+export function coinUsageFromJson(doc) {
+  if (!doc || doc.schemaVersion !== 1) return null;
+  if (doc.coinLogicVersion !== COIN_LOGIC_VERSION) return null;
+  const byHalf = { first_half: new Map(), second_half: new Map() };
+  const maxRoundByHalf = { first_half: 0, second_half: 0 };
+  for (const half of ['first_half', 'second_half']) {
+    const block = doc.byHalf?.[half];
+    if (!block) continue;
+    maxRoundByHalf[half] = block.maxRound || 0;
+    for (const [name, rec] of Object.entries(block.players || {})) {
+      byHalf[half].set(name, {
+        solo: rec.solo || 0,
+        team: rec.team || 0,
+        log: Array.isArray(rec.log) ? rec.log.slice() : [],
+      });
+    }
+  }
+  return { byHalf, maxRoundByHalf };
 }

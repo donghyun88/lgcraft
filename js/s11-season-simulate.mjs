@@ -55,83 +55,18 @@ export async function loadJson(path) {
   return res.json();
 }
 
-export async function loadRoundResultDoc(roundNum) {
-  const p = String(roundNum).padStart(2, '0');
-  for (const url of [`data/s11/results/round-${p}.json`, `data/s11/results/round-${p}.sample.json`]) {
-    const res = await fetch(url, { cache: 'no-store' });
-    if (res.ok) return res.json();
-  }
-  return null;
-}
+export {
+  loadRoundDocsForRange,
+  loadSingleRoundDoc,
+  fetchPerMatchResultDoc,
+  matchupFromPerMatchDoc,
+  fixtureIdsForRoundRange,
+} from './s11-data-loader.mjs';
 
-export async function fetchPerMatchResultDoc(fixtureId) {
-  const url = `data/s11/results/${fixtureId}.json`;
-  const res = await fetch(url, { cache: 'no-store' });
-  if (!res.ok) return null;
-  return res.json();
-}
+import { loadRoundDocsForRange } from './s11-data-loader.mjs';
 
-export function matchupFromPerMatchDoc(doc, fixtureId) {
-  if (!doc || !Array.isArray(doc.matchups)) return null;
-  return doc.matchups.find((x) => x.fixtureId === fixtureId) || null;
-}
-
-export async function mergePerMatchOverlaysIntoRoundDoc(baseDoc, roundNum, fixtures) {
-  const rd = (fixtures.rounds || []).find((x) => x.round === roundNum);
-  const fixtureIds = (rd && rd.matchups ? rd.matchups.map((m) => m.id).filter(Boolean) : []) || [];
-  const overlays = new Map();
-  await Promise.all(
-    fixtureIds.map(async (fid) => {
-      const pm = await fetchPerMatchResultDoc(fid);
-      const mu = matchupFromPerMatchDoc(pm, fid);
-      if (mu) overlays.set(fid, mu);
-    }),
-  );
-  if (!overlays.size && !baseDoc) return null;
-
-  const out = baseDoc
-    ? JSON.parse(JSON.stringify(baseDoc))
-    : {
-        schemaVersion: 1,
-        season: 11,
-        phase: fixtures.phase || 'first_half',
-        round: roundNum,
-        recordedAt: '',
-        author: '',
-        notes: '',
-        matchups: [],
-      };
-  if (!Array.isArray(out.matchups)) out.matchups = [];
-
-  if (baseDoc) {
-    for (const [fid, mu] of overlays) {
-      const idx = out.matchups.findIndex((x) => x.fixtureId === fid);
-      if (idx >= 0) out.matchups[idx] = mu;
-      else out.matchups.push(mu);
-    }
-  } else {
-    const ordered = [];
-    for (const fid of fixtureIds) {
-      const mu = overlays.get(fid);
-      if (mu) ordered.push(mu);
-    }
-    out.matchups = ordered;
-  }
-  return out;
-}
-
-export async function loadRoundResultDocMerged(roundNum, fixtures) {
-  const base = await loadRoundResultDoc(roundNum);
-  return mergePerMatchOverlaysIntoRoundDoc(base, roundNum, fixtures);
-}
-
-export async function loadAllRoundResults(maxRound, fixtures, minRound = 1) {
-  const start = Math.max(1, minRound | 0);
-  const end = Math.max(start, maxRound | 0);
-  const docs = await Promise.all(
-    Array.from({ length: end - start + 1 }, (_, i) => loadRoundResultDocMerged(start + i, fixtures)),
-  );
-  return docs.filter(Boolean);
+export async function loadAllRoundResults(maxRound, fixtures, minRound = 1, options = {}) {
+  return loadRoundDocsForRange(fixtures, maxRound, minRound, options);
 }
 
 export function fixtureRoundMap(fixtures, roundNum) {

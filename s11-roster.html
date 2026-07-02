@@ -315,16 +315,19 @@
   </div>
 
   <script type="module">
-    import { loadAllRoundResults } from './js/s11-season-simulate.mjs';
+    import { loadRoundDocsForRange } from './js/s11-data-loader.mjs';
     import {
       COIN_CAPS,
       HALF_RANGES,
       buildCoinUsageByHalf,
       coinUsageForPlayer,
+      coinUsageFromJson,
       coinMeterTone,
       defaultHalfKey,
       formatAppearanceTooltip,
     } from './js/s11-coin-usage.mjs';
+
+    const COIN_USAGE_URL = 'data/s11/coin-usage.json';
 
     const TIER_ROWS = ['갓', '킹', '휴먼', '애니멀', '아메바'];
 
@@ -337,6 +340,8 @@
       activeHalf: 'first_half',
       coinDataReady: false,
       coinLoading: false,
+      secondHalfCoinLoaded: false,
+      coinFromPrecomputed: false,
     };
 
     function mergeRoundDocsIntoCache(docs) {
@@ -346,6 +351,7 @@
     }
 
     function rebuildCoinUsage() {
+      if (!appState.roundDocsByRound.size) return;
       appState.coinUsage = buildCoinUsageByHalf(
         appState.fixtures,
         [...appState.roundDocsByRound.values()],
@@ -437,19 +443,47 @@
       el.textContent = appState.coinLoading ? `${base} (추가 로딩 중…)` : base;
     }
 
-    async function loadAllCoinData() {
-      if (!appState.fixtures || appState.coinDataReady || appState.coinLoading) return;
+    async function tryLoadPrecomputedCoinUsage() {
+      try {
+        const res = await fetch(COIN_USAGE_URL, { cache: 'default' });
+        if (!res.ok) return false;
+        const parsed = coinUsageFromJson(await res.json());
+        if (!parsed) return false;
+        appState.coinUsage = parsed;
+        appState.coinDataReady = true;
+        appState.coinFromPrecomputed = true;
+        appState.secondHalfCoinLoaded = true;
+        return true;
+      } catch {
+        return false;
+      }
+    }
+
+    async function loadFirstHalfCoinData() {
+      if (!appState.fixtures || appState.coinLoading) return;
+      appState.coinFromPrecomputed = false;
       appState.coinLoading = true;
       updateCoinReflectNote();
       try {
-        const firstDocs = await loadAllRoundResults(10, appState.fixtures, 1);
+        const firstDocs = await loadRoundDocsForRange(appState.fixtures, 10, 1);
         mergeRoundDocsIntoCache(firstDocs);
         rebuildCoinUsage();
+      } finally {
+        appState.coinLoading = false;
         renderAll();
+      }
+    }
 
-        const secondDocs = await loadAllRoundResults(20, appState.fixtures, 11);
+    async function ensureSecondHalfCoinData() {
+      if (appState.coinFromPrecomputed) return;
+      if (!appState.fixtures || appState.secondHalfCoinLoaded || appState.coinLoading) return;
+      appState.coinLoading = true;
+      updateCoinReflectNote();
+      try {
+        const secondDocs = await loadRoundDocsForRange(appState.fixtures, 20, 11);
         mergeRoundDocsIntoCache(secondDocs);
         rebuildCoinUsage();
+        appState.secondHalfCoinLoaded = true;
         appState.coinDataReady = true;
       } finally {
         appState.coinLoading = false;
@@ -457,11 +491,20 @@
       }
     }
 
+    async function loadAllCoinData() {
+      if (await tryLoadPrecomputedCoinUsage()) {
+        renderAll();
+        return;
+      }
+      await loadFirstHalfCoinData();
+    }
+
     function wireHalfTabs() {
       document.querySelectorAll('[data-coin-half]').forEach((btn) => {
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', async () => {
           const half = btn.dataset.coinHalf;
           if (half === appState.activeHalf) return;
+          if (half === 'second_half') await ensureSecondHalfCoinData();
           appState.activeHalf = half;
           renderAll();
         });
