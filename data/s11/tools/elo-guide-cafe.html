@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>시즌11 ELO 안내</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: #e4e4e7;
+      padding: 24px;
+      display: flex;
+      justify-content: center;
+    }
+    .poster {
+      width: 720px;
+      background: #fff;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 8px 32px rgba(0,0,0,.12);
+    }
+    .header {
+      background: linear-gradient(135deg, #312e81 0%, #4338ca 50%, #6366f1 100%);
+      color: #fff;
+      padding: 28px 32px 24px;
+    }
+    .header-badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      background: rgba(255,255,255,.18);
+      border: 1px solid rgba(255,255,255,.25);
+      border-radius: 999px;
+      padding: 4px 12px;
+      margin-bottom: 10px;
+    }
+    .header h1 {
+      font-size: 28px;
+      font-weight: 900;
+      line-height: 1.25;
+      margin-bottom: 8px;
+    }
+    .header p {
+      font-size: 14px;
+      opacity: .92;
+      line-height: 1.5;
+    }
+    .body { padding: 24px 28px 28px; }
+    .summary {
+      background: linear-gradient(180deg, #eef2ff, #f5f3ff);
+      border: 1px solid #c7d2fe;
+      border-radius: 12px;
+      padding: 16px 18px;
+      margin-bottom: 20px;
+    }
+    .summary-title {
+      font-size: 13px;
+      font-weight: 800;
+      color: #4338ca;
+      margin-bottom: 8px;
+    }
+    .summary ul {
+      list-style: none;
+      font-size: 13.5px;
+      line-height: 1.65;
+      color: #1e1b4b;
+    }
+    .summary li::before {
+      content: '▸ ';
+      color: #6366f1;
+      font-weight: 700;
+    }
+    .one-liner {
+      text-align: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: #4338ca;
+      background: #fafafa;
+      border: 1px dashed #c7d2fe;
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-bottom: 22px;
+      line-height: 1.55;
+    }
+    .section-title {
+      font-size: 15px;
+      font-weight: 900;
+      color: #18181b;
+      margin-bottom: 12px;
+      padding-bottom: 6px;
+      border-bottom: 2px solid #e4e4e7;
+    }
+    .examples { display: flex; flex-direction: column; gap: 12px; margin-bottom: 22px; }
+    .example {
+      border: 1px solid #e4e4e7;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .example-head {
+      background: #fafafa;
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: 800;
+      color: #3f3f46;
+      border-bottom: 1px solid #f4f4f5;
+    }
+    .example-head span { color: #6366f1; }
+    .example-body { padding: 12px 14px; }
+    .matchup {
+      font-size: 14px;
+      font-weight: 700;
+      color: #27272a;
+      margin-bottom: 10px;
+    }
+    .result-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .result-box {
+      border-radius: 8px;
+      padding: 10px 12px;
+      text-align: center;
+    }
+    .result-box.win { background: #ecfdf5; border: 1px solid #a7f3d0; }
+    .result-box.lose { background: #fef2f2; border: 1px solid #fecaca; }
+    .result-box .name { font-size: 12px; font-weight: 700; color: #52525b; margin-bottom: 4px; }
+    .result-box .delta { font-size: 20px; font-weight: 900; }
+    .result-box.win .delta { color: #059669; }
+    .result-box.lose .delta { color: #dc2626; }
+    .result-box .after { font-size: 11px; color: #71717a; margin-top: 2px; }
+    .note {
+      font-size: 11.5px;
+      color: #71717a;
+      margin-top: 8px;
+      line-height: 1.45;
+    }
+    .k-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      margin-bottom: 22px;
+    }
+    .k-table th, .k-table td {
+      border: 1px solid #e4e4e7;
+      padding: 10px 12px;
+      text-align: center;
+    }
+    .k-table th {
+      background: #f4f4f5;
+      font-weight: 800;
+      color: #3f3f46;
+    }
+    .k-table td:first-child { font-weight: 700; text-align: left; }
+    .k-table .high { color: #059669; font-weight: 800; }
+    .k-table .mid { color: #d97706; font-weight: 800; }
+    .k-table .low { color: #71717a; font-weight: 800; }
+    .faq { display: flex; flex-direction: column; gap: 10px; margin-bottom: 8px; }
+    .faq-item {
+      background: #fafafa;
+      border-radius: 10px;
+      padding: 12px 14px;
+      border: 1px solid #f4f4f5;
+    }
+    .faq-q {
+      font-size: 12.5px;
+      font-weight: 800;
+      color: #4338ca;
+      margin-bottom: 4px;
+    }
+    .faq-a {
+      font-size: 12px;
+      color: #52525b;
+      line-height: 1.55;
+    }
+    .footer {
+      text-align: center;
+      font-size: 11px;
+      color: #a1a1aa;
+      padding-top: 16px;
+      border-top: 1px solid #f4f4f5;
+    }
+  </style>
+</head>
+<body>
+  <article class="poster" id="poster">
+    <header class="header">
+      <div class="header-badge">LG CRAFT · 멸망전</div>
+      <h1>시즌11 ELO 안내</h1>
+      <p>실력 점수(ELO)가 어떻게 오르고 내리는지, 예시와 함께 쉽게 설명합니다.</p>
+    </header>
+
+    <div class="body">
+      <div class="summary">
+        <div class="summary-title">📌 ELO란?</div>
+        <ul>
+          <li>경기 결과로 계산되는 <strong>실력 점수</strong> (높을수록 순위 ↑)</li>
+          <li>시즌 시작: <strong>모든 선수 1000점</strong></li>
+          <li>이기면 오르고, 지면 내려갑니다</li>
+          <li>승패만이 아니라 <strong>상대 실력</strong>도 반영됩니다</li>
+        </ul>
+      </div>
+
+      <div class="one-liner">
+        약한 상대를 이기면 조금 ↑ · 강한 상대를 이기면 많이 ↑<br>
+        강한 상대에게 지면 덜 ↓ · 약한 상대에게 지면 많이 ↓
+      </div>
+
+      <h2 class="section-title">예시로 이해하기</h2>
+      <div class="examples">
+        <div class="example">
+          <div class="example-head">예시 1 · <span>실력 비슷</span> (둘 다 1000점, 개인전)</div>
+          <div class="example-body">
+            <div class="matchup">A(1000) vs B(1000) → A 승리</div>
+            <div class="result-grid">
+              <div class="result-box win">
+                <div class="name">A 승</div>
+                <div class="delta">+32</div>
+                <div class="after">→ 1032</div>
+              </div>
+              <div class="result-box lose">
+                <div class="name">B 패</div>
+                <div class="delta">−32</div>
+                <div class="after">→ 968</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="example">
+          <div class="example-head">예시 2 · <span>역전승</span> (낮은 점수가 이김)</div>
+          <div class="example-body">
+            <div class="matchup">A(1000) vs B(1200) → A 승리</div>
+            <div class="result-grid">
+              <div class="result-box win">
+                <div class="name">A 승 (약체)</div>
+                <div class="delta">+49</div>
+                <div class="after">→ 1049</div>
+              </div>
+              <div class="result-box lose">
+                <div class="name">B 패 (강자)</div>
+                <div class="delta">−49</div>
+                <div class="after">→ 1151</div>
+              </div>
+            </div>
+            <div class="note">※ 강한 상대를 이기면 크게 오릅니다!</div>
+          </div>
+        </div>
+
+        <div class="example">
+          <div class="example-head">예시 3 · <span>정석 승</span> (높은 점수가 이김)</div>
+          <div class="example-body">
+            <div class="matchup">B(1200) vs A(1000) → B 승리</div>
+            <div class="result-grid">
+              <div class="result-box win">
+                <div class="name">B 승 (강자)</div>
+                <div class="delta">+15</div>
+                <div class="after">→ 1215</div>
+              </div>
+              <div class="result-box lose">
+                <div class="name">A 패 (약체)</div>
+                <div class="delta">−15</div>
+                <div class="after">→ 985</div>
+              </div>
+            </div>
+            <div class="note">※ 이미 높은 점수가 낮은 상대를 이기면 조금만 오릅니다.</div>
+          </div>
+        </div>
+      </div>
+
+      <h2 class="section-title">경기 형식별 변동 폭 (K값)</h2>
+      <table class="k-table">
+        <thead>
+          <tr><th>경기 형식</th><th>K값</th><th>설명</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>개인전 (1:1)</td><td class="high">64</td><td>한 판당 가장 크게 변함</td></tr>
+          <tr><td>2:2 팀전</td><td class="mid">48</td><td>팀원 ELO 평균 기준</td></tr>
+          <tr><td>3:3 팀전</td><td class="low">32</td><td>팀원 ELO 평균 기준</td></tr>
+        </tbody>
+      </table>
+      <p class="note" style="margin-top:-14px;margin-bottom:22px;font-size:11.5px;color:#71717a;line-height:1.5;padding:0 2px;">
+        ※ K값 = 한 세트 승패 시 ELO가 움직일 수 있는 기준 폭. 비슷한 실력(1000 vs 1000)에서 이기면 약 ±32(=K÷2) 변동.
+      </p>
+
+      <h2 class="section-title">자주 묻는 질문</h2>
+      <div class="faq">
+        <div class="faq-item">
+          <div class="faq-q">Q. 승수는 적은데 ELO가 더 높은 사람이 있어요</div>
+          <div class="faq-a">A. 강한 상대를 이겼으면 승수는 적어도 점수가 높을 수 있습니다.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">Q. 한 라운드에 여러 세트를 치면?</div>
+          <div class="faq-a">A. 그 라운드 모든 세트 변동을 합산해서 표시합니다.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q">Q. 사이트의 (▲63) (▼15) (-) 는?</div>
+          <div class="faq-a">A. 가장 최근 라운드 ELO 변동입니다. (-)는 변동 없음(또는 미출전)입니다.</div>
+        </div>
+      </div>
+
+      <div class="footer">LG Craft · 멸망전 시즌11 · 선수 기록 / 통계 차트에서 실시간 확인</div>
+    </div>
+  </article>
+</body>
+</html>

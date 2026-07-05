@@ -432,17 +432,18 @@
       return `${s.w}승 ${s.l}패`;
     }
 
-    /** 최근(최대) 라운드 ELO 변동 합계 */
-    function lastRoundEloDelta(state) {
-      const history = state?.history || [];
-      if (!history.length) return null;
-      const rounds = history.map((h) => h.round).filter((r) => r != null);
+    function getMaxRoundFromDocs(roundDocs) {
+      const rounds = (roundDocs || []).map((d) => d.round).filter((r) => r != null);
       if (!rounds.length) return null;
-      const lastRound = Math.max(...rounds);
-      const sets = history.filter((h) => h.round === lastRound);
+      return Math.max(...rounds);
+    }
+
+    /** 리그 최신 라운드 ELO 변동 (해당 라운드 미출전 → null) */
+    function lastRoundEloDelta(state, leagueMaxRound) {
+      if (leagueMaxRound == null) return null;
+      const sets = (state?.history || []).filter((h) => h.round === leagueMaxRound);
       if (!sets.length) return null;
-      const delta = sets.reduce((sum, h) => sum + (h.delta || 0), 0);
-      return delta === 0 ? 0 : delta;
+      return sets.reduce((sum, h) => sum + (h.delta || 0), 0);
     }
 
     function formatDeltaInParens(delta, title) {
@@ -455,8 +456,9 @@
       return `<span class="player-elo-delta player-elo-delta--down" title="${title}"> (▼${Math.abs(delta)})</span>`;
     }
 
-    function formatLastRoundDeltaBadge(delta) {
-      return formatDeltaInParens(delta, '최근 라운드 ELO');
+    function formatLastRoundDeltaBadge(delta, leagueMaxRound) {
+      const tip = leagueMaxRound != null ? `${leagueMaxRound}라운드 ELO` : '최신 라운드 ELO';
+      return formatDeltaInParens(delta, tip);
     }
 
     function formatRankDeltaBadge(rankDelta) {
@@ -530,6 +532,7 @@
       const ranked = assignEloRanks(rows);
       const currentRankByName = new Map(ranked.map((p) => [(p.displayName || '').trim(), p.rank]));
       const prevRankDeltaMap = buildPrevRoundRankDeltaByName(lastFixtures, lastRoundDocs, players, currentRankByName);
+      const leagueMaxRound = getMaxRoundFromDocs(lastRoundDocs);
 
       const teamOptions = meta.teams.map((t) => `<option value="${escapeHtml(t.name)}">${escapeHtml(t.name)}</option>`).join('');
       const uniqueRaces = [...new Set(roster.map(getRaceLetter).filter(Boolean))].sort();
@@ -599,7 +602,7 @@
         const pid = (p.id || '').toLowerCase();
         const pname = (p.displayName || '').toLowerCase();
         const dn = (p.displayName || '').trim();
-        const lastDelta = lastRoundEloDelta(stateByName.get(dn));
+        const lastDelta = lastRoundEloDelta(stateByName.get(dn), leagueMaxRound);
         const rankDelta = prevRankDeltaMap.get(dn);
         const pidEnc = p.id ? encodeURIComponent(p.id) : '';
         const hrefPlayer = pidEnc ? ` href="?player=${pidEnc}"` : ' href="#"';
@@ -616,7 +619,7 @@
               ${vsChip ? `<div class="mt-1">${vsChip}</div>` : ''}
             </td>
             <td class="px-4 py-3 align-top whitespace-nowrap text-sm text-zinc-600">${escapeHtml(p.tier || '—')}</td>
-            <td class="px-4 py-3 align-top whitespace-nowrap text-sm font-bold tabular-nums text-indigo-700">${p.elo}${formatLastRoundDeltaBadge(lastDelta)}</td>
+            <td class="px-4 py-3 align-top whitespace-nowrap text-sm font-bold tabular-nums text-indigo-700">${p.elo}${formatLastRoundDeltaBadge(lastDelta, leagueMaxRound)}</td>
             <td class="px-4 py-3 align-top whitespace-nowrap text-sm text-zinc-600">${wlCell(st.total)}</td>
             <td class="px-4 py-3 align-top whitespace-nowrap text-sm text-zinc-600">${wlCell(st.개인전)}</td>
             <td class="px-4 py-3 align-top whitespace-nowrap text-sm text-zinc-600">${wlCell(st.팀전)}</td>
@@ -634,7 +637,7 @@
         const pid = (p.id || '').toLowerCase();
         const pname = (p.displayName || '').trim().toLowerCase();
         const dn = (p.displayName || '').trim();
-        const lastDelta = lastRoundEloDelta(stateByName.get(dn));
+        const lastDelta = lastRoundEloDelta(stateByName.get(dn), leagueMaxRound);
         const rankDelta = prevRankDeltaMap.get(dn);
         html += `
           <div class="player-card rounded-lg border border-zinc-200/90 bg-white p-2 shadow-sm" role="button" tabindex="0"
@@ -651,7 +654,7 @@
               </div>
               <div class="text-right shrink-0 pl-1">
                 <div class="player-card-elo-row">
-                  <span class="player-card-elo-num">${p.elo}</span>${formatLastRoundDeltaBadge(lastDelta)}
+                  <span class="player-card-elo-num">${p.elo}</span>${formatLastRoundDeltaBadge(lastDelta, leagueMaxRound)}
                 </div>
                 <div class="player-card-record">${st.total.w}승 ${st.total.l}패${totalWinRate ? `<span class="player-card-record-pct"> · ${totalWinRate}%</span>` : ''}</div>
               </div>
