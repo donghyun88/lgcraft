@@ -132,6 +132,131 @@ function raceBadgeHtml(race) {
   return `<span class="race-icon race-${safe}" title="${escapeHtml(safe)}">${escapeHtml(safe)}</span>`;
 }
 
+function getMaxRoundFromDocs(roundDocs) {
+  if (!roundDocs?.length) return null;
+  return Math.max(...roundDocs.map((d) => d.round).filter((r) => r != null));
+}
+
+function lastRoundEloDelta(state, lastRound) {
+  const history = state?.history || [];
+  if (!history.length || lastRound == null) return null;
+  const sets = history.filter((h) => h.round === lastRound);
+  if (!sets.length) return null;
+  const delta = sets.reduce((sum, h) => sum + (h.delta || 0), 0);
+  return delta;
+}
+
+function lastRoundWl(state, lastRound) {
+  const history = state?.history || [];
+  if (!history.length || lastRound == null) return null;
+  const sets = history.filter((h) => h.round === lastRound);
+  if (!sets.length) return null;
+  let w = 0;
+  let l = 0;
+  for (const h of sets) {
+    if (h.won) w++;
+    else l++;
+  }
+  return { w, l };
+}
+
+function formatRoundDeltaBadge(delta) {
+  if (delta == null || delta === 0) return '';
+  if (delta > 0) {
+    return `<span class="last-round-delta last-round-delta--up" title="해당 라운드 ELO 변동">▲${delta}</span>`;
+  }
+  return `<span class="last-round-delta last-round-delta--down" title="해당 라운드 ELO 변동">▼${Math.abs(delta)}</span>`;
+}
+
+function renderLastRoundLeaderboardCard(title, rows) {
+  let html = `<div class="bg-white p-4 rounded-xl border border-zinc-200/80 shadow-sm">
+    <h4 class="font-bold text-base mb-3 border-b border-zinc-100 pb-2 text-zinc-800">${escapeHtml(title)}</h4>`;
+  if (!rows.length) {
+    html += '<p class="text-sm text-zinc-500">표시할 데이터가 없습니다.</p></div>';
+    return html;
+  }
+  html += '<ul class="space-y-2.5">';
+  rows.forEach((row, index) => {
+    const idLine = row.playerId ? escapeHtml(row.playerId) : '—';
+    html += `<li class="flex items-start justify-between gap-2 text-sm">
+      <span class="flex items-start gap-2 min-w-0 flex-1">
+        <span class="font-bold w-6 shrink-0 text-center text-zinc-400 leading-6">${index + 1}</span>
+        ${raceBadgeHtml(row.race)}
+        <span class="min-w-0">
+          <span class="block truncate font-medium leading-snug text-zinc-800">${escapeHtml(row.name)} <span class="font-normal text-zinc-400">(${escapeHtml(row.team)})</span></span>
+          <span class="mt-0.5 block truncate font-mono text-[10px] text-zinc-400">${idLine}</span>
+        </span>
+      </span>
+      <div class="shrink-0 text-right">
+        <div class="text-base leading-tight">${formatRoundDeltaBadge(row.delta)}</div>
+        <div class="text-[10px] text-zinc-500 tabular-nums">${row.roundW}승 ${row.roundL}패 · ELO ${row.elo}</div>
+      </div>
+    </li>`;
+  });
+  html += '</ul></div>';
+  return html;
+}
+
+function buildLastRoundRows(meta, roster, stateByName, lastRound) {
+  const teamName = (tid) => meta.teams.find((t) => t.id === tid)?.name || tid;
+  return roster
+    .filter((p) => p.teamId)
+    .map((p) => {
+      const dn = (p.displayName || '').trim();
+      const st = stateByName.get(dn);
+      const delta = lastRoundEloDelta(st, lastRound);
+      if (delta == null) return null;
+      const wl = lastRoundWl(st, lastRound) || { w: 0, l: 0 };
+      return {
+        name: dn,
+        playerId: (p.id && String(p.id).trim()) || '',
+        team: teamName(p.teamId),
+        race: getRaceLetter(p),
+        delta,
+        elo: st?.elo ?? 1000,
+        roundW: wl.w,
+        roundL: wl.l,
+      };
+    })
+    .filter(Boolean);
+}
+
+function renderLastRoundLeaderboards(meta, roster, stateByName, roundDocs) {
+  const grid = document.getElementById('last-round-grid');
+  const caption = document.getElementById('last-round-caption');
+  if (!grid) return;
+
+  const lastRound = getMaxRoundFromDocs(roundDocs);
+  if (lastRound == null) {
+    if (caption) caption.textContent = '';
+    grid.innerHTML = '<p class="text-sm text-zinc-500 col-span-full">라운드 결과가 없습니다.</p>';
+    return;
+  }
+
+  if (caption) {
+    caption.textContent = `${lastRound}라운드 ELO 변동 기준 · 해당 라운드에 경기한 선수만`;
+  }
+
+  const rows = buildLastRoundRows(meta, roster, stateByName, lastRound);
+  if (!rows.length) {
+    grid.innerHTML = '<p class="text-sm text-zinc-500 col-span-full">해당 라운드 경기 기록이 없습니다.</p>';
+    return;
+  }
+
+  const gainers = rows
+    .filter((r) => r.delta > 0)
+    .sort((a, b) => b.delta - a.delta || b.roundW - a.roundW)
+    .slice(0, 10);
+  const losers = rows
+    .filter((r) => r.delta < 0)
+    .sort((a, b) => a.delta - b.delta || a.roundL - b.roundL)
+    .slice(0, 10);
+
+  grid.innerHTML =
+    renderLastRoundLeaderboardCard(`마지막 라운드 상승 TOP (${lastRound}R)`, gainers) +
+    renderLastRoundLeaderboardCard(`마지막 라운드 하락 TOP (${lastRound}R)`, losers);
+}
+
 function renderLeaderboardCard(title, rows, { wlHint = '' } = {}) {
   let html = `<div class="bg-white p-4 rounded-xl border border-zinc-200/80 shadow-sm">
     <h4 class="font-bold text-base mb-3 border-b border-zinc-100 pb-2 text-zinc-800">${escapeHtml(title)}</h4>
@@ -682,6 +807,7 @@ async function main() {
     const { statsByName, stateByName } = simulateSeason(fixtures, roundDocs, roster);
 
     renderLeaderboards(meta, roster, stateByName, statsByName);
+    renderLastRoundLeaderboards(meta, roster, stateByName, roundDocs);
     const mapStats = buildMapMatchupStats(fixtures, roundDocs, roster);
     renderMapTables(mapStats);
     buildCharts(meta, fixtures, roundDocs, roster, stateByName, statsByName, mapStats);

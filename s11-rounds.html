@@ -97,6 +97,94 @@
       #roundTabs .sub-tab:nth-child(10):last-child {
         grid-column: 2 / 3;
       }
+      #main { padding: 0.75rem; }
+      .round-slot-compact {
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+        padding: 0.4rem 0.45rem;
+        border-bottom: 1px solid rgba(228, 228, 231, 0.85);
+        background: #fff;
+        font-size: 10px;
+        line-height: 1.2;
+      }
+      .round-slot-compact:last-child { border-bottom: none; }
+      .round-slot-compact__meta {
+        flex-shrink: 0;
+        width: 2.75rem;
+        font-size: 8px;
+        color: #71717a;
+        text-align: center;
+        line-height: 1.15;
+      }
+      .round-slot-compact__meta .slot-num {
+        font-size: 10px;
+        font-weight: 800;
+        color: #4338ca;
+      }
+      .round-slot-compact__meta .slot-type {
+        font-size: 11px;
+        font-weight: 800;
+        line-height: 1.1;
+        margin-top: 0.1rem;
+      }
+      .tier-short--god { color: #7c3aed; }
+      .tier-short--king { color: #b45309; }
+      .tier-short--human { color: #0369a1; }
+      .tier-short--animal { color: #047857; }
+      .tier-short--amoeba { color: #57534e; }
+      .tier-short--team { color: #6d28d9; }
+      .round-slot-compact__side {
+        flex: 1 1 0;
+        min-width: 0;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 0.1rem 0.2rem;
+        padding: 0.25rem 0.3rem;
+        border-radius: 0.35rem;
+      }
+      .round-slot-compact__side--win {
+        color: #047857;
+        font-weight: 700;
+        background: rgba(209, 250, 229, 0.92);
+        border: 1px solid rgba(16, 185, 129, 0.28);
+      }
+      .round-slot-compact__side--lose {
+        color: #71717a;
+        font-weight: 500;
+        background: rgba(250, 250, 250, 0.95);
+        border: 1px solid rgba(228, 228, 231, 0.95);
+      }
+      .round-slot-compact--decided {
+        background: linear-gradient(90deg, rgba(240, 253, 244, 0.35) 0%, #fff 50%, rgba(250, 250, 250, 0.5) 100%);
+      }
+      .round-slot-compact__sep {
+        flex-shrink: 0;
+        color: #d4d4d8;
+        font-size: 8px;
+        font-weight: 800;
+        padding: 0 0.1rem;
+      }
+      .round-slot-inline-name {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.1rem;
+        white-space: nowrap;
+        max-width: 100%;
+      }
+      .round-slot-inline-name .race-pill {
+        width: 0.875rem;
+        height: 0.875rem;
+        font-size: 0.45rem;
+      }
+      .round-slot-inline-name--win { color: #047857; }
+      .round-slots-mobile-wrap {
+        border-radius: 0.65rem;
+        border: 1px solid rgba(228, 228, 231, 0.9);
+        overflow: hidden;
+      }
     }
   </style>
   <script defer src="https://cloud.umami.is/script.js" data-website-id="feb79bac-7105-44c9-a5ce-142957ac05b9"></script>
@@ -124,7 +212,8 @@
       </div>
     </header>
     <nav class="s11-site-nav mb-8 border-b border-zinc-200 pb-3" aria-label="시즌11">
-      <a href="index.html" class="s11-site-nav-link">팀 순위 및 경기 일정</a>
+      <a href="index.html" class="s11-site-nav-link">팀 순위</a>
+      <a href="s11-schedule.html" class="s11-site-nav-link">경기 일정</a>
       <a href="s11-roster.html" class="s11-site-nav-link">로스터</a>
       <span class="s11-site-nav-current">라운드 결과</span>
       <a href="s11-players.html" class="s11-site-nav-link">선수 기록</a>
@@ -430,6 +519,97 @@
       return `<div class="flex flex-wrap gap-2 ${justify}">${items}</div>`;
     }
 
+    function tierLineShort(tierLine) {
+      const t = String(tierLine || '').trim();
+      const map = { 갓: '갓', 킹: '킹', 휴먼: '휴', 애니멀: '애', 아메바: '아' };
+      return map[t] || '';
+    }
+
+    function tierShortClass(tierLine, format) {
+      const t = String(tierLine || '').trim();
+      if (t === '갓') return 'tier-short--god';
+      if (t === '킹') return 'tier-short--king';
+      if (t === '휴먼') return 'tier-short--human';
+      if (t === '애니멀') return 'tier-short--animal';
+      if (t === '아메바') return 'tier-short--amoeba';
+      if (format === '2v2' || format === '3v3') return 'tier-short--team';
+      return '';
+    }
+
+    /** 슬롯 유형 라벨: 1v1 → 티어 약어(애·휴·킹·갓·아), 팀전 → 2:2 / 3:3 */
+    function formatSlotTypeLabel(plan) {
+      if (!plan) return '—';
+      if (plan.format === '2v2') return '2:2';
+      if (plan.format === '3v3') return '3:3';
+      const short = tierLineShort(plan.tierLine);
+      if (short) return short;
+      if (plan.format === '1v1') return '1v1';
+      return plan.format || '—';
+    }
+
+    function formatSlotTypeBadge(plan) {
+      if (!plan) return '';
+      const label = formatSlotTypeLabel(plan);
+      const cls = tierShortClass(plan.tierLine, plan.format);
+      if (plan.format === '2v2') {
+        return '<span class="inline-flex rounded-full bg-fuchsia-50 text-fuchsia-800 px-2 py-0.5 text-[10px] font-semibold leading-none ring-1 ring-inset ring-fuchsia-200/50">2:2</span>';
+      }
+      if (plan.format === '3v3') {
+        return '<span class="inline-flex rounded-full bg-violet-50 text-violet-800 px-2 py-0.5 text-[10px] font-semibold leading-none ring-1 ring-inset ring-violet-200/50">3:3</span>';
+      }
+      const tone = cls || 'tier-short--human';
+      return `<span class="inline-flex rounded-full bg-sky-50/90 text-sky-900 px-1.5 py-0.5 text-[10px] font-bold leading-none ring-1 ring-inset ring-sky-200/50 slot-type-badge ${tone}">${escapeHtml(label)}</span>`;
+    }
+
+    function formatSlotTypeMetaHtml(plan) {
+      const label = formatSlotTypeLabel(plan);
+      const cls = tierShortClass(plan.tierLine, plan.format) || 'tier-short--team';
+      return `<div class="slot-type ${cls}">${escapeHtml(label)}</div>`;
+    }
+
+    function slotPlayerInline(row, rosterMap, isWinner) {
+      const dn = (row.displayName || '').trim();
+      if (!dn) return '';
+      const letter = resolvedRaceLetter(row, rosterMap);
+      const winCls = isWinner ? 'round-slot-inline-name--win' : '';
+      return `<span class="round-slot-inline-name ${winCls}">${racePill(letter)}<span class="truncate max-w-[4.5rem]">${escapeHtml(dn)}</span></span>`;
+    }
+
+    function formatRosterInlineSide(rows, rosterMap, winnerTeamIndex, side) {
+      const list = (rows || []).filter((r) => (r.displayName || '').trim());
+      const isWin =
+        winnerTeamIndex === 1 ? side === 'a' : winnerTeamIndex === 2 ? side === 'b' : false;
+      const sideCls =
+        winnerTeamIndex == null
+          ? ''
+          : isWin
+            ? 'round-slot-compact__side--win'
+            : 'round-slot-compact__side--lose';
+      if (!list.length) {
+        return `<div class="round-slot-compact__side ${sideCls}"><span class="text-zinc-300">—</span></div>`;
+      }
+      const items = list
+        .map((r) => slotPlayerInline(r, rosterMap, isWin))
+        .join('<span class="text-zinc-200">·</span>');
+      return `<div class="round-slot-compact__side ${sideCls}">${items}</div>`;
+    }
+
+    function slotRowMobileCompact(plan, sl, rosterMap) {
+      if (!plan) return '';
+      const w = sl && sl.winnerTeamIndex;
+      const slotNum = plan.slot != null ? plan.slot : '—';
+      const mapLabel = plan.map ? escapeHtml(plan.map) : '';
+      const decidedCls = w === 1 || w === 2 ? ' round-slot-compact--decided' : '';
+      const meta = `<div class="round-slot-compact__meta">
+        <div class="slot-num">#${slotNum}</div>
+        ${formatSlotTypeMetaHtml(plan)}
+        ${mapLabel ? `<div class="truncate max-w-full" title="${mapLabel}">${mapLabel.length > 5 ? mapLabel.slice(0, 5) + '…' : mapLabel}</div>` : ''}
+      </div>`;
+      const sideA = formatRosterInlineSide(sl?.teamA, rosterMap, w, 'a');
+      const sideB = formatRosterInlineSide(sl?.teamB, rosterMap, w, 'b');
+      return `<div class="round-slot-compact${decidedCls}">${meta}${sideA}<span class="round-slot-compact__sep">vs</span>${sideB}</div>`;
+    }
+
     function formatChip(format) {
       if (format === '1v1') return '<span class="inline-flex rounded-full bg-sky-100/90 text-sky-800 px-2 py-0.5 text-[10px] font-semibold leading-none ring-1 ring-inset ring-sky-200/60">개인전</span>';
       if (format === '2v2') return '<span class="inline-flex rounded-full bg-fuchsia-50 text-fuchsia-800 px-2 py-0.5 text-[10px] font-semibold leading-none ring-1 ring-inset ring-fuchsia-200/50">2:2</span>';
@@ -474,13 +654,10 @@
         playIndex != null
           ? `<span class="text-zinc-300">·</span><span class="text-indigo-600/85 font-bold tabular-nums">${playIndex}번째</span>`
           : '';
-      const tierPart = plan.tierLine
-        ? `<span class="text-zinc-300">·</span><span class="text-zinc-500 font-normal">${escapeHtml(plan.tierLine)}</span>`
-        : '';
       const top = `<div class="flex flex-wrap items-center justify-center gap-x-1 text-[10px] text-zinc-500 leading-none">
         <span class="font-bold text-indigo-600/90 tabular-nums">#${slotNum}</span>
         <span class="text-zinc-200 select-none">|</span>
-        ${formatChip(plan.format)}${tierPart}${playBadge}
+        ${formatSlotTypeBadge(plan)}${playBadge}
       </div>`;
       const mapName = plan.map ? escapeHtml(plan.map) : '—';
       const mapEl = `<div class="mt-1 text-[11px] font-semibold text-zinc-700 leading-snug tracking-tight">${mapName}</div>`;
@@ -562,6 +739,7 @@
       const order = slotDisplayOrder(resMu, planBySlot);
       const orderedPlans = order.map((slot) => planBySlot.get(slot)).filter(Boolean);
       const slotRows = [];
+      const slotRowsMobile = [];
       for (let pi = 0; pi < orderedPlans.length; pi++) {
         const plan = orderedPlans[pi];
         const sl = resMu && slotsRes.find((x) => x.slot === plan.slot);
@@ -570,19 +748,16 @@
         const t1Win = w === 1 ? 'bg-emerald-50/90 sm:border-r-[4px] sm:border-r-emerald-500' : 'bg-zinc-50/40';
         const t2Win = w === 2 ? 'bg-emerald-50/90 sm:border-l-[4px] sm:border-l-emerald-500' : 'bg-zinc-50/40';
         const centerHtml = slotCenterBlock(plan, w, nameA, nameB, playIndex);
+        slotRowsMobile.push(slotRowMobileCompact(plan, sl, rosterMap));
         slotRows.push(`
-          <div class="flex flex-col sm:grid sm:grid-cols-12 gap-0 items-stretch rounded-xl border border-zinc-200/50 bg-white shadow-sm overflow-hidden ring-1 ring-zinc-900/[0.03]">
+          <div class="hidden sm:grid sm:grid-cols-12 gap-0 items-stretch rounded-xl border border-zinc-200/50 bg-white shadow-sm overflow-hidden ring-1 ring-zinc-900/[0.03]">
             <div class="order-1 sm:order-2 sm:col-span-2 px-2 py-2.5 flex flex-col items-center justify-center bg-zinc-50/90 border-b sm:border-b-0 sm:border-x border-zinc-100/90 text-center min-w-0">
               ${centerHtml}
             </div>
             <div class="order-2 sm:order-1 sm:col-span-5 px-3 py-2.5 text-center sm:text-right ${t1Win} border-b sm:border-b-0 sm:border-r border-zinc-100">
-              <div class="sm:hidden text-[10px] font-bold text-indigo-800/85 mb-1.5 truncate">${escapeHtml(nameA)}</div>
-              <div class="w-full sm:hidden">${formatRoster(sl ? sl.teamA : null, rosterMap, 'center')}</div>
               <div class="hidden sm:block w-full">${formatRoster(sl ? sl.teamA : null, rosterMap, 'end')}</div>
             </div>
             <div class="order-3 sm:order-3 sm:col-span-5 px-3 py-2.5 text-center sm:text-left ${t2Win}">
-              <div class="sm:hidden text-[10px] font-bold text-indigo-800/85 mb-1.5 truncate">${escapeHtml(nameB)}</div>
-              <div class="w-full sm:hidden">${formatRoster(sl ? sl.teamB : null, rosterMap, 'center')}</div>
               <div class="hidden sm:block w-full">${formatRoster(sl ? sl.teamB : null, rosterMap, 'start')}</div>
             </div>
           </div>`);
@@ -590,15 +765,15 @@
 
       return `
         <article class="rounded-2xl border border-zinc-200/60 bg-white shadow-sm shadow-zinc-900/5 overflow-hidden mb-4 ring-1 ring-zinc-900/[0.04]" title="${escapeHtml(fixMu.id)}">
-          <div class="px-4 py-3 sm:px-5 sm:py-4 bg-gradient-to-b from-zinc-50/80 to-white border-b border-zinc-100/90">
+          <div class="px-3 py-2.5 sm:px-5 sm:py-4 bg-gradient-to-b from-zinc-50/80 to-white border-b border-zinc-100/90">
             <div class="sm:hidden">
-              <div class="flex flex-col items-center mb-3">
-                <div class="text-2xl font-black tabular-nums leading-none tracking-tight text-zinc-900">
+              <div class="flex flex-col items-center mb-2">
+                <div class="text-xl font-black tabular-nums leading-none tracking-tight text-zinc-900">
                   <span class="${scoreAcls}">${escapeHtml(scoreA)}</span><span class="text-zinc-300 mx-0.5 font-light">:</span><span class="${scoreBcls}">${escapeHtml(scoreB)}</span>
                 </div>
-                <div class="text-[10px] text-zinc-400 mt-1.5 font-medium tracking-wide">세트</div>
+                <div class="text-[9px] text-zinc-400 mt-1 font-medium tracking-wide">세트</div>
               </div>
-              <div class="grid grid-cols-2 gap-3">
+              <div class="grid grid-cols-2 gap-2">
                 <div class="min-w-0">${teamAMobileHtml}</div>
                 <div class="min-w-0">${teamBMobileHtml}</div>
               </div>
@@ -619,8 +794,11 @@
             </div>
           </div>
           ${mvpHtml}
-          ${showMetaRow ? `<div class="px-4 py-1.5 border-b border-zinc-100 bg-amber-50/40 text-right text-xs flex flex-wrap justify-end gap-x-3 gap-y-1">${playOrderNote}${seriesNote}</div>` : ''}
-          <div class="p-2.5 space-y-2">${slotRows.join('')}</div>
+          ${showMetaRow ? `<div class="px-3 py-1 border-b border-zinc-100 bg-amber-50/40 text-right text-[10px] flex flex-wrap justify-end gap-x-2 gap-y-0.5">${playOrderNote}${seriesNote}</div>` : ''}
+          <div class="p-1.5 sm:p-2.5 space-y-2">
+            <div class="round-slots-mobile-wrap sm:hidden">${slotRowsMobile.join('')}</div>
+            <div class="hidden sm:block space-y-2">${slotRows.join('')}</div>
+          </div>
         </article>`;
     }
 

@@ -1,6 +1,6 @@
 /** 시즌11 라운드 결과 — fixture ID 기반 병렬 로드 + manifest + sessionStorage 캐시 */
 
-export const RESULTS_CACHE_VERSION = 2;
+export const RESULTS_CACHE_VERSION = 3;
 
 const MANIFEST_URL = 'data/s11/results/manifest.json';
 
@@ -73,13 +73,17 @@ export function buildRoundDocsFromMatchups(fixtures, matchupsByFixtureId) {
   return docs.sort((a, b) => (a.round || 0) - (b.round || 0));
 }
 
-function cacheKey(minRound, maxRound) {
-  return `s11-round-docs:v${RESULTS_CACHE_VERSION}:${minRound}-${maxRound}`;
+function cacheKey(minRound, maxRound, manifest) {
+  const stamp =
+    manifest?.generatedAt ||
+    (Array.isArray(manifest?.matchResults) ? manifest.matchResults.join(',') : '') ||
+    'none';
+  return `s11-round-docs:v${RESULTS_CACHE_VERSION}:${minRound}-${maxRound}:${stamp}`;
 }
 
-function readCache(minRound, maxRound) {
+function readCache(minRound, maxRound, manifest) {
   try {
-    const raw = sessionStorage.getItem(cacheKey(minRound, maxRound));
+    const raw = sessionStorage.getItem(cacheKey(minRound, maxRound, manifest));
     if (!raw) return null;
     const parsed = JSON.parse(raw);
     return Array.isArray(parsed) ? parsed : null;
@@ -88,9 +92,9 @@ function readCache(minRound, maxRound) {
   }
 }
 
-function writeCache(minRound, maxRound, docs) {
+function writeCache(minRound, maxRound, docs, manifest) {
   try {
-    sessionStorage.setItem(cacheKey(minRound, maxRound), JSON.stringify(docs));
+    sessionStorage.setItem(cacheKey(minRound, maxRound, manifest), JSON.stringify(docs));
   } catch {
     /* quota exceeded */
   }
@@ -118,17 +122,21 @@ async function fetchMatchupsForFixtureIds(fixtureIds) {
 export async function loadRoundDocsForRange(fixtures, maxRound, minRound = 1, { useCache = true } = {}) {
   const start = Math.max(1, minRound | 0);
   const end = Math.max(start, maxRound | 0);
+  const manifest = await loadResultsManifest();
   if (useCache) {
-    const cached = readCache(start, end);
+    const cached = readCache(start, end, manifest);
     if (cached) return cached;
   }
-  const manifest = await loadResultsManifest();
   const fixtureIds = fixtureIdsForRoundRange(fixtures, start, end, manifest);
   const matchupsByFixtureId = await fetchMatchupsForFixtureIds(fixtureIds);
+  const missing = fixtureIds.filter((fid) => !matchupsByFixtureId.has(fid));
+  if (missing.length) {
+    console.warn('[s11] 결과 JSON 미로드 (manifest에는 있으나 fetch 실패):', missing);
+  }
   const docs = buildRoundDocsFromMatchups(fixtures, matchupsByFixtureId).filter(
     (d) => d.round >= start && d.round <= end,
   );
-  if (useCache && docs.length) writeCache(start, end, docs);
+  if (useCache && docs.length && !missing.length) writeCache(start, end, docs, manifest);
   return docs;
 }
 

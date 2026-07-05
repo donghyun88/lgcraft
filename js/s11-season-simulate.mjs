@@ -1,6 +1,7 @@
 /** 시즌11 ELO·세트 집계 (선수 페이지와 동기) */
 
-export const K_VALUES = { 개인전: 32, '22': 24, '33': 16 };
+/** 시즌11: 경기 수 대비 변동폭 — 기본(32/24/16)의 2배 */
+export const K_VALUES = { 개인전: 64, '22': 48, '33': 32 };
 
 export function emptyStats() {
   return {
@@ -231,7 +232,7 @@ export function simulateSeason(fixtures, roundDocs, rosterPlayers) {
         bumpSide(namesA, team1Won);
         bumpSide(namesB, !team1Won);
 
-        const record = (nm, eloBefore, delta, won, opponents, opponentRaces) => {
+        const record = (nm, eloBefore, delta, won, opponents, opponentRaces, oppElo = {}) => {
           const st = ensure(nm);
           if (!st) return;
           const eloAfter = eloBefore + delta;
@@ -241,6 +242,13 @@ export function simulateSeason(fixtures, roundDocs, rosterPlayers) {
             Array.isArray(opponentRaces) && opponentRaces.length === opps.length
               ? opponentRaces
               : opps.map(() => '');
+          const opponentElos = Array.isArray(oppElo.opponentElos) ? oppElo.opponentElos.map((e) => Math.round(e)) : [];
+          let oppEloAvg = oppElo.oppEloAvg;
+          if (oppEloAvg == null && opponentElos.length) {
+            oppEloAvg = Math.round(opponentElos.reduce((s, e) => s + e, 0) / opponentElos.length);
+          } else if (oppEloAvg != null) {
+            oppEloAvg = Math.round(oppEloAvg);
+          }
           st.history.push({
             seq: ++globalSeq,
             round: rnum,
@@ -255,6 +263,8 @@ export function simulateSeason(fixtures, roundDocs, rosterPlayers) {
             eloAfter,
             opponents: opps,
             opponentRaces: races,
+            opponentElos,
+            oppEloAvg: oppEloAvg ?? null,
             teamIds: [tA, tB],
           });
         };
@@ -278,8 +288,8 @@ export function simulateSeason(fixtures, roundDocs, rosterPlayers) {
           const roppFor2 = oppRaceZtp(sl.teamA[0], rosterMap, n1);
           bumpVsOppRace(s1.vsOppRace, roppFor1, team1Won);
           bumpVsOppRace(s2.vsOppRace, roppFor2, !team1Won);
-          record(n1, e1, d1, team1Won, [n2], [roppFor1 || '']);
-          record(n2, e2, d2, !team1Won, [n1], [roppFor2 || '']);
+          record(n1, e1, d1, team1Won, [n2], [roppFor1 || ''], { opponentElos: [e2], oppEloAvg: e2 });
+          record(n2, e2, d2, !team1Won, [n1], [roppFor2 || ''], { opponentElos: [e1], oppEloAvg: e1 });
         } else if ((format === '2v2' || format === '3v3') && namesA.length && namesB.length) {
           const snapA = namesA.map((nm) => ({ nm, eloBefore: ensure(nm).elo, eloTeamBefore: ensure(nm).eloTeam }));
           const snapB = namesB.map((nm) => ({ nm, eloBefore: ensure(nm).elo, eloTeamBefore: ensure(nm).eloTeam }));
@@ -292,12 +302,18 @@ export function simulateSeason(fixtures, roundDocs, rosterPlayers) {
           const { d1, d2 } = updateEloPair(aAvg, bAvg, team1Won ? 1 : 0, k);
           const { d1: d1team, d2: d2team } = updateEloPair(aTeamAvg, bTeamAvg, team1Won ? 1 : 0, k);
           for (const { nm, eloBefore, eloTeamBefore } of snapA) {
-            record(nm, eloBefore, d1, team1Won, namesB, racesB);
+            record(nm, eloBefore, d1, team1Won, namesB, racesB, {
+              opponentElos: snapB.map((x) => x.eloBefore),
+              oppEloAvg: bAvg,
+            });
             ensure(nm).eloTeam = eloTeamBefore + d1team;
             bumpTeamMap(ensure(nm).teamMapStats, format, mapName, team1Won);
           }
           for (const { nm, eloBefore, eloTeamBefore } of snapB) {
-            record(nm, eloBefore, d2, !team1Won, namesA, racesA);
+            record(nm, eloBefore, d2, !team1Won, namesA, racesA, {
+              opponentElos: snapA.map((x) => x.eloBefore),
+              oppEloAvg: aAvg,
+            });
             ensure(nm).eloTeam = eloTeamBefore + d2team;
             bumpTeamMap(ensure(nm).teamMapStats, format, mapName, !team1Won);
           }

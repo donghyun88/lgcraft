@@ -123,6 +123,123 @@
       color: #a1a1aa;
     }
     .player-elo-ring--primary .player-elo-ring__label { color: #6366f1; }
+    .elo-match-pills {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      flex-wrap: wrap;
+    }
+    .elo-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 0.4rem;
+      font-size: 11px;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+      line-height: 1.15;
+      border: 1px solid;
+      white-space: nowrap;
+    }
+    .elo-pill-tag {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      opacity: 0.9;
+    }
+    .elo-pill-mark {
+      font-size: 9px;
+      font-weight: 900;
+      line-height: 1;
+    }
+    .elo-pill--me.elo-pill--up {
+      background: linear-gradient(165deg, #eef2ff, #e0e7ff);
+      border-color: #a5b4fc;
+      color: #3730a3;
+    }
+    .elo-pill--me.elo-pill--up .elo-pill-mark { color: #4f46e5; }
+    .elo-pill--me.elo-pill--down {
+      background: #fafafa;
+      border-color: #e4e4e7;
+      color: #71717a;
+    }
+    .elo-pill--opp.elo-pill--up {
+      background: linear-gradient(165deg, #fffbeb, #fef3c7);
+      border-color: #fcd34d;
+      color: #92400e;
+    }
+    .elo-pill--opp.elo-pill--up .elo-pill-mark { color: #d97706; }
+    .elo-pill--opp.elo-pill--down {
+      background: #fafafa;
+      border-color: #e4e4e7;
+      color: #71717a;
+    }
+    .elo-pill-gap {
+      font-size: 9px;
+      font-weight: 800;
+      color: #d4d4d8;
+      flex-shrink: 0;
+    }
+    .player-elo-delta {
+      font-size: 0.72em;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.02em;
+    }
+    .player-elo-delta--up { color: #059669 !important; }
+    .player-elo-delta--down { color: #dc2626 !important; }
+    .player-elo-delta--flat { color: #a1a1aa !important; font-weight: 600; }
+    @media (max-width: 767px) {
+      #s11-page-header { padding-top: 1rem !important; }
+      #s11-page-header .s11-site-nav { margin-bottom: 1rem; }
+      .player-card {
+        padding: 0.5rem 0.625rem !important;
+        border-radius: 0.65rem !important;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05) !important;
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+      }
+      .player-card:active { background: rgba(238, 242, 255, 0.65); }
+      .player-card-elo-row {
+        display: flex;
+        align-items: baseline;
+        justify-content: flex-end;
+        gap: 0.15rem;
+        flex-wrap: wrap;
+        line-height: 1.1;
+      }
+      .player-card-elo-num {
+        font-size: 1.125rem;
+        font-weight: 800;
+        font-variant-numeric: tabular-nums;
+        color: #4338ca;
+      }
+      .player-card-record {
+        font-size: 11px;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+        color: #27272a;
+        margin-top: 0.2rem;
+        line-height: 1.2;
+      }
+      .player-card-record-pct {
+        color: #71717a;
+        font-weight: 600;
+      }
+      .player-elo-ring__circle {
+        width: 3.25rem !important;
+        height: 3.25rem !important;
+        border-width: 2px;
+      }
+      .player-elo-ring__score { font-size: 0.9rem !important; }
+      .player-elo-ring--primary .player-elo-ring__score { font-size: 0.95rem !important; }
+      .player-elo-rings { gap: 0.5rem !important; margin-top: 0.65rem !important; }
+      .player-elo-ring { min-width: 3.5rem !important; }
+      .set-history-row:last-child { border-bottom: none; }
+      .player-detail-profile-grid { gap: 0.65rem !important; }
+      #main-stack { padding-left: 0.5rem !important; padding-right: 0.5rem !important; padding-bottom: 2rem !important; }
+    }
   </style>
   <script defer src="https://cloud.umami.is/script.js" data-website-id="feb79bac-7105-44c9-a5ce-142957ac05b9"></script>
 </head>
@@ -149,7 +266,8 @@
       </div>
     </header>
     <nav class="s11-site-nav mb-8 border-b border-zinc-200 pb-3" aria-label="시즌11">
-      <a href="index.html" class="s11-site-nav-link">팀 순위 및 경기 일정</a>
+      <a href="index.html" class="s11-site-nav-link">팀 순위</a>
+      <a href="s11-schedule.html" class="s11-site-nav-link">경기 일정</a>
       <a href="s11-roster.html" class="s11-site-nav-link">로스터</a>
       <a href="s11-rounds.html" class="s11-site-nav-link">라운드 결과</a>
       <span class="s11-site-nav-current">선수 기록</span>
@@ -265,6 +383,45 @@
         .join('<span class="text-zinc-300 mx-0.5">·</span>');
     }
 
+    function opponentEloForHistory(h) {
+      if (h?.oppEloAvg != null) return h.oppEloAvg;
+      const arr = h?.opponentElos;
+      if (Array.isArray(arr) && arr.length) {
+        return Math.round(arr.reduce((s, e) => s + e, 0) / arr.length);
+      }
+      return null;
+    }
+
+    /** 세트 직전 내 ELO vs 상대 ELO — pill UI, ▲ = 당시 상위 */
+    function formatSetEloMatchupHtml(h) {
+      const mine = h?.eloBefore != null ? Math.round(h.eloBefore) : null;
+      const theirs = opponentEloForHistory(h);
+      if (mine == null && theirs == null) return '';
+      const isTeam = h.format === '2v2' || h.format === '3v3';
+      const tip = isTeam
+        ? '세트 직전 ELO · 상대는 팀 평균 · ▲ = 당시 ELO 상위'
+        : '세트 직전 ELO · ▲ = 당시 ELO 상위';
+
+      if (theirs == null) {
+        return `<div class="elo-match-pills" title="${tip}"><span class="elo-pill elo-pill--me elo-pill--up"><span class="elo-pill-tag">나</span><span>${mine}</span></span></div>`;
+      }
+      if (mine == null) {
+        return `<div class="elo-match-pills" title="${tip}"><span class="elo-pill elo-pill--opp elo-pill--up"><span class="elo-pill-tag">${isTeam ? '상대~' : '상대'}</span><span>${theirs}</span></span></div>`;
+      }
+
+      const tied = mine === theirs;
+      const iHigher = !tied && mine > theirs;
+      const oppHigher = !tied && theirs > mine;
+      const meTier = tied || iHigher ? 'up' : 'down';
+      const oppTier = tied || oppHigher ? 'up' : 'down';
+
+      return `<div class="elo-match-pills" title="${tip}">
+        <span class="elo-pill elo-pill--me elo-pill--${meTier}"><span class="elo-pill-tag">나</span><span>${mine}</span>${iHigher ? '<span class="elo-pill-mark">▲</span>' : ''}</span>
+        <span class="elo-pill-gap">vs</span>
+        <span class="elo-pill elo-pill--opp elo-pill--${oppTier}"><span class="elo-pill-tag">${isTeam ? '상대~' : '상대'}</span><span>${theirs}</span>${oppHigher ? '<span class="elo-pill-mark">▲</span>' : ''}</span>
+      </div>`;
+    }
+
     function getRaceIcon(race) {
       if (!race) return '';
       const c = race.charAt(0);
@@ -273,6 +430,37 @@
 
     function wlCell(s) {
       return `${s.w}승 ${s.l}패`;
+    }
+
+    /** 최근(최대) 라운드 ELO 변동 합계 */
+    function lastRoundEloDelta(state) {
+      const history = state?.history || [];
+      if (!history.length) return null;
+      const rounds = history.map((h) => h.round).filter((r) => r != null);
+      if (!rounds.length) return null;
+      const lastRound = Math.max(...rounds);
+      const sets = history.filter((h) => h.round === lastRound);
+      if (!sets.length) return null;
+      const delta = sets.reduce((sum, h) => sum + (h.delta || 0), 0);
+      return delta === 0 ? 0 : delta;
+    }
+
+    function formatDeltaInParens(delta, title) {
+      if (delta == null || delta === 0) {
+        return `<span class="player-elo-delta player-elo-delta--flat" title="${title}"> (-)</span>`;
+      }
+      if (delta > 0) {
+        return `<span class="player-elo-delta player-elo-delta--up" title="${title}"> (▲${delta})</span>`;
+      }
+      return `<span class="player-elo-delta player-elo-delta--down" title="${title}"> (▼${Math.abs(delta)})</span>`;
+    }
+
+    function formatLastRoundDeltaBadge(delta) {
+      return formatDeltaInParens(delta, '최근 라운드 ELO');
+    }
+
+    function formatRankDeltaBadge(rankDelta) {
+      return formatDeltaInParens(rankDelta, '이전 라운드 대비 순위');
     }
 
     function assignEloRanks(sorted) {
@@ -286,6 +474,43 @@
         }
         return { ...p, rank };
       });
+    }
+
+    function buildEloRankByName(fixtures, roundDocs, players) {
+      const roster = (players || []).filter((p) => p.teamId);
+      const { statsByName, stateByName } = simulateSeason(fixtures, roundDocs, players);
+      const rows = roster.map((p) => {
+        const dn = (p.displayName || '').trim();
+        const stats = statsByName[dn] || emptyStats();
+        const elo = stateByName.get(dn)?.elo ?? 1000;
+        return { dn, elo, stats };
+      });
+      rows.sort((a, b) => {
+        if (b.elo !== a.elo) return b.elo - a.elo;
+        const tw = (b.stats.total.w || 0) - (a.stats.total.w || 0);
+        if (tw !== 0) return tw;
+        return (a.dn || '').localeCompare(b.dn || '', 'ko');
+      });
+      const ranked = assignEloRanks(rows);
+      const map = new Map();
+      for (const p of ranked) map.set(p.dn, p.rank);
+      return map;
+    }
+
+    function buildPrevRoundRankDeltaByName(fixtures, roundDocs, players, currentRankByName) {
+      const rounds = (roundDocs || []).map((d) => d.round).filter((r) => r != null);
+      if (!rounds.length) return new Map();
+      const maxR = Math.max(...rounds);
+      if (maxR <= 1) return new Map();
+      const prevDocs = roundDocs.filter((d) => d.round != null && d.round < maxR);
+      const prevRankMap = buildEloRankByName(fixtures, prevDocs, players);
+      const deltaMap = new Map();
+      for (const [dn, currentRank] of currentRankByName) {
+        const prevRank = prevRankMap.get(dn);
+        if (prevRank == null) continue;
+        deltaMap.set(dn, prevRank - currentRank);
+      }
+      return deltaMap;
     }
 
     function renderPlayersPage(meta, players, statsByName, stateByName) {
@@ -303,6 +528,8 @@
         return (a.displayName || '').localeCompare(b.displayName || '', 'ko');
       });
       const ranked = assignEloRanks(rows);
+      const currentRankByName = new Map(ranked.map((p) => [(p.displayName || '').trim(), p.rank]));
+      const prevRankDeltaMap = buildPrevRoundRankDeltaByName(lastFixtures, lastRoundDocs, players, currentRankByName);
 
       const teamOptions = meta.teams.map((t) => `<option value="${escapeHtml(t.name)}">${escapeHtml(t.name)}</option>`).join('');
       const uniqueRaces = [...new Set(roster.map(getRaceLetter).filter(Boolean))].sort();
@@ -311,17 +538,19 @@
       const tierOptions = uniqueTiers.map((t) => `<option value="${escapeHtml(t)}">${escapeHtml(t)}</option>`).join('');
 
       const mobileFilters = `
-        <div class="md:hidden rounded-xl border border-zinc-200 bg-white shadow-sm p-4 mb-4 flex flex-col gap-2">
-          <input type="text" id="player-name-filter-mobile" placeholder="이름 또는 ID 검색…" class="w-full rounded-xl border border-zinc-200 px-3 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
-          <select id="player-team-filter-mobile" class="w-full rounded-xl border border-zinc-200 px-3 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500">
-            <option value="all">모든 팀</option>${teamOptions}
+        <div class="md:hidden rounded-lg border border-zinc-200 bg-white shadow-sm p-2.5 mb-2 flex flex-col gap-1.5">
+          <input type="text" id="player-name-filter-mobile" placeholder="이름 또는 ID 검색…" class="w-full rounded-lg border border-zinc-200 px-2.5 py-2 text-xs focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+          <div class="grid grid-cols-3 gap-1.5">
+          <select id="player-team-filter-mobile" class="w-full rounded-lg border border-zinc-200 px-2 py-1.5 text-xs focus:ring-2 focus:ring-indigo-500">
+            <option value="all">팀</option>${teamOptions}
           </select>
-          <select id="player-race-filter-mobile" class="w-full rounded-xl border border-zinc-200 px-3 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500">
-            <option value="all">모든 종족</option>${raceOptions}
+          <select id="player-race-filter-mobile" class="w-full rounded-lg border border-zinc-200 px-2 py-1.5 text-xs focus:ring-2 focus:ring-indigo-500">
+            <option value="all">종족</option>${raceOptions}
           </select>
-          <select id="player-tier-filter-mobile" class="w-full rounded-xl border border-zinc-200 px-3 py-2.5 text-sm focus:ring-2 focus:ring-indigo-500">
-            <option value="all">모든 티어</option>${tierOptions}
+          <select id="player-tier-filter-mobile" class="w-full rounded-lg border border-zinc-200 px-2 py-1.5 text-xs focus:ring-2 focus:ring-indigo-500">
+            <option value="all">티어</option>${tierOptions}
           </select>
+          </div>
         </div>`;
 
       let html = mobileFilters;
@@ -369,12 +598,15 @@
         const tname = teamName(meta, p.teamId);
         const pid = (p.id || '').toLowerCase();
         const pname = (p.displayName || '').toLowerCase();
+        const dn = (p.displayName || '').trim();
+        const lastDelta = lastRoundEloDelta(stateByName.get(dn));
+        const rankDelta = prevRankDeltaMap.get(dn);
         const pidEnc = p.id ? encodeURIComponent(p.id) : '';
         const hrefPlayer = pidEnc ? ` href="?player=${pidEnc}"` : ' href="#"';
         const vsChip = renderRaceVsOpponentChips(p, { compact: true });
         html += `
           <tr class="player-row transition hover:bg-indigo-50/40" data-name="${escapeHtml(pname)}" data-id="${escapeHtml(pid)}" data-team="${escapeHtml(tname)}" data-race="${escapeHtml(race)}" data-tier="${escapeHtml(p.tier || '')}">
-            <td class="px-4 py-3 align-top whitespace-nowrap text-sm font-semibold text-zinc-500 tabular-nums">${p.rank}</td>
+            <td class="px-4 py-3 align-top whitespace-nowrap text-sm font-semibold text-zinc-500 tabular-nums">${p.rank}${formatRankDeltaBadge(rankDelta)}</td>
             <td class="px-4 py-3 align-top whitespace-nowrap text-sm font-semibold text-zinc-900">
               <a${hrefPlayer} class="player-link text-indigo-600 hover:text-indigo-800 hover:underline" data-player-id="${escapeHtml(p.id || '')}">${escapeHtml(p.displayName || '')}<span class="text-zinc-400 font-normal"> · ${escapeHtml(p.id || '—')}</span></a>
             </td>
@@ -384,7 +616,7 @@
               ${vsChip ? `<div class="mt-1">${vsChip}</div>` : ''}
             </td>
             <td class="px-4 py-3 align-top whitespace-nowrap text-sm text-zinc-600">${escapeHtml(p.tier || '—')}</td>
-            <td class="px-4 py-3 align-top whitespace-nowrap text-sm font-bold tabular-nums text-indigo-700">${p.elo}</td>
+            <td class="px-4 py-3 align-top whitespace-nowrap text-sm font-bold tabular-nums text-indigo-700">${p.elo}${formatLastRoundDeltaBadge(lastDelta)}</td>
             <td class="px-4 py-3 align-top whitespace-nowrap text-sm text-zinc-600">${wlCell(st.total)}</td>
             <td class="px-4 py-3 align-top whitespace-nowrap text-sm text-zinc-600">${wlCell(st.개인전)}</td>
             <td class="px-4 py-3 align-top whitespace-nowrap text-sm text-zinc-600">${wlCell(st.팀전)}</td>
@@ -392,39 +624,41 @@
       }
       html += `</tbody></table></div>`;
 
-      html += `<div class="md:hidden space-y-3 p-3">`;
+      html += `<div class="md:hidden space-y-1.5 p-1.5 pb-3">`;
       for (const p of ranked) {
         const st = p.stats;
         const race = getRaceLetter(p);
         const tname = teamName(meta, p.teamId);
-        const totalWinRate = st.total.w + st.total.l > 0 ? Math.round((st.total.w / (st.total.w + st.total.l)) * 100) : 0;
+        const totalG = st.total.w + st.total.l;
+        const totalWinRate = totalG > 0 ? Math.round((st.total.w / totalG) * 100) : 0;
         const pid = (p.id || '').toLowerCase();
-        const pname = (p.displayName || '').toLowerCase();
-        const pidEncM = p.id ? encodeURIComponent(p.id) : '';
-        const hrefPlayerM = pidEncM ? ` href="?player=${pidEncM}"` : ' href="#"';
-        const vsChipM = renderRaceVsOpponentChips(p, { compact: true });
+        const pname = (p.displayName || '').trim().toLowerCase();
+        const dn = (p.displayName || '').trim();
+        const lastDelta = lastRoundEloDelta(stateByName.get(dn));
+        const rankDelta = prevRankDeltaMap.get(dn);
         html += `
-          <div class="player-card rounded-2xl border border-zinc-200/80 bg-white p-4 shadow-md" data-name="${escapeHtml(pname)}" data-id="${escapeHtml(pid)}" data-team="${escapeHtml(tname)}" data-race="${escapeHtml(race)}" data-tier="${escapeHtml(p.tier || '')}">
-            <div class="flex justify-between items-start gap-3">
+          <div class="player-card rounded-lg border border-zinc-200/90 bg-white p-2 shadow-sm" role="button" tabindex="0"
+            data-player-id="${escapeHtml(p.id || '')}"
+            data-name="${escapeHtml(pname)}" data-id="${escapeHtml(pid)}" data-team="${escapeHtml(tname)}" data-race="${escapeHtml(race)}" data-tier="${escapeHtml(p.tier || '')}">
+            <div class="flex items-center gap-2">
+              <span class="text-[10px] font-bold text-zinc-400 tabular-nums w-5 shrink-0 text-center">${p.rank}${formatRankDeltaBadge(rankDelta)}</span>
               <div class="min-w-0 flex-1">
-                <div class="flex items-baseline gap-2 flex-wrap">
-                  <span class="text-xs font-bold text-zinc-400 tabular-nums w-6">${p.rank}</span>
-                  <a${hrefPlayerM} class="player-link font-bold text-zinc-900 text-lg hover:text-indigo-600" data-player-id="${escapeHtml(p.id || '')}">${escapeHtml(p.displayName || '')}</a>
-                  <span class="text-xs text-zinc-500 font-mono">${escapeHtml(p.id || '')}</span>
+                <div class="flex items-baseline gap-1.5 min-w-0">
+                  <span class="player-link font-bold text-zinc-900 text-sm truncate">${escapeHtml(p.displayName || '')}</span>
+                  <span class="text-[9px] text-zinc-400 font-mono shrink-0">${escapeHtml(p.id || '')}</span>
                 </div>
-                <p class="text-xs text-zinc-500 mt-2 ml-8"><span class="text-zinc-400 font-semibold mr-1.5">종족</span>${getRaceIcon(race)}<span class="text-sm text-zinc-700 font-medium">${escapeHtml(race || '—')}</span></p>
-                ${vsChipM ? `<div class="mt-1 ml-8">${vsChipM}</div>` : ''}
-                <p class="text-sm text-zinc-500 mt-1.5 ml-8">${escapeHtml(p.tier || '—')} · ${escapeHtml(tname)}</p>
+                <p class="text-[10px] text-zinc-500 mt-0.5 truncate">${getRaceIcon(race)}${escapeHtml(race || '—')} · ${escapeHtml(p.tier || '—')} · ${escapeHtml(tname)}</p>
               </div>
-              <div class="text-right shrink-0 rounded-xl bg-indigo-50 px-3 py-2 border border-indigo-100">
-                <div class="text-2xl font-extrabold text-indigo-700 tabular-nums leading-none">${p.elo}</div>
-                <div class="text-[10px] font-semibold text-indigo-500 uppercase tracking-wide mt-1">ELO</div>
+              <div class="text-right shrink-0 pl-1">
+                <div class="player-card-elo-row">
+                  <span class="player-card-elo-num">${p.elo}</span>${formatLastRoundDeltaBadge(lastDelta)}
+                </div>
+                <div class="player-card-record">${st.total.w}승 ${st.total.l}패${totalWinRate ? `<span class="player-card-record-pct"> · ${totalWinRate}%</span>` : ''}</div>
               </div>
             </div>
-            <div class="mt-3 grid grid-cols-3 gap-2 text-center text-xs border-t border-zinc-100 pt-3">
-              <div><span class="font-semibold text-zinc-800">${wlCell(st.total)}</span><div class="text-zinc-400">전체 ${totalWinRate ? totalWinRate + '%' : ''}</div></div>
-              <div><span class="font-semibold">${wlCell(st.개인전)}</span><div class="text-zinc-400">개인전</div></div>
-              <div><span class="font-semibold">${wlCell(st.팀전)}</span><div class="text-zinc-400">팀전</div></div>
+            <div class="mt-1.5 grid grid-cols-2 gap-1 text-center text-[10px] border-t border-zinc-100 pt-1.5">
+              <div><span class="font-semibold text-zinc-800">${st.개인전.w}승 ${st.개인전.l}패</span><div class="text-zinc-400">개인</div></div>
+              <div><span class="font-semibold text-zinc-800">${st.팀전.w}승 ${st.팀전.l}패</span><div class="text-zinc-400">팀</div></div>
             </div>
           </div>`;
       }
@@ -525,6 +759,8 @@
     let lastPlayers = [];
     let lastStatsByName = {};
     let lastStateByName = new Map();
+    let lastFixtures = null;
+    let lastRoundDocs = [];
     let modalEloChart = null;
     let detailPageChart = null;
     /** 모바일에서 목록→선수 클릭으로 pushState 된 경우, 뒤로가기는 history.back()으로 스택 정리 */
@@ -693,6 +929,34 @@
       </div>`;
     }
 
+    function buildSetHistoryCompactHtml(history) {
+      const rows = [...(history || [])].reverse().slice(0, 50);
+      if (!rows.length) return '<p class="text-xs text-zinc-400 py-2">기록 없음</p>';
+      return rows
+        .map((h) => {
+          const res = h.won ? '승' : '패';
+          const resCls = h.won ? 'text-emerald-600 font-bold' : 'text-rose-600 font-bold';
+          const dCls = h.delta > 0 ? 'elo-up' : h.delta < 0 ? 'elo-down' : 'text-zinc-400';
+          const opp = (h.opponents || []).join(' · ') || '—';
+          const eloMatch = formatSetEloMatchupHtml(h);
+          return `<div class="set-history-row flex items-start gap-1.5 py-2 border-b border-zinc-50">
+          <span class="shrink-0 font-bold text-zinc-500 tabular-nums text-[10px] w-6">${h.round}R</span>
+          <span class="shrink-0 scale-90 origin-left">${formatChip(h.format)}</span>
+          <div class="flex-1 min-w-0 leading-snug">
+            <div class="text-zinc-800 font-medium truncate text-[11px]">${escapeHtml(h.map || '—')}</div>
+            <div class="text-zinc-500 truncate text-[10px]">${escapeHtml(opp)}</div>
+            ${eloMatch ? `<div class="mt-1">${eloMatch}</div>` : ''}
+          </div>
+          <div class="shrink-0 text-right leading-tight">
+            <div class="${resCls} text-[11px]">${res}</div>
+            <div class="${dCls} tabular-nums text-[10px] font-mono">${h.delta > 0 ? '+' : ''}${h.delta}</div>
+            <div class="text-zinc-400 tabular-nums text-[9px]">${h.eloAfter}</div>
+          </div>
+        </div>`;
+        })
+        .join('');
+    }
+
     function buildPlayerDetailInnerHTML(meta, p, chartCanvasId) {
       const dn = (p.displayName || '').trim();
       const st = lastStatsByName[dn] || emptyStats();
@@ -711,6 +975,7 @@
         const resCls = h.won ? 'text-emerald-600 font-semibold' : 'text-rose-600 font-semibold';
         const dCls = h.delta > 0 ? 'elo-up' : h.delta < 0 ? 'elo-down' : 'text-zinc-500';
         const oppHtml = formatOpponentsWithRaces(h.opponents || [], h.opponentRaces || []);
+        const eloMatchHtml = formatSetEloMatchupHtml(h);
         const tip = `${h.fixtureId || ''} · 슬롯${h.slot}`.trim();
         return `<tr class="border-b border-zinc-50 hover:bg-zinc-50/80">
           <td class="px-2 py-2 whitespace-nowrap text-zinc-600">${h.round}R</td>
@@ -718,6 +983,7 @@
           <td class="px-2 py-2">${formatChip(h.format)}</td>
           <td class="px-2 py-2 text-zinc-700">${escapeHtml(h.map)}</td>
           <td class="px-2 py-2 text-xs text-zinc-700 max-w-[11rem] sm:max-w-[14rem] leading-snug" title="${escapeHtml(tip)}">${oppHtml}</td>
+          <td class="px-2 py-2 tabular-nums whitespace-nowrap">${eloMatchHtml || '<span class="text-zinc-300">—</span>'}</td>
           <td class="px-2 py-2 ${resCls}">${res}</td>
           <td class="px-2 py-2 tabular-nums font-mono text-xs ${dCls}">${h.delta > 0 ? '+' : ''}${h.delta}</td>
           <td class="px-2 py-2 tabular-nums text-zinc-600">${h.eloAfter}</td>
@@ -725,28 +991,29 @@
       }).join('');
 
       return `
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <div class="rounded-xl border border-zinc-200 bg-gradient-to-br from-zinc-50 to-white p-4 shadow-sm">
-            <h4 class="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-3">프로필</h4>
-            <p class="text-sm"><span class="text-zinc-500">팀</span> <span class="font-semibold text-zinc-900">${escapeHtml(teamName(meta, p.teamId))}</span></p>
-            <p class="text-sm mt-1"><span class="text-zinc-500">종족</span> ${getRaceIcon(race)}<span class="font-medium">${escapeHtml(race || '—')}</span></p>
-            <p class="text-sm mt-1"><span class="text-zinc-500">티어</span> <span class="font-medium">${escapeHtml(p.tier || '—')}</span></p>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 player-detail-profile-grid">
+          <div class="rounded-xl border border-zinc-200 bg-gradient-to-br from-zinc-50 to-white p-3 sm:p-4 shadow-sm">
+            <h4 class="text-[10px] font-bold uppercase tracking-wider text-zinc-400 mb-2">프로필</h4>
+            <p class="text-xs sm:text-sm"><span class="text-zinc-500">팀</span> <span class="font-semibold text-zinc-900">${escapeHtml(teamName(meta, p.teamId))}</span></p>
+            <p class="text-xs sm:text-sm mt-1"><span class="text-zinc-500">종족</span> ${getRaceIcon(race)}<span class="font-medium">${escapeHtml(race || '—')}</span></p>
+            <p class="text-xs sm:text-sm mt-1"><span class="text-zinc-500">티어</span> <span class="font-medium">${escapeHtml(p.tier || '—')}</span></p>
             ${renderRaceVsOpponentBlock(p)}
             ${formatPlayerEloDetailHtml(pst, ranks, st)}
           </div>
-          <div class="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
-            <h4 class="text-xs font-bold uppercase tracking-wider text-zinc-400 mb-3">세트 요약</h4>
-            <p class="text-sm"><span class="text-zinc-500">전체</span> <strong>${wlCell(st.total)}</strong>
+          <div class="rounded-xl border border-zinc-200 bg-white p-3 sm:p-4 shadow-sm">
+            <h4 class="text-[10px] font-bold uppercase tracking-wider text-zinc-400 mb-2">세트 요약</h4>
+            <p class="text-xs sm:text-sm"><span class="text-zinc-500">전체</span> <strong>${wlCell(st.total)}</strong>
               <span class="text-zinc-400">(${st.total.w + st.total.l > 0 ? ((st.total.w / (st.total.w + st.total.l)) * 100).toFixed(1) : '0'}%)</span></p>
-            <p class="text-sm mt-1"><span class="text-zinc-500">개인전</span> <strong>${wlCell(st.개인전)}</strong></p>
-            <p class="text-sm mt-1"><span class="text-zinc-500">팀전</span> <strong>${wlCell(st.팀전)}</strong></p>
-            <p class="text-sm mt-1"><span class="text-zinc-500">2:2 / 3:3</span> <strong>${wlCell(st['22'])}</strong> · <strong>${wlCell(st['33'])}</strong></p>
+            <p class="text-xs sm:text-sm mt-1"><span class="text-zinc-500">개인전</span> <strong>${wlCell(st.개인전)}</strong></p>
+            <p class="text-xs sm:text-sm mt-1"><span class="text-zinc-500">팀전</span> <strong>${wlCell(st.팀전)}</strong></p>
+            <p class="text-xs sm:text-sm mt-1"><span class="text-zinc-500">2:2 / 3:3</span> <strong>${wlCell(st['22'])}</strong> · <strong>${wlCell(st['33'])}</strong></p>
           </div>
         </div>
 
-        <div class="mt-6 rounded-xl border border-zinc-200 bg-white p-4 shadow-sm overflow-hidden">
-          <h4 class="text-sm font-bold text-zinc-800 mb-3">세트 기록</h4>
-          <div class="overflow-x-auto max-h-96 overflow-y-auto text-xs">
+        <div class="mt-4 sm:mt-6 rounded-xl border border-zinc-200 bg-white p-3 sm:p-4 shadow-sm overflow-hidden">
+          <h4 class="text-xs sm:text-sm font-bold text-zinc-800 mb-2">세트 기록</h4>
+          <div class="md:hidden max-h-72 overflow-y-auto -mx-1 px-1">${buildSetHistoryCompactHtml(history)}</div>
+          <div class="hidden md:block overflow-x-auto max-h-96 overflow-y-auto text-xs">
             <table class="min-w-full text-left">
               <thead class="sticky top-0 bg-zinc-50 text-zinc-500 font-semibold z-10">
                 <tr>
@@ -755,17 +1022,18 @@
                   <th class="px-2 py-2">유형</th>
                   <th class="px-2 py-2">맵</th>
                   <th class="px-2 py-2">상대</th>
+                  <th class="px-2 py-2" title="세트 직전 ELO · ▲ = 당시 상위">ELO 대결</th>
                   <th class="px-2 py-2">결</th>
                   <th class="px-2 py-2">Δ</th>
                   <th class="px-2 py-2">ELO</th>
                 </tr>
               </thead>
-              <tbody>${histRows || '<tr><td colspan="8" class="p-4 text-zinc-400">기록 없음</td></tr>'}</tbody>
+              <tbody>${histRows || '<tr><td colspan="9" class="p-4 text-zinc-400">기록 없음</td></tr>'}</tbody>
             </table>
           </div>
         </div>
 
-        <div class="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div class="mt-4 sm:mt-6 grid grid-cols-1 lg:grid-cols-2 gap-3 sm:gap-4">
           <div class="rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
             <h4 class="text-sm font-bold text-zinc-800 mb-3">맵별 개인전</h4>
             ${renderMapSection(pst?.mapStats)}
@@ -775,9 +1043,9 @@
 
         <div class="mt-4">${renderTeamMapSection(pst?.teamMapStats)}</div>
 
-        <div class="mt-6 rounded-xl border border-zinc-200 bg-white p-4 shadow-sm">
-          <h4 class="text-sm font-bold text-zinc-800 mb-2">ELO 변화 <span class="text-xs font-normal text-zinc-400">(라운드 종료 시점)</span></h4>
-          <div class="h-36 sm:h-40"><canvas id="${escapeHtml(chartCanvasId)}"></canvas></div>
+        <div class="mt-4 sm:mt-6 rounded-xl border border-zinc-200 bg-white p-3 sm:p-4 shadow-sm">
+          <h4 class="text-xs sm:text-sm font-bold text-zinc-800 mb-2">ELO 변화 <span class="text-[10px] font-normal text-zinc-400">(라운드 종료 시점)</span></h4>
+          <div class="h-28 sm:h-40"><canvas id="${escapeHtml(chartCanvasId)}"></canvas></div>
         </div>`;
     }
 
@@ -939,6 +1207,18 @@
       return html;
     }
 
+    function navigateToPlayer(playerId) {
+      if (!playerId) return;
+      if (isMobilePlayerDetail()) {
+        mobilePlayerDetailViaList = true;
+        window.history.pushState({ view: 'player', id: playerId }, '', `?player=${encodeURIComponent(playerId)}`);
+        showPlayerDetailFullPage(playerId);
+        window.scrollTo(0, 0);
+      } else {
+        openPlayerModal(playerId);
+      }
+    }
+
     function openPlayerModal(playerId) {
       const p = findPlayerById(playerId);
       if (!p || !lastMeta) return;
@@ -972,6 +1252,8 @@
         lastPlayers = players;
         lastStatsByName = statsByName;
         lastStateByName = stateByName;
+        lastFixtures = fixtures;
+        lastRoundDocs = roundDocs;
 
         routeFromUrl();
         window.addEventListener('popstate', () => routeFromUrl());
@@ -990,17 +1272,24 @@
           const plink = e.target.closest('.player-link');
           if (plink) {
             e.preventDefault();
-            const id = plink.dataset.playerId;
+            const id = plink.dataset.playerId || plink.closest('.player-card')?.dataset.playerId;
             if (!id) return;
-            if (isMobilePlayerDetail()) {
-              mobilePlayerDetailViaList = true;
-              window.history.pushState({ view: 'player', id }, '', `?player=${encodeURIComponent(id)}`);
-              showPlayerDetailFullPage(id);
-              window.scrollTo(0, 0);
-            } else {
-              openPlayerModal(id);
-            }
+            navigateToPlayer(id);
+            return;
           }
+          const card = e.target.closest('.player-card[data-player-id]');
+          if (card && card.dataset.playerId) {
+            e.preventDefault();
+            navigateToPlayer(card.dataset.playerId);
+          }
+        });
+
+        document.body.addEventListener('keydown', (e) => {
+          if (e.key !== 'Enter' && e.key !== ' ') return;
+          const card = e.target.closest('.player-card[data-player-id]');
+          if (!card) return;
+          e.preventDefault();
+          navigateToPlayer(card.dataset.playerId);
         });
 
         document.getElementById('playerModalClose').addEventListener('click', () => {
