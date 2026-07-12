@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>멸망전 시즌11 · 팀 전력</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="s11-site-header.css" />
+  <style>
+    body { font-family: Inter, sans-serif; }
+    .power-form-dot {
+      display: inline-flex;
+      width: 1.15rem;
+      height: 1.15rem;
+      border-radius: 0.25rem;
+      font-size: 0.5625rem;
+      font-weight: 800;
+      align-items: center;
+      justify-content: center;
+    }
+    .power-form-w { background: #d1fae5; color: #047857; }
+    .power-form-l { background: #fee2e2; color: #b91c1c; }
+    .power-section-label {
+      font-size: 0.6875rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #71717a;
+      margin-bottom: 0.5rem;
+    }
+  </style>
+  <script defer src="https://cloud.umami.is/script.js" data-website-id="feb79bac-7105-44c9-a5ce-142957ac05b9"></script>
+</head>
+<body class="bg-zinc-100 text-zinc-800 min-h-screen text-sm antialiased">
+  <div class="max-w-6xl mx-auto px-4 py-8">
+    <header class="s11-site-header" role="banner">
+      <div class="s11-site-header-accent" aria-hidden="true"></div>
+      <div class="s11-site-header-panel">
+        <div class="s11-site-header-body">
+          <div class="s11-site-header-top">
+            <div class="s11-site-header-brand">
+              <div class="lg-craft-lockup lg-craft-lockup--hero" title="LG Craft">
+                <img src="LG_symbol.svg.png" alt="" class="lg-craft-hero-img mx-auto w-auto max-w-full object-contain" decoding="async" />
+                <div class="lg-craft-wordmark" lang="en"><span class="lg-red">LG</span> Craft</div>
+              </div>
+            </div>
+            <div class="s11-site-header-series" aria-label="멸망전 시즌 11">
+              <span class="s11-site-header-series-ko" lang="ko">멸망전</span>
+              <span class="s11-site-header-series-en" lang="en">Season 11</span>
+            </div>
+          </div>
+          <h1 class="s11-site-header-page-title">팀 전력</h1>
+        </div>
+      </div>
+    </header>
+
+    <nav class="s11-site-nav mb-8 border-b border-zinc-200 pb-3" aria-label="시즌11">
+      <a href="index.html" class="s11-site-nav-link">팀 순위</a>
+      <a href="s11-schedule.html" class="s11-site-nav-link">경기 일정</a>
+      <a href="s11-roster.html" class="s11-site-nav-link">로스터</a>
+      <a href="s11-rounds.html" class="s11-site-nav-link">라운드 결과</a>
+      <a href="s11-players.html" class="s11-site-nav-link">선수 기록</a>
+      <a href="s11-stats.html" class="s11-site-nav-link">통계 차트</a>
+      <span class="s11-site-nav-current">팀 전력</span>
+    </nav>
+
+    <p id="load-err" class="hidden rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 mb-4"></p>
+
+    <div id="loading" class="rounded-xl border border-zinc-200 bg-white p-12 text-center text-zinc-500 shadow-sm">
+      <p class="font-medium text-zinc-700">불러오는 중…</p>
+    </div>
+
+    <main id="main-content" class="hidden space-y-5 pb-8">
+      <div class="rounded-xl border border-zinc-200 bg-white p-4 sm:p-5 shadow-sm">
+        <p id="power-subtitle" class="text-sm text-zinc-600"></p>
+        <p id="power-disclaimer" class="mt-1.5 text-xs text-zinc-400"></p>
+      </div>
+      <div id="power-grid" class="space-y-4"></div>
+    </main>
+  </div>
+
+  <script type="module">
+    function escapeHtml(s) {
+      if (s == null) return '';
+      return String(s)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+    }
+
+    function formHtml(form) {
+      if (!form?.length) return '';
+      return form
+        .map((c) => {
+          const cls = c === 'W' ? 'power-form-w' : 'power-form-l';
+          return `<span class="power-form-dot ${cls}" title="${c === 'W' ? '승' : '패'}">${c}</span>`;
+        })
+        .join('');
+    }
+
+    function listHtml(items, tone) {
+      const bullet = tone === 'up' ? 'text-emerald-600' : 'text-rose-500';
+      return `<ul class="space-y-1.5">${(items || [])
+        .map(
+          (t) =>
+            `<li class="flex gap-2 text-[13px] leading-snug text-zinc-700"><span class="${bullet} font-bold shrink-0">·</span><span>${escapeHtml(t)}</span></li>`,
+        )
+        .join('')}</ul>`;
+    }
+
+    function renderTeamCard(t) {
+      const rec = t.record || {};
+      const next = t.nextRound || {};
+      const keys = (t.keyPlayers || [])
+        .map(
+          (p) => `<li class="rounded-lg border border-zinc-100 bg-zinc-50/80 px-3 py-2">
+          <div class="flex items-baseline justify-between gap-2">
+            <span class="font-semibold text-zinc-900">${escapeHtml(p.displayName)}</span>
+            <span class="text-[10px] font-bold text-indigo-600 shrink-0">${escapeHtml(p.tier || '')}</span>
+          </div>
+          <div class="text-[10px] font-mono text-zinc-400 mt-0.5">${escapeHtml(p.id || '')}</div>
+          <p class="text-[12px] text-zinc-600 mt-1 leading-snug">${escapeHtml(p.note || '')}</p>
+        </li>`,
+        )
+        .join('');
+
+      const summary = (t.summary || [])
+        .map((line) => `<li class="text-[13px] leading-relaxed text-zinc-700 pl-3 border-l-2 border-indigo-200">${escapeHtml(line)}</li>`)
+        .join('');
+
+      const story = (t.story || [])
+        .map((p) => `<p class="text-[13px] leading-[1.7] text-zinc-700">${escapeHtml(p)}</p>`)
+        .join('');
+
+      const watch = (t.watchPoints || [])
+        .map(
+          (w, i) =>
+            `<li class="flex gap-2 text-[13px] leading-snug text-zinc-700"><span class="text-indigo-500 font-extrabold tabular-nums shrink-0">${i + 1}</span><span>${escapeHtml(w)}</span></li>`,
+        )
+        .join('');
+
+      return `<article class="rounded-xl border border-zinc-200 bg-white shadow-sm overflow-hidden">
+        <div class="border-b border-zinc-100 bg-gradient-to-r from-zinc-50 to-indigo-50/40 px-4 py-3.5 sm:px-5">
+          <div class="flex flex-wrap items-start justify-between gap-3">
+            <div class="min-w-0">
+              <div class="flex items-baseline gap-2 flex-wrap">
+                <span class="text-xs font-extrabold text-indigo-600 tabular-nums">#${t.rank}</span>
+                <h2 class="text-lg font-bold text-zinc-900">${escapeHtml(t.name)}</h2>
+                <span class="text-xs text-zinc-400 font-medium">${escapeHtml(t.short || '')}</span>
+              </div>
+              <p class="mt-1 text-xs text-zinc-500 tabular-nums">
+                시리즈 <strong class="text-zinc-800">${rec.seriesW ?? 0}승 ${rec.seriesL ?? 0}패</strong>
+                <span class="mx-1 text-zinc-300">·</span>
+                세트 <strong class="text-zinc-800">${rec.setW ?? 0}–${rec.setL ?? 0}</strong>
+              </p>
+            </div>
+            <div class="flex items-center gap-1 shrink-0" title="시리즈 결과 (1R→최근)">${formHtml(t.form)}</div>
+          </div>
+          ${t.tagline ? `<p class="mt-2.5 text-sm font-semibold text-indigo-800/90 leading-snug">“${escapeHtml(t.tagline)}”</p>` : ''}
+        </div>
+
+        <div class="p-4 sm:p-5 space-y-5">
+          <section>
+            <div class="power-section-label">한눈에</div>
+            <ul class="space-y-2">${summary}</ul>
+          </section>
+
+          ${story ? `<section>
+            <div class="power-section-label">시즌 스토리</div>
+            <div class="space-y-3">${story}</div>
+          </section>` : ''}
+
+          ${t.turningPoint ? `<section class="rounded-lg border border-amber-100 bg-amber-50/60 px-3.5 py-3">
+            <div class="power-section-label !text-amber-700">전환점</div>
+            <p class="text-[13px] leading-relaxed text-zinc-800">${escapeHtml(t.turningPoint)}</p>
+          </section>` : ''}
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <section>
+              <div class="power-section-label">강점</div>
+              ${listHtml(t.strengths, 'up')}
+            </section>
+            <section>
+              <div class="power-section-label">약점</div>
+              ${listHtml(t.weaknesses, 'down')}
+            </section>
+          </div>
+
+          ${watch ? `<section>
+            <div class="power-section-label">관전 포인트</div>
+            <ul class="space-y-1.5">${watch}</ul>
+          </section>` : ''}
+
+          <section>
+            <div class="power-section-label">핵심 선수 · 기여도·코인 기준</div>
+            <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2">${keys}</ul>
+          </section>
+
+          ${t.coinOutlook ? `<section class="rounded-lg border border-orange-100 bg-orange-50/50 px-3.5 py-3">
+            <div class="power-section-label !text-orange-700">${escapeHtml(t.coinOutlook.title || '출전 코인')}</div>
+            <p class="text-[13px] leading-relaxed text-zinc-800">${escapeHtml(t.coinOutlook.body || '')}</p>
+          </section>` : ''}
+
+          ${t.verdict ? `<section class="rounded-lg border border-zinc-200 bg-zinc-900 px-3.5 py-3">
+            <div class="power-section-label !text-zinc-400">한 줄 평</div>
+            <p class="text-[13px] font-semibold leading-relaxed text-white">${escapeHtml(t.verdict)}</p>
+          </section>` : ''}
+
+          <section class="rounded-lg border border-indigo-100 bg-indigo-50/50 px-3.5 py-3">
+            <div class="power-section-label !text-indigo-600">다음 라운드 전망 · ${escapeHtml(String(next.round ?? ''))}R</div>
+            <p class="text-[13px] font-semibold text-zinc-900 mb-1">
+              vs ${escapeHtml(next.opponentName || '—')}
+              ${next.date ? `<span class="font-normal text-zinc-500"> · ${escapeHtml(next.date)}</span>` : ''}
+            </p>
+            <p class="text-[13px] leading-relaxed text-zinc-700">${escapeHtml(next.outlook || '')}</p>
+          </section>
+        </div>
+      </article>`;
+    }
+
+    async function main() {
+      const loading = document.getElementById('loading');
+      const mainEl = document.getElementById('main-content');
+      const errEl = document.getElementById('load-err');
+      try {
+        const res = await fetch('data/s11/team-power.json');
+        if (!res.ok) throw new Error(`team-power.json ${res.status}`);
+        const data = await res.json();
+        document.getElementById('power-subtitle').textContent =
+          data.subtitle || `${data.asOfRound || ''}라운드까지 기준 팀 전력 분석`;
+        document.getElementById('power-disclaimer').textContent = data.disclaimer || '';
+
+        const teams = [...(data.teams || [])].sort((a, b) => (a.rank || 99) - (b.rank || 99));
+        document.getElementById('power-grid').innerHTML = teams.map(renderTeamCard).join('')
+          || '<p class="text-sm text-zinc-500">분석 데이터가 없습니다.</p>';
+
+        loading.classList.add('hidden');
+        mainEl.classList.remove('hidden');
+      } catch (e) {
+        console.error(e);
+        loading.classList.add('hidden');
+        errEl.textContent = e.message || String(e);
+        errEl.classList.remove('hidden');
+      }
+    }
+
+    main();
+  </script>
+</body>
+</html>

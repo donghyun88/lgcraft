@@ -198,7 +198,7 @@
 }
 
 @media (max-width: 767px) {
-  .s11-site-nav > :nth-child(5):last-child {
+  .s11-site-nav > :last-child:nth-child(odd) {
     grid-column: 1 / -1;
   }
 
