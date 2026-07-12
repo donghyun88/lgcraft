@@ -1,10 +1,10 @@
 {
     "schemaVersion":  1,
     "coinLogicVersion":  1,
-    "generatedAt":  "2026-07-05T14:08:14.0709840Z",
+    "generatedAt":  "2026-07-12T13:44:51.3875961Z",
     "byHalf":  {
                    "first_half":  {
-                                      "maxRound":  6,
+                                      "maxRound":  7,
                                       "players":  {
                                                       "강구산":  {
                                                                   "solo":  1,
@@ -41,7 +41,7 @@
                                                                           ]
                                                               },
                                                       "강성구":  {
-                                                                  "solo":  2,
+                                                                  "solo":  3,
                                                                   "team":  5,
                                                                   "log":  [
                                                                               {
@@ -92,11 +92,18 @@
                                                                                   "format":  "2v2",
                                                                                   "fixtureId":  "s11-r06-m3",
                                                                                   "countsTeam":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  1,
+                                                                                  "format":  "1v1",
+                                                                                  "fixtureId":  "s11-r07-m2",
+                                                                                  "countsSolo":  true
                                                                               }
                                                                           ]
                                                               },
                                                       "강응선":  {
-                                                                  "solo":  2,
+                                                                  "solo":  3,
                                                                   "team":  3,
                                                                   "log":  [
                                                                               {
@@ -133,12 +140,19 @@
                                                                                   "format":  "3v3",
                                                                                   "fixtureId":  "s11-r06-m2",
                                                                                   "countsTeam":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  4,
+                                                                                  "format":  "1v1",
+                                                                                  "fixtureId":  "s11-r07-m1",
+                                                                                  "countsSolo":  true
                                                                               }
                                                                           ]
                                                               },
                                                       "경제진":  {
                                                                   "solo":  2,
-                                                                  "team":  3,
+                                                                  "team":  4,
                                                                   "log":  [
                                                                               {
                                                                                   "round":  1,
@@ -174,12 +188,19 @@
                                                                                   "format":  "3v3",
                                                                                   "fixtureId":  "s11-r05-m3",
                                                                                   "countsTeam":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  6,
+                                                                                  "format":  "3v3",
+                                                                                  "fixtureId":  "s11-r07-m2",
+                                                                                  "countsTeam":  true
                                                                               }
                                                                           ]
                                                               },
                                                       "고성근":  {
                                                                   "solo":  2,
-                                                                  "team":  1,
+                                                                  "team":  2,
                                                                   "log":  [
                                                                               {
                                                                                   "round":  1,
@@ -201,12 +222,19 @@
                                                                                   "format":  "1v1",
                                                                                   "fixtureId":  "s11-r05-m2",
                                                                                   "countsSolo":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  6,
+                                                                                  "format":  "3v3",
+                                                                                  "fixtureId":  "s11-r07-m1",
+                                                                                  "countsTeam":  true
                                                                               }
                                                                           ]
                                                               },
                                                       "공동건":  {
-                                                                  "solo":  1,
-                                                                  "team":  1,
+                                                                  "solo":  2,
+                                                                  "team":  2,
                                                                   "log":  [
                                                                               {
                                                                                   "round":  4,
@@ -221,12 +249,26 @@
                                                                                   "format":  "3v3",
                                                                                   "fixtureId":  "s11-r05-m3",
                                                                                   "countsTeam":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  3,
+                                                                                  "format":  "2v2",
+                                                                                  "fixtureId":  "s11-r07-m3",
+                                                                                  "countsTeam":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  7,
+                                                                                  "format":  "1v1",
+                                                                                  "fixtureId":  "s11-r07-m3",
+                                                                                  "countsSolo":  true
                                                                               }
                                                                           ]
                                                               },
                                                       "공동현":  {
                                                                   "solo":  4,
-                                                                  "team":  1,
+                                                                  "team":  2,
                                                                   "log":  [
                                                                               {
                                                                                   "round":  1,
@@ -262,12 +304,19 @@
                                                                                   "format":  "1v1",
                                                                                   "fixtureId":  "s11-r06-m3",
                                                                                   "countsSolo":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  6,
+                                                                                  "format":  "3v3",
+                                                                                  "fixtureId":  "s11-r07-m2",
+                                                                                  "countsTeam":  true
                                                                               }
                                                                           ]
                                                               },
                                                       "구선웅":  {
                                                                   "solo":  0,
-                                                                  "team":  3,
+                                                                  "team":  4,
                                                                   "log":  [
                                                                               {
                                                                                   "round":  1,
@@ -288,6 +337,13 @@
                                                                                   "slot":  6,
                                                                                   "format":  "3v3",
                                                                                   "fixtureId":  "s11-r06-m3",
+                                                                                  "countsTeam":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  6,
+                                                                                  "format":  "3v3",
+                                                                                  "fixtureId":  "s11-r07-m2",
                                                                                   "countsTeam":  true
                                                                               }
                                                                           ]
@@ -361,7 +417,7 @@
                                                                           ]
                                                               },
                                                       "김경식":  {
-                                                                  "solo":  3,
+                                                                  "solo":  4,
                                                                   "team":  0,
                                                                   "log":  [
                                                                               {
@@ -384,11 +440,18 @@
                                                                                   "format":  "1v1",
                                                                                   "fixtureId":  "s11-r06-m2",
                                                                                   "countsSolo":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  2,
+                                                                                  "format":  "1v1",
+                                                                                  "fixtureId":  "s11-r07-m1",
+                                                                                  "countsSolo":  true
                                                                               }
                                                                           ]
                                                               },
                                                       "김경철":  {
-                                                                  "solo":  2,
+                                                                  "solo":  3,
                                                                   "team":  1,
                                                                   "log":  [
                                                                               {
@@ -411,12 +474,19 @@
                                                                                   "format":  "2v2",
                                                                                   "fixtureId":  "s11-r05-m3",
                                                                                   "countsTeam":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  5,
+                                                                                  "format":  "1v1",
+                                                                                  "fixtureId":  "s11-r07-m2",
+                                                                                  "countsSolo":  true
                                                                               }
                                                                           ]
                                                               },
                                                       "김도완":  {
-                                                                  "solo":  3,
-                                                                  "team":  5,
+                                                                  "solo":  4,
+                                                                  "team":  6,
                                                                   "log":  [
                                                                               {
                                                                                   "round":  2,
@@ -473,12 +543,26 @@
                                                                                   "format":  "2v2",
                                                                                   "fixtureId":  "s11-r06-m3",
                                                                                   "countsTeam":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  3,
+                                                                                  "format":  "2v2",
+                                                                                  "fixtureId":  "s11-r07-m2",
+                                                                                  "countsTeam":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  5,
+                                                                                  "format":  "1v1",
+                                                                                  "fixtureId":  "s11-r07-m2",
+                                                                                  "countsSolo":  true
                                                                               }
                                                                           ]
                                                               },
                                                       "김도현":  {
-                                                                  "solo":  2,
-                                                                  "team":  4,
+                                                                  "solo":  3,
+                                                                  "team":  5,
                                                                   "log":  [
                                                                               {
                                                                                   "round":  2,
@@ -521,12 +605,26 @@
                                                                                   "format":  "2v2",
                                                                                   "fixtureId":  "s11-r06-m1",
                                                                                   "countsTeam":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  1,
+                                                                                  "format":  "1v1",
+                                                                                  "fixtureId":  "s11-r07-m2",
+                                                                                  "countsSolo":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  3,
+                                                                                  "format":  "2v2",
+                                                                                  "fixtureId":  "s11-r07-m2",
+                                                                                  "countsTeam":  true
                                                                               }
                                                                           ]
                                                               },
                                                       "김동현":  {
                                                                   "solo":  1,
-                                                                  "team":  4,
+                                                                  "team":  5,
                                                                   "log":  [
                                                                               {
                                                                                   "round":  1,
@@ -562,12 +660,19 @@
                                                                                   "format":  "3v3",
                                                                                   "fixtureId":  "s11-r06-m1",
                                                                                   "countsTeam":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  3,
+                                                                                  "format":  "2v2",
+                                                                                  "fixtureId":  "s11-r07-m3",
+                                                                                  "countsTeam":  true
                                                                               }
                                                                           ]
                                                               },
                                                       "김민중":  {
-                                                                  "solo":  1,
-                                                                  "team":  3,
+                                                                  "solo":  2,
+                                                                  "team":  4,
                                                                   "log":  [
                                                                               {
                                                                                   "round":  1,
@@ -596,6 +701,20 @@
                                                                                   "format":  "1v1",
                                                                                   "fixtureId":  "s11-r04-m2",
                                                                                   "countsSolo":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  1,
+                                                                                  "format":  "1v1",
+                                                                                  "fixtureId":  "s11-r07-m3",
+                                                                                  "countsSolo":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  6,
+                                                                                  "format":  "3v3",
+                                                                                  "fixtureId":  "s11-r07-m3",
+                                                                                  "countsTeam":  true
                                                                               }
                                                                           ]
                                                               },
@@ -675,7 +794,7 @@
                                                                           ]
                                                               },
                                                       "김재현":  {
-                                                                  "solo":  1,
+                                                                  "solo":  2,
                                                                   "team":  0,
                                                                   "log":  [
                                                                               {
@@ -684,12 +803,19 @@
                                                                                   "format":  "1v1",
                                                                                   "fixtureId":  "s11-r05-m3",
                                                                                   "countsSolo":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  2,
+                                                                                  "format":  "1v1",
+                                                                                  "fixtureId":  "s11-r07-m2",
+                                                                                  "countsSolo":  true
                                                                               }
                                                                           ]
                                                               },
                                                       "김종성":  {
                                                                   "solo":  3,
-                                                                  "team":  1,
+                                                                  "team":  2,
                                                                   "log":  [
                                                                               {
                                                                                   "round":  3,
@@ -718,12 +844,19 @@
                                                                                   "format":  "1v1",
                                                                                   "fixtureId":  "s11-r06-m2",
                                                                                   "countsSolo":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  6,
+                                                                                  "format":  "3v3",
+                                                                                  "fixtureId":  "s11-r07-m1",
+                                                                                  "countsTeam":  true
                                                                               }
                                                                           ]
                                                               },
                                                       "김주한":  {
                                                                   "solo":  4,
-                                                                  "team":  4,
+                                                                  "team":  5,
                                                                   "log":  [
                                                                               {
                                                                                   "round":  2,
@@ -779,6 +912,13 @@
                                                                                   "slot":  6,
                                                                                   "format":  "3v3",
                                                                                   "fixtureId":  "s11-r06-m3",
+                                                                                  "countsTeam":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  6,
+                                                                                  "format":  "3v3",
+                                                                                  "fixtureId":  "s11-r07-m1",
                                                                                   "countsTeam":  true
                                                                               }
                                                                           ]
@@ -886,8 +1026,8 @@
                                                                           ]
                                                               },
                                                       "김현기":  {
-                                                                  "solo":  0,
-                                                                  "team":  2,
+                                                                  "solo":  1,
+                                                                  "team":  3,
                                                                   "log":  [
                                                                               {
                                                                                   "round":  1,
@@ -902,12 +1042,26 @@
                                                                                   "format":  "2v2",
                                                                                   "fixtureId":  "s11-r03-m2",
                                                                                   "countsTeam":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  3,
+                                                                                  "format":  "2v2",
+                                                                                  "fixtureId":  "s11-r07-m1",
+                                                                                  "countsTeam":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  7,
+                                                                                  "format":  "1v1",
+                                                                                  "fixtureId":  "s11-r07-m1",
+                                                                                  "countsSolo":  true
                                                                               }
                                                                           ]
                                                               },
                                                       "남상원":  {
                                                                   "solo":  2,
-                                                                  "team":  2,
+                                                                  "team":  3,
                                                                   "log":  [
                                                                               {
                                                                                   "round":  1,
@@ -936,6 +1090,13 @@
                                                                                   "format":  "1v1",
                                                                                   "fixtureId":  "s11-r05-m3",
                                                                                   "countsSolo":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  6,
+                                                                                  "format":  "3v3",
+                                                                                  "fixtureId":  "s11-r07-m3",
+                                                                                  "countsTeam":  true
                                                                               }
                                                                           ]
                                                               },
@@ -960,8 +1121,8 @@
                                                                           ]
                                                               },
                                                       "명동주":  {
-                                                                  "solo":  1,
-                                                                  "team":  3,
+                                                                  "solo":  2,
+                                                                  "team":  4,
                                                                   "log":  [
                                                                               {
                                                                                   "round":  2,
@@ -990,11 +1151,25 @@
                                                                                   "format":  "1v1",
                                                                                   "fixtureId":  "s11-r05-m1",
                                                                                   "countsSolo":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  1,
+                                                                                  "format":  "1v1",
+                                                                                  "fixtureId":  "s11-r07-m1",
+                                                                                  "countsSolo":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  6,
+                                                                                  "format":  "3v3",
+                                                                                  "fixtureId":  "s11-r07-m1",
+                                                                                  "countsTeam":  true
                                                                               }
                                                                           ]
                                                               },
                                                       "박광명":  {
-                                                                  "solo":  2,
+                                                                  "solo":  3,
                                                                   "team":  1,
                                                                   "log":  [
                                                                               {
@@ -1017,12 +1192,19 @@
                                                                                   "format":  "3v3",
                                                                                   "fixtureId":  "s11-r05-m2",
                                                                                   "countsTeam":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  4,
+                                                                                  "format":  "1v1",
+                                                                                  "fixtureId":  "s11-r07-m1",
+                                                                                  "countsSolo":  true
                                                                               }
                                                                           ]
                                                               },
                                                       "박재창":  {
                                                                   "solo":  3,
-                                                                  "team":  2,
+                                                                  "team":  3,
                                                                   "log":  [
                                                                               {
                                                                                   "round":  1,
@@ -1058,6 +1240,13 @@
                                                                                   "format":  "1v1",
                                                                                   "fixtureId":  "s11-r06-m3",
                                                                                   "countsSolo":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  3,
+                                                                                  "format":  "2v2",
+                                                                                  "fixtureId":  "s11-r07-m2",
+                                                                                  "countsTeam":  true
                                                                               }
                                                                           ]
                                                               },
@@ -1090,7 +1279,7 @@
                                                               },
                                                       "박진욱":  {
                                                                   "solo":  2,
-                                                                  "team":  0,
+                                                                  "team":  1,
                                                                   "log":  [
                                                                               {
                                                                                   "round":  1,
@@ -1105,6 +1294,13 @@
                                                                                   "format":  "1v1",
                                                                                   "fixtureId":  "s11-r04-m2",
                                                                                   "countsSolo":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  6,
+                                                                                  "format":  "3v3",
+                                                                                  "fixtureId":  "s11-r07-m3",
+                                                                                  "countsTeam":  true
                                                                               }
                                                                           ]
                                                               },
@@ -1170,7 +1366,7 @@
                                                                           ]
                                                               },
                                                       "설재근":  {
-                                                                  "solo":  3,
+                                                                  "solo":  4,
                                                                   "team":  4,
                                                                   "log":  [
                                                                               {
@@ -1221,6 +1417,13 @@
                                                                                   "format":  "3v3",
                                                                                   "fixtureId":  "s11-r05-m1",
                                                                                   "countsTeam":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  5,
+                                                                                  "format":  "1v1",
+                                                                                  "fixtureId":  "s11-r07-m1",
+                                                                                  "countsSolo":  true
                                                                               }
                                                                           ]
                                                               },
@@ -1293,8 +1496,8 @@
                                                                           ]
                                                               },
                                                       "안정한":  {
-                                                                  "solo":  4,
-                                                                  "team":  3,
+                                                                  "solo":  5,
+                                                                  "team":  4,
                                                                   "log":  [
                                                                               {
                                                                                   "round":  1,
@@ -1343,6 +1546,20 @@
                                                                                   "slot":  6,
                                                                                   "format":  "3v3",
                                                                                   "fixtureId":  "s11-r06-m1",
+                                                                                  "countsTeam":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  4,
+                                                                                  "format":  "1v1",
+                                                                                  "fixtureId":  "s11-r07-m2",
+                                                                                  "countsSolo":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  6,
+                                                                                  "format":  "3v3",
+                                                                                  "fixtureId":  "s11-r07-m2",
                                                                                   "countsTeam":  true
                                                                               }
                                                                           ]
@@ -1389,8 +1606,8 @@
                                                                           ]
                                                               },
                                                       "양시찬":  {
-                                                                  "solo":  2,
-                                                                  "team":  4,
+                                                                  "solo":  3,
+                                                                  "team":  5,
                                                                   "log":  [
                                                                               {
                                                                                   "round":  1,
@@ -1432,6 +1649,20 @@
                                                                                   "slot":  3,
                                                                                   "format":  "2v2",
                                                                                   "fixtureId":  "s11-r06-m1",
+                                                                                  "countsTeam":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  5,
+                                                                                  "format":  "1v1",
+                                                                                  "fixtureId":  "s11-r07-m3",
+                                                                                  "countsSolo":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  6,
+                                                                                  "format":  "3v3",
+                                                                                  "fixtureId":  "s11-r07-m3",
                                                                                   "countsTeam":  true
                                                                               }
                                                                           ]
@@ -1492,7 +1723,7 @@
                                                                           ]
                                                               },
                                                       "염규상":  {
-                                                                  "solo":  3,
+                                                                  "solo":  4,
                                                                   "team":  5,
                                                                   "log":  [
                                                                               {
@@ -1550,11 +1781,18 @@
                                                                                   "format":  "3v3",
                                                                                   "fixtureId":  "s11-r06-m1",
                                                                                   "countsTeam":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  7,
+                                                                                  "format":  "1v1",
+                                                                                  "fixtureId":  "s11-r07-m2",
+                                                                                  "countsSolo":  true
                                                                               }
                                                                           ]
                                                               },
                                                       "오석현":  {
-                                                                  "solo":  1,
+                                                                  "solo":  2,
                                                                   "team":  0,
                                                                   "log":  [
                                                                               {
@@ -1562,6 +1800,13 @@
                                                                                   "slot":  4,
                                                                                   "format":  "1v1",
                                                                                   "fixtureId":  "s11-r03-m1",
+                                                                                  "countsSolo":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  5,
+                                                                                  "format":  "1v1",
+                                                                                  "fixtureId":  "s11-r07-m1",
                                                                                   "countsSolo":  true
                                                                               }
                                                                           ]
@@ -1621,7 +1866,7 @@
                                                                           ]
                                                               },
                                                       "유윤실":  {
-                                                                  "solo":  3,
+                                                                  "solo":  4,
                                                                   "team":  3,
                                                                   "log":  [
                                                                               {
@@ -1664,6 +1909,13 @@
                                                                                   "slot":  1,
                                                                                   "format":  "1v1",
                                                                                   "fixtureId":  "s11-r06-m3",
+                                                                                  "countsSolo":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  7,
+                                                                                  "format":  "1v1",
+                                                                                  "fixtureId":  "s11-r07-m1",
                                                                                   "countsSolo":  true
                                                                               }
                                                                           ]
@@ -1738,7 +1990,7 @@
                                                               },
                                                       "이대연":  {
                                                                   "solo":  3,
-                                                                  "team":  4,
+                                                                  "team":  5,
                                                                   "log":  [
                                                                               {
                                                                                   "round":  1,
@@ -1788,6 +2040,13 @@
                                                                                   "format":  "3v3",
                                                                                   "fixtureId":  "s11-r06-m2",
                                                                                   "countsTeam":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  3,
+                                                                                  "format":  "2v2",
+                                                                                  "fixtureId":  "s11-r07-m3",
+                                                                                  "countsTeam":  true
                                                                               }
                                                                           ]
                                                               },
@@ -1819,7 +2078,7 @@
                                                                           ]
                                                               },
                                                       "이봉철":  {
-                                                                  "solo":  2,
+                                                                  "solo":  3,
                                                                   "team":  3,
                                                                   "log":  [
                                                                               {
@@ -1856,6 +2115,13 @@
                                                                                   "format":  "3v3",
                                                                                   "fixtureId":  "s11-r05-m3",
                                                                                   "countsTeam":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  2,
+                                                                                  "format":  "1v1",
+                                                                                  "fixtureId":  "s11-r07-m3",
+                                                                                  "countsSolo":  true
                                                                               }
                                                                           ]
                                                               },
@@ -1941,7 +2207,7 @@
                                                                           ]
                                                               },
                                                       "이창언":  {
-                                                                  "solo":  1,
+                                                                  "solo":  2,
                                                                   "team":  5,
                                                                   "log":  [
                                                                               {
@@ -1985,11 +2251,18 @@
                                                                                   "format":  "2v2",
                                                                                   "fixtureId":  "s11-r06-m2",
                                                                                   "countsTeam":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  1,
+                                                                                  "format":  "1v1",
+                                                                                  "fixtureId":  "s11-r07-m3",
+                                                                                  "countsSolo":  true
                                                                               }
                                                                           ]
                                                               },
                                                       "이철훈":  {
-                                                                  "solo":  3,
+                                                                  "solo":  4,
                                                                   "team":  2,
                                                                   "log":  [
                                                                               {
@@ -2026,6 +2299,13 @@
                                                                                   "format":  "3v3",
                                                                                   "fixtureId":  "s11-r06-m1",
                                                                                   "countsTeam":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  4,
+                                                                                  "format":  "1v1",
+                                                                                  "fixtureId":  "s11-r07-m3",
+                                                                                  "countsSolo":  true
                                                                               }
                                                                           ]
                                                               },
@@ -2092,7 +2372,7 @@
                                                               },
                                                       "임채현":  {
                                                                   "solo":  3,
-                                                                  "team":  0,
+                                                                  "team":  1,
                                                                   "log":  [
                                                                               {
                                                                                   "round":  1,
@@ -2114,6 +2394,13 @@
                                                                                   "format":  "1v1",
                                                                                   "fixtureId":  "s11-r06-m2",
                                                                                   "countsSolo":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  6,
+                                                                                  "format":  "3v3",
+                                                                                  "fixtureId":  "s11-r07-m1",
+                                                                                  "countsTeam":  true
                                                                               }
                                                                           ]
                                                               },
@@ -2160,7 +2447,7 @@
                                                               },
                                                       "장대원":  {
                                                                   "solo":  2,
-                                                                  "team":  0,
+                                                                  "team":  1,
                                                                   "log":  [
                                                                               {
                                                                                   "round":  3,
@@ -2175,6 +2462,13 @@
                                                                                   "format":  "1v1",
                                                                                   "fixtureId":  "s11-r04-m1",
                                                                                   "countsSolo":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  6,
+                                                                                  "format":  "3v3",
+                                                                                  "fixtureId":  "s11-r07-m2",
+                                                                                  "countsTeam":  true
                                                                               }
                                                                           ]
                                                               },
@@ -2206,7 +2500,7 @@
                                                                           ]
                                                               },
                                                       "전성민":  {
-                                                                  "solo":  3,
+                                                                  "solo":  4,
                                                                   "team":  2,
                                                                   "log":  [
                                                                               {
@@ -2243,12 +2537,19 @@
                                                                                   "format":  "1v1",
                                                                                   "fixtureId":  "s11-r06-m2",
                                                                                   "countsSolo":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  2,
+                                                                                  "format":  "1v1",
+                                                                                  "fixtureId":  "s11-r07-m3",
+                                                                                  "countsSolo":  true
                                                                               }
                                                                           ]
                                                               },
                                                       "전은후":  {
                                                                   "solo":  1,
-                                                                  "team":  3,
+                                                                  "team":  4,
                                                                   "log":  [
                                                                               {
                                                                                   "round":  2,
@@ -2277,11 +2578,18 @@
                                                                                   "format":  "3v3",
                                                                                   "fixtureId":  "s11-r05-m1",
                                                                                   "countsTeam":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  6,
+                                                                                  "format":  "3v3",
+                                                                                  "fixtureId":  "s11-r07-m3",
+                                                                                  "countsTeam":  true
                                                                               }
                                                                           ]
                                                               },
                                                       "정용석":  {
-                                                                  "solo":  1,
+                                                                  "solo":  2,
                                                                   "team":  0,
                                                                   "log":  [
                                                                               {
@@ -2289,6 +2597,13 @@
                                                                                   "slot":  4,
                                                                                   "format":  "1v1",
                                                                                   "fixtureId":  "s11-r02-m3",
+                                                                                  "countsSolo":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  4,
+                                                                                  "format":  "1v1",
+                                                                                  "fixtureId":  "s11-r07-m2",
                                                                                   "countsSolo":  true
                                                                               }
                                                                           ]
@@ -2362,7 +2677,7 @@
                                                                           ]
                                                               },
                                                       "정현우":  {
-                                                                  "solo":  1,
+                                                                  "solo":  2,
                                                                   "team":  2,
                                                                   "log":  [
                                                                               {
@@ -2385,12 +2700,19 @@
                                                                                   "format":  "3v3",
                                                                                   "fixtureId":  "s11-r05-m1",
                                                                                   "countsTeam":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  7,
+                                                                                  "format":  "1v1",
+                                                                                  "fixtureId":  "s11-r07-m3",
+                                                                                  "countsSolo":  true
                                                                               }
                                                                           ]
                                                               },
                                                       "조승일":  {
                                                                   "solo":  3,
-                                                                  "team":  2,
+                                                                  "team":  3,
                                                                   "log":  [
                                                                               {
                                                                                   "round":  1,
@@ -2426,6 +2748,13 @@
                                                                                   "format":  "1v1",
                                                                                   "fixtureId":  "s11-r04-m3",
                                                                                   "countsSolo":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  3,
+                                                                                  "format":  "2v2",
+                                                                                  "fixtureId":  "s11-r07-m1",
+                                                                                  "countsTeam":  true
                                                                               }
                                                                           ]
                                                               },
@@ -2458,7 +2787,7 @@
                                                               },
                                                       "조현용":  {
                                                                   "solo":  2,
-                                                                  "team":  3,
+                                                                  "team":  4,
                                                                   "log":  [
                                                                               {
                                                                                   "round":  1,
@@ -2494,6 +2823,13 @@
                                                                                   "format":  "1v1",
                                                                                   "fixtureId":  "s11-r06-m1",
                                                                                   "countsSolo":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  3,
+                                                                                  "format":  "2v2",
+                                                                                  "fixtureId":  "s11-r07-m2",
+                                                                                  "countsTeam":  true
                                                                               }
                                                                           ]
                                                               },
@@ -2540,7 +2876,7 @@
                                                               },
                                                       "지주영":  {
                                                                   "solo":  4,
-                                                                  "team":  2,
+                                                                  "team":  3,
                                                                   "log":  [
                                                                               {
                                                                                   "round":  1,
@@ -2583,11 +2919,18 @@
                                                                                   "format":  "1v1",
                                                                                   "fixtureId":  "s11-r06-m1",
                                                                                   "countsSolo":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  6,
+                                                                                  "format":  "3v3",
+                                                                                  "fixtureId":  "s11-r07-m2",
+                                                                                  "countsTeam":  true
                                                                               }
                                                                           ]
                                                               },
                                                       "최상균":  {
-                                                                  "solo":  4,
+                                                                  "solo":  5,
                                                                   "team":  5,
                                                                   "log":  [
                                                                               {
@@ -2652,12 +2995,19 @@
                                                                                   "format":  "3v3",
                                                                                   "fixtureId":  "s11-r06-m3",
                                                                                   "countsTeam":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  2,
+                                                                                  "format":  "1v1",
+                                                                                  "fixtureId":  "s11-r07-m2",
+                                                                                  "countsSolo":  true
                                                                               }
                                                                           ]
                                                               },
                                                       "최성진":  {
                                                                   "solo":  3,
-                                                                  "team":  2,
+                                                                  "team":  3,
                                                                   "log":  [
                                                                               {
                                                                                   "round":  1,
@@ -2693,12 +3043,19 @@
                                                                                   "format":  "1v1",
                                                                                   "fixtureId":  "s11-r06-m3",
                                                                                   "countsSolo":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  3,
+                                                                                  "format":  "2v2",
+                                                                                  "fixtureId":  "s11-r07-m1",
+                                                                                  "countsTeam":  true
                                                                               }
                                                                           ]
                                                               },
                                                       "최수명":  {
-                                                                  "solo":  3,
-                                                                  "team":  3,
+                                                                  "solo":  4,
+                                                                  "team":  5,
                                                                   "log":  [
                                                                               {
                                                                                   "round":  1,
@@ -2741,12 +3098,33 @@
                                                                                   "format":  "2v2",
                                                                                   "fixtureId":  "s11-r06-m2",
                                                                                   "countsTeam":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  3,
+                                                                                  "format":  "2v2",
+                                                                                  "fixtureId":  "s11-r07-m3",
+                                                                                  "countsTeam":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  5,
+                                                                                  "format":  "1v1",
+                                                                                  "fixtureId":  "s11-r07-m3",
+                                                                                  "countsSolo":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  6,
+                                                                                  "format":  "3v3",
+                                                                                  "fixtureId":  "s11-r07-m3",
+                                                                                  "countsTeam":  true
                                                                               }
                                                                           ]
                                                               },
                                                       "최재광":  {
-                                                                  "solo":  1,
-                                                                  "team":  4,
+                                                                  "solo":  2,
+                                                                  "team":  5,
                                                                   "log":  [
                                                                               {
                                                                                   "round":  1,
@@ -2781,6 +3159,20 @@
                                                                                   "slot":  6,
                                                                                   "format":  "3v3",
                                                                                   "fixtureId":  "s11-r05-m2",
+                                                                                  "countsTeam":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  2,
+                                                                                  "format":  "1v1",
+                                                                                  "fixtureId":  "s11-r07-m1",
+                                                                                  "countsSolo":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  6,
+                                                                                  "format":  "3v3",
+                                                                                  "fixtureId":  "s11-r07-m1",
                                                                                   "countsTeam":  true
                                                                               }
                                                                           ]
@@ -2846,7 +3238,7 @@
                                                                           ]
                                                               },
                                                       "황윤도":  {
-                                                                  "solo":  3,
+                                                                  "solo":  4,
                                                                   "team":  1,
                                                                   "log":  [
                                                                               {
@@ -2876,6 +3268,13 @@
                                                                                   "format":  "3v3",
                                                                                   "fixtureId":  "s11-r06-m2",
                                                                                   "countsTeam":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  4,
+                                                                                  "format":  "1v1",
+                                                                                  "fixtureId":  "s11-r07-m3",
+                                                                                  "countsSolo":  true
                                                                               }
                                                                           ]
                                                               },
@@ -2948,7 +3347,7 @@
                                                                           ]
                                                               },
                                                       "황진영":  {
-                                                                  "solo":  1,
+                                                                  "solo":  2,
                                                                   "team":  2,
                                                                   "log":  [
                                                                               {
@@ -2971,12 +3370,19 @@
                                                                                   "format":  "3v3",
                                                                                   "fixtureId":  "s11-r06-m3",
                                                                                   "countsTeam":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  7,
+                                                                                  "format":  "1v1",
+                                                                                  "fixtureId":  "s11-r07-m2",
+                                                                                  "countsSolo":  true
                                                                               }
                                                                           ]
                                                               },
                                                       "황찬종":  {
-                                                                  "solo":  2,
-                                                                  "team":  5,
+                                                                  "solo":  3,
+                                                                  "team":  6,
                                                                   "log":  [
                                                                               {
                                                                                   "round":  2,
@@ -3033,6 +3439,20 @@
                                                                                   "slot":  3,
                                                                                   "format":  "2v2",
                                                                                   "fixtureId":  "s11-r06-m3",
+                                                                                  "countsTeam":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  1,
+                                                                                  "format":  "1v1",
+                                                                                  "fixtureId":  "s11-r07-m1",
+                                                                                  "countsSolo":  true
+                                                                              },
+                                                                              {
+                                                                                  "round":  7,
+                                                                                  "slot":  3,
+                                                                                  "format":  "2v2",
+                                                                                  "fixtureId":  "s11-r07-m1",
                                                                                   "countsTeam":  true
                                                                               }
                                                                           ]
