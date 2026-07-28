@@ -1,10 +1,12 @@
-/** 시즌11 출전 코인 집계 (상·하반기별 개인전 5 / 팀전 6) */
+/** 시즌11 출전 코인 집계 (상·하반기별 개인전 5 / 팀전 6 + 시즌 팀코인 3) */
 
 import { fixtureRoundMap, slotPlanBySlot } from './s11-season-simulate.mjs';
 
 export const COIN_CAPS = { solo: 5, team: 6 };
+/** 시즌 전체(상·하반 합산) 팀당 재량 팀코인 */
+export const TEAM_COIN_CAP = 3;
 /** coin-usage.json 과 집계 로직 동기화용 — 규칙 변경 시 증가 */
-export const COIN_LOGIC_VERSION = 1;
+export const COIN_LOGIC_VERSION = 2;
 
 export const HALF_RANGES = {
   first_half: { min: 1, max: 10, label: '상반기', roundLabel: '1R~10R' },
@@ -38,7 +40,11 @@ function formatLabel(format) {
 }
 
 function emptyPlayerCoin() {
-  return { solo: 0, team: 0, log: [] };
+  return { solo: 0, team: 0, teamCoin: 0, log: [] };
+}
+
+function emptyTeamCoin() {
+  return { used: 0, log: [] };
 }
 
 /** displayName → players.json tier */
@@ -47,6 +53,16 @@ export function tierByDisplayName(players) {
   for (const p of players || []) {
     const n = (p.displayName || '').trim();
     if (n) m.set(n, (p.tier || '').trim());
+  }
+  return m;
+}
+
+/** displayName → teamId */
+export function teamIdByDisplayName(players) {
+  const m = new Map();
+  for (const p of players || []) {
+    const n = (p.displayName || '').trim();
+    if (n) m.set(n, (p.teamId || '').trim());
   }
   return m;
 }
@@ -63,6 +79,12 @@ function countsSoloCoin(metaSlot, playerName, tierMap) {
 function ensurePlayerCoin(map, name) {
   if (!map.has(name)) map.set(name, emptyPlayerCoin());
   return map.get(name);
+}
+
+function ensureTeamCoin(map, teamId) {
+  if (!teamId) return null;
+  if (!map.has(teamId)) map.set(teamId, emptyTeamCoin());
+  return map.get(teamId);
 }
 
 function uniqueMatchups(matchups) {
@@ -85,19 +107,38 @@ export function dedupeRoundDocs(roundDocs) {
   return [...byRound.values()].sort((a, b) => (a.round || 0) - (b.round || 0));
 }
 
+function spendTeamCoin(teamCoins, teamId, entry, playerRec) {
+  const teamRec = ensureTeamCoin(teamCoins, teamId);
+  entry.usesTeamCoin = true;
+  if (playerRec) playerRec.teamCoin = (playerRec.teamCoin || 0) + 1;
+  if (!teamRec) return;
+  teamRec.used++;
+  teamRec.log.push({
+    round: entry.round,
+    slot: entry.slot,
+    format: entry.format,
+    fixtureId: entry.fixtureId,
+    displayName: entry.displayName,
+    half: entry.half,
+    kind: entry.teamCoinKind || null,
+  });
+}
+
 /**
  * @param {object} fixtures
  * @param {object[]} roundDocs
- * @param {object[]} [players] — players.json 항목 (개인전 tierLine 일치 판별)
- * @returns {{ byHalf: { first_half: Map, second_half: Map }, maxRoundByHalf: { first_half: number, second_half: number } }}
+ * @param {object[]} [players] — players.json 항목 (개인전 tierLine 일치·팀코인 소속 판별)
+ * @returns {{ byHalf: { first_half: Map, second_half: Map }, maxRoundByHalf: { first_half: number, second_half: number }, teamCoins: Map }}
  */
 export function buildCoinUsageByHalf(fixtures, roundDocs, players) {
   const tierMap = tierByDisplayName(players);
+  const teamMap = teamIdByDisplayName(players);
   const byHalf = {
     first_half: new Map(),
     second_half: new Map(),
   };
   const maxRoundByHalf = { first_half: 0, second_half: 0 };
+  const teamCoins = new Map();
 
   for (const doc of dedupeRoundDocs(roundDocs)) {
     const rnum = doc.round;
@@ -134,15 +175,25 @@ export function buildCoinUsageByHalf(fixtures, roundDocs, players) {
             slot: sl.slot,
             format,
             fixtureId: mu.fixtureId,
+            displayName: nm,
+            half,
           };
           if (isSolo) {
             if (countsSoloCoin(metaSlot, nm, tierMap)) {
-              rec.solo++;
-              entry.countsSolo = true;
+              if (rec.solo >= COIN_CAPS.solo) {
+                entry.teamCoinKind = 'solo';
+                spendTeamCoin(teamCoins, teamMap.get(nm) || '', entry, rec);
+              } else {
+                rec.solo++;
+                entry.countsSolo = true;
+              }
             } else {
               entry.countsSolo = false;
               entry.crossTier = true;
             }
+          } else if (rec.team >= COIN_CAPS.team) {
+            entry.teamCoinKind = 'team';
+            spendTeamCoin(teamCoins, teamMap.get(nm) || '', entry, rec);
           } else {
             rec.team++;
             entry.countsTeam = true;
@@ -153,7 +204,7 @@ export function buildCoinUsageByHalf(fixtures, roundDocs, players) {
     }
   }
 
-  return { byHalf, maxRoundByHalf };
+  return { byHalf, maxRoundByHalf, teamCoins };
 }
 
 export function defaultHalfKey(fixtures) {
@@ -165,12 +216,26 @@ export function coinUsageForPlayer(byHalf, halfKey, displayName) {
   if (!name) return emptyPlayerCoin();
   const rec = byHalf[halfKey]?.get(name);
   if (!rec) return emptyPlayerCoin();
-  return { solo: rec.solo, team: rec.team, log: rec.log.slice() };
+  return {
+    solo: rec.solo,
+    team: rec.team,
+    teamCoin: rec.teamCoin || 0,
+    log: rec.log.slice(),
+  };
+}
+
+export function teamCoinUsageForTeam(teamCoins, teamId) {
+  const id = (teamId || '').trim();
+  if (!id || !teamCoins) return emptyTeamCoin();
+  const rec = teamCoins.get ? teamCoins.get(id) : teamCoins[id];
+  if (!rec) return emptyTeamCoin();
+  return { used: rec.used || 0, log: Array.isArray(rec.log) ? rec.log.slice() : [] };
 }
 
 export function coinMeterTone(used, cap, kind = 'solo') {
   if (used >= cap) return 'cap';
   if (kind === 'team' && used >= 4) return 'warn';
+  if (kind === 'teamCoin' && used >= 2) return 'warn';
   if (kind === 'solo' && cap > 0 && used / cap >= 0.8) return 'warn';
   return 'ok';
 }
@@ -181,18 +246,32 @@ export function formatAppearanceTooltip(log) {
     .map((e) => {
       let line = `${e.round}R #${e.slot} ${formatLabel(e.format)}`;
       if (e.crossTier) line += ' (상위티어 출전)';
+      if (e.usesTeamCoin) line += ' (팀코인)';
       return line;
     })
     .join('\n');
 }
 
+export function formatTeamCoinTooltip(log) {
+  if (!Array.isArray(log) || !log.length) return '팀코인 사용 없음';
+  return log
+    .map((e) => {
+      const kind =
+        e.kind === 'solo' ? '개인전 한도초과' : e.kind === 'team' ? '팀전 한도초과' : '재량';
+      return `${e.round}R #${e.slot} ${formatLabel(e.format)} · ${e.displayName || '—'} (${kind})`;
+    })
+    .join('\n');
+}
+
 /** buildCoinUsageByHalf 결과 → coin-usage.json */
-export function coinUsageToJson({ byHalf, maxRoundByHalf }) {
+export function coinUsageToJson({ byHalf, maxRoundByHalf, teamCoins }) {
   const out = {
     schemaVersion: 1,
     coinLogicVersion: COIN_LOGIC_VERSION,
+    teamCoinCap: TEAM_COIN_CAP,
     generatedAt: new Date().toISOString(),
     byHalf: {},
+    teams: {},
   };
   for (const half of ['first_half', 'second_half']) {
     const players = {};
@@ -200,12 +279,20 @@ export function coinUsageToJson({ byHalf, maxRoundByHalf }) {
       players[name] = {
         solo: rec.solo,
         team: rec.team,
+        teamCoin: rec.teamCoin || 0,
         log: rec.log,
       };
     }
     out.byHalf[half] = {
       maxRound: maxRoundByHalf[half] || 0,
       players,
+    };
+  }
+  const teamEntries = teamCoins instanceof Map ? teamCoins.entries() : Object.entries(teamCoins || {});
+  for (const [teamId, rec] of teamEntries) {
+    out.teams[teamId] = {
+      used: rec.used || 0,
+      log: Array.isArray(rec.log) ? rec.log : [],
     };
   }
   return out;
@@ -225,9 +312,17 @@ export function coinUsageFromJson(doc) {
       byHalf[half].set(name, {
         solo: rec.solo || 0,
         team: rec.team || 0,
+        teamCoin: rec.teamCoin || 0,
         log: Array.isArray(rec.log) ? rec.log.slice() : [],
       });
     }
   }
-  return { byHalf, maxRoundByHalf };
+  const teamCoins = new Map();
+  for (const [teamId, rec] of Object.entries(doc.teams || {})) {
+    teamCoins.set(teamId, {
+      used: rec.used || 0,
+      log: Array.isArray(rec.log) ? rec.log.slice() : [],
+    });
+  }
+  return { byHalf, maxRoundByHalf, teamCoins };
 }

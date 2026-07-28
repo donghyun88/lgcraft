@@ -62,6 +62,44 @@
       color: #fff;
       letter-spacing: 0.02em;
     }
+    .chip-join-badge {
+      font-size: 0.5625rem;
+      font-weight: 800;
+      padding: 0.1rem 0.3rem;
+      border-radius: 0.2rem;
+      background: linear-gradient(135deg, #0d9488, #0f766e);
+      color: #fff;
+      letter-spacing: 0.02em;
+    }
+    .chip-teamcoin-badge {
+      font-size: 0.5625rem;
+      font-weight: 800;
+      padding: 0.1rem 0.3rem;
+      border-radius: 0.2rem;
+      background: linear-gradient(135deg, #db2777, #9d174d);
+      color: #fff;
+      letter-spacing: 0.02em;
+    }
+    .team-coin-meter {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      margin-top: 0.35rem;
+      padding: 0.2rem 0.4rem;
+      border-radius: 0.35rem;
+      border: 1px solid #fbcfe8;
+      background: #fdf2f8;
+      font-size: 0.625rem;
+      font-weight: 700;
+      color: #9d174d;
+      line-height: 1.2;
+    }
+    .team-coin-meter .coin-dot-filled.coin-ok { background: #db2777; }
+    .team-coin-meter .coin-dot-filled.coin-warn { background: #e11d48; }
+    .team-coin-meter .coin-dot-filled.coin-cap { background: #be123c; }
+    .team-coin-meter .coin-dot-count.coin-ok { color: #9d174d; }
+    .team-coin-meter .coin-dot-count.coin-warn { color: #be123c; }
+    .team-coin-meter .coin-dot-count.coin-cap { color: #9f1239; }
     .roster-team-logo-wrap {
       display: flex;
       justify-content: center;
@@ -297,7 +335,7 @@
     <section id="rosters" class="mb-10 scroll-mt-8">
       <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between mb-3">
         <h2 class="text-base font-semibold text-zinc-900">로스터</h2>
-        <p class="text-xs text-zinc-600 leading-snug font-medium">코인 = 세트 출전 1회 · 개인전 <span class="text-indigo-700">5</span> (본인 티어 슬롯만) · 팀전 <span class="text-orange-700">6</span> (반기별)</p>
+        <p class="text-xs text-zinc-600 leading-snug font-medium">코인 = 세트 출전 1회 · 개인전 <span class="text-indigo-700">5</span> (본인 티어 슬롯만) · 팀전 <span class="text-orange-700">6</span> (반기별) · <span class="text-pink-700 font-semibold">팀코인 3</span> (시즌 합산·한도 초과 재량 출전) · <span class="chip-teamcoin-badge align-middle">재량</span> = 팀코인 사용 · <span class="chip-join-badge align-middle">6R 합류</span> = 시즌 중 합류</p>
       </div>
       <div class="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between mb-3">
         <div class="inline-flex rounded-lg border border-zinc-200 bg-white p-0.5 shadow-sm" role="tablist" aria-label="출전 코인 반기">
@@ -320,6 +358,7 @@
     import { loadRoundDocsForRange } from './js/s11-data-loader.mjs';
     import {
       COIN_CAPS,
+      TEAM_COIN_CAP,
       HALF_RANGES,
       buildCoinUsageByHalf,
       coinUsageForPlayer,
@@ -327,6 +366,8 @@
       coinMeterTone,
       defaultHalfKey,
       formatAppearanceTooltip,
+      formatTeamCoinTooltip,
+      teamCoinUsageForTeam,
     } from './js/s11-coin-usage.mjs';
 
     const COIN_USAGE_URL = 'data/s11/coin-usage.json';
@@ -385,13 +426,16 @@
     }
 
     function playerCoinRec(p) {
-      if (!appState.coinUsage) return { solo: 0, team: 0, log: [] };
+      if (!appState.coinUsage) return { solo: 0, team: 0, teamCoin: 0, log: [] };
       return coinUsageForPlayer(appState.coinUsage.byHalf, appState.activeHalf, p.displayName);
     }
 
-    function renderCoinSeg(kind, used, cap, tone) {
-      const labelClass = kind === 'solo' ? 'coin-dot-label--solo' : 'coin-dot-label--team';
-      const label = kind === 'solo' ? '개' : '팀';
+    function teamCoinRec(teamId) {
+      if (!appState.coinUsage) return { used: 0, log: [] };
+      return teamCoinUsageForTeam(appState.coinUsage.teamCoins, teamId);
+    }
+
+    function renderCoinDots(used, cap, tone) {
       let dots = '<span class="coin-dots">';
       for (let i = 0; i < cap; i++) {
         const filled = i < used;
@@ -400,9 +444,15 @@
           : '<span class="coin-dot coin-dot-empty"></span>';
       }
       dots += '</span>';
+      return dots;
+    }
+
+    function renderCoinSeg(kind, used, cap, tone) {
+      const labelClass = kind === 'solo' ? 'coin-dot-label--solo' : 'coin-dot-label--team';
+      const label = kind === 'solo' ? '개' : '팀';
       return `<span class="coin-seg">
       <span class="coin-dot-label ${labelClass}">${label}</span>
-      ${dots}
+      ${renderCoinDots(used, cap, tone)}
       <span class="coin-dot-count coin-${tone}">${used}/${cap}</span>
     </span>`;
     }
@@ -422,6 +472,18 @@
   </div>`;
     }
 
+    function formatTeamCoinMeterHtml(teamId) {
+      const rec = teamCoinRec(teamId);
+      const tone = coinMeterTone(rec.used, TEAM_COIN_CAP, 'teamCoin');
+      const tip = escapeAttr(formatTeamCoinTooltip(rec.log));
+      const aria = escapeAttr(`팀코인 ${rec.used}/${TEAM_COIN_CAP} (시즌 합산)`);
+      return `<div class="team-coin-meter cursor-help" title="${tip}" aria-label="${aria}">
+      <span>팀코인</span>
+      ${renderCoinDots(rec.used, TEAM_COIN_CAP, tone)}
+      <span class="coin-dot-count coin-${tone}">${rec.used}/${TEAM_COIN_CAP}</span>
+    </div>`;
+    }
+
     function updateHalfTabs() {
       document.querySelectorAll('[data-coin-half]').forEach((btn) => {
         const on = btn.dataset.coinHalf === appState.activeHalf;
@@ -439,8 +501,14 @@
         return;
       }
       const maxR = appState.coinUsage.maxRoundByHalf[appState.activeHalf] || 0;
+      const teamCoinMap = appState.coinUsage.teamCoins;
+      const teamVals =
+        teamCoinMap instanceof Map
+          ? [...teamCoinMap.values()]
+          : Object.values(teamCoinMap || {});
+      const teamUsed = teamVals.reduce((s, rec) => s + (rec.used || 0), 0);
       const base = maxR
-        ? `${range.label} · ${maxR}라운드까지 결과 반영`
+        ? `${range.label} · ${maxR}라운드까지 결과 반영 · 팀코인 사용 ${teamUsed}`
         : `${range.label} · 출전 기록 없음`;
       el.textContent = appState.coinLoading ? `${base} (추가 로딩 중…)` : base;
     }
@@ -629,7 +697,18 @@
       const mainChip = isPlayerMainCaptain(meta, p)
         ? '<span class="chip-main-badge shrink-0">주장</span>'
         : '';
-      const coinHtml = formatCoinMeterHtml(playerCoinRec(p));
+      const joinRound = Number(p.joinedFromRound);
+      const joinChip =
+        Number.isFinite(joinRound) && joinRound >= 1
+          ? `<span class="chip-join-badge shrink-0" title="${joinRound}라운드부터 합류">${joinRound}R 합류</span>`
+          : '';
+      const coinRec = playerCoinRec(p);
+      const teamCoinUsed = Number(coinRec.teamCoin) || 0;
+      const teamCoinChip =
+        teamCoinUsed > 0
+          ? `<span class="chip-teamcoin-badge shrink-0" title="개인 코인 한도 초과 후 팀코인으로 출전 ${teamCoinUsed}회">재량×${teamCoinUsed}</span>`
+          : '';
+      const coinHtml = formatCoinMeterHtml(coinRec);
       return `<div class="rounded-md border px-1.5 py-1 mb-1 last:mb-0 ${bg}">
         <div class="flex items-start gap-1.5">
           ${pill}
@@ -637,7 +716,7 @@
             <div class="flex flex-wrap items-center gap-x-1 gap-y-0.5">
               <span class="font-semibold text-zinc-900">${escapeHtml(p.displayName)}</span>
               <span class="text-[10px] font-medium text-indigo-600/85 font-mono tracking-tight">${pid ? '(' + pid + ')' : ''}</span>
-              ${capChip}${mainChip}
+              ${capChip}${mainChip}${joinChip}${teamCoinChip}
             </div>
             ${coinHtml}
             ${ruleHtml}
@@ -688,6 +767,7 @@
           <div class="min-w-0 flex-1 text-left">
             <div class="text-sm font-bold text-zinc-900 leading-snug">${formatTeamHeaderName(t)}</div>
             <div class="text-[11px] text-zinc-500 tabular-nums mt-0.5">${playerCount}명</div>
+            ${formatTeamCoinMeterHtml(t.id)}
           </div>
           ${ROSTER_MOBILE_CHEVRON}
         </div>
@@ -757,6 +837,7 @@
                   <span class="cap-badge cap-badge-main shrink-0 mt-0.5">주장</span>
                   <span class="font-semibold text-zinc-900 leading-tight pt-0.5">${mainCap}</span>
                 </div>
+                ${formatTeamCoinMeterHtml(t.id)}
               </div>
             </th>`;
             })

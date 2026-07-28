@@ -1,6 +1,9 @@
 # manifest + results + fixtures + players → data/s11/coin-usage.json (Node 없이)
 $ErrorActionPreference = 'Stop'
-$COIN_LOGIC_VERSION = 1
+$COIN_LOGIC_VERSION = 2
+$COIN_CAPS_SOLO = 5
+$COIN_CAPS_TEAM = 6
+$TEAM_COIN_CAP = 3
 
 $here = Split-Path -Parent $MyInvocation.MyCommand.Path
 $dataRoot = Split-Path -Parent $here
@@ -38,6 +41,15 @@ function Get-TierMap($players) {
   foreach ($p in $players) {
     $n = ($p.displayName -as [string]).Trim()
     if ($n) { $m[$n] = ($p.tier -as [string]).Trim() }
+  }
+  return $m
+}
+
+function Get-TeamMap($players) {
+  $m = @{}
+  foreach ($p in $players) {
+    $n = ($p.displayName -as [string]).Trim()
+    if ($n) { $m[$n] = ($p.teamId -as [string]).Trim() }
   }
   return $m
 }
@@ -110,9 +122,34 @@ function Build-RoundDocs($fixtures, $manifest) {
 
 function Ensure-PlayerCoin($halfMap, [string]$name) {
   if (-not $halfMap.ContainsKey($name)) {
-    $halfMap[$name] = @{ solo = 0; team = 0; log = [System.Collections.Generic.List[object]]::new() }
+    $halfMap[$name] = @{ solo = 0; team = 0; teamCoin = 0; log = [System.Collections.Generic.List[object]]::new() }
   }
   return $halfMap[$name]
+}
+
+function Ensure-TeamCoin($teamCoins, [string]$teamId) {
+  if (-not $teamId) { return $null }
+  if (-not $teamCoins.ContainsKey($teamId)) {
+    $teamCoins[$teamId] = @{ used = 0; log = [System.Collections.Generic.List[object]]::new() }
+  }
+  return $teamCoins[$teamId]
+}
+
+function Spend-TeamCoin($teamCoins, [string]$teamId, $entry, $playerRec) {
+  $entry.usesTeamCoin = $true
+  if ($playerRec) { $playerRec.teamCoin++ }
+  $teamRec = Ensure-TeamCoin $teamCoins $teamId
+  if (-not $teamRec) { return }
+  $teamRec.used++
+  $teamRec.log.Add([ordered]@{
+    round       = $entry.round
+    slot        = $entry.slot
+    format      = $entry.format
+    fixtureId   = $entry.fixtureId
+    displayName = $entry.displayName
+    half        = $entry.half
+    kind        = $entry.teamCoinKind
+  })
 }
 
 $manifestPath = Join-Path $resultsDir 'manifest.json'
@@ -124,6 +161,7 @@ $manifest = Read-JsonFile $manifestPath
 $fixtures = Read-JsonFile (Join-Path $dataRoot 'fixtures.json')
 $playersData = Read-JsonFile (Join-Path $dataRoot 'players.json')
 $tierMap = Get-TierMap @($playersData.players)
+$teamMap = Get-TeamMap @($playersData.players)
 $roundDocs = Build-RoundDocs $fixtures $manifest
 
 $byHalf = @{
@@ -131,6 +169,7 @@ $byHalf = @{
   second_half = @{}
 }
 $maxRoundByHalf = @{ first_half = 0; second_half = 0 }
+$teamCoins = @{}
 
 $docsByRound = @{}
 foreach ($doc in $roundDocs) { $docsByRound[$doc.round] = $doc }
@@ -180,20 +219,31 @@ foreach ($rnum in $sortedRounds) {
 
       foreach ($nm in $names) {
         $rec = Ensure-PlayerCoin $byHalf[$half] $nm
+        $teamId = if ($teamMap.ContainsKey($nm)) { $teamMap[$nm] } else { '' }
         $entry = [ordered]@{
-          round     = $rnum
-          slot      = $sl.slot
-          format    = $format
-          fixtureId = $fid
+          round       = $rnum
+          slot        = $sl.slot
+          format      = $format
+          fixtureId   = $fid
+          displayName = $nm
+          half        = $half
         }
         if ($isSolo) {
           if (Test-CountsSoloCoin $metaSlot $nm $tierMap) {
-            $rec.solo++
-            $entry.countsSolo = $true
+            if ($rec.solo -ge $COIN_CAPS_SOLO) {
+              $entry.teamCoinKind = 'solo'
+              Spend-TeamCoin $teamCoins $teamId $entry $rec
+            } else {
+              $rec.solo++
+              $entry.countsSolo = $true
+            }
           } else {
             $entry.countsSolo = $false
             $entry.crossTier = $true
           }
+        } elseif ($rec.team -ge $COIN_CAPS_TEAM) {
+          $entry.teamCoinKind = 'team'
+          Spend-TeamCoin $teamCoins $teamId $entry $rec
         } else {
           $rec.team++
           $entry.countsTeam = $true
@@ -205,19 +255,22 @@ foreach ($rnum in $sortedRounds) {
 }
 
 $out = [ordered]@{
-  schemaVersion     = 1
-  coinLogicVersion  = $COIN_LOGIC_VERSION
-  generatedAt       = (Get-Date).ToUniversalTime().ToString('o')
-  byHalf            = [ordered]@{}
+  schemaVersion    = 1
+  coinLogicVersion = $COIN_LOGIC_VERSION
+  teamCoinCap      = $TEAM_COIN_CAP
+  generatedAt      = (Get-Date).ToUniversalTime().ToString('o')
+  byHalf           = [ordered]@{}
+  teams            = [ordered]@{}
 }
 
 foreach ($half in @('first_half', 'second_half')) {
   $playersOut = [ordered]@{}
   foreach ($kv in $byHalf[$half].GetEnumerator() | Sort-Object Name) {
     $playersOut[$kv.Key] = [ordered]@{
-      solo = $kv.Value.solo
-      team = $kv.Value.team
-      log  = @($kv.Value.log)
+      solo     = $kv.Value.solo
+      team     = $kv.Value.team
+      teamCoin = $kv.Value.teamCoin
+      log      = @($kv.Value.log)
     }
   }
   $out.byHalf[$half] = [ordered]@{
@@ -226,9 +279,17 @@ foreach ($half in @('first_half', 'second_half')) {
   }
 }
 
+foreach ($kv in $teamCoins.GetEnumerator() | Sort-Object Name) {
+  $out.teams[$kv.Key] = [ordered]@{
+    used = $kv.Value.used
+    log  = @($kv.Value.log)
+  }
+}
+
 $json = $out | ConvertTo-Json -Depth 20
 [System.IO.File]::WriteAllText($outPath, "$json`n", [System.Text.UTF8Encoding]::new($false))
 
 $firstCount = @($out.byHalf['first_half'].players.PSObject.Properties).Count
 $secondCount = @($out.byHalf['second_half'].players.PSObject.Properties).Count
-Write-Host "Wrote $outPath (first_half $firstCount players maxR $($maxRoundByHalf.first_half), second_half $secondCount players maxR $($maxRoundByHalf.second_half))"
+$teamCoinUsed = ($out.teams.PSObject.Properties | ForEach-Object { $_.Value.used } | Measure-Object -Sum).Sum
+Write-Host "Wrote $outPath (first_half $firstCount players maxR $($maxRoundByHalf.first_half), second_half $secondCount players maxR $($maxRoundByHalf.second_half), teamCoins used $teamCoinUsed)"

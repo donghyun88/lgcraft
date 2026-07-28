@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "season": 11,
-  "notes": "티어 표에서 같은 티어 블록의 1행=메인저그(Z), 2행=메인테란(T), 3행=메인토스(P). tierSheetMainRace 와 raceDefault 가 동일합니다. teamId 는 팀 확정 후 meta.json 의 t1~t6 로 채웁니다. raceVsOpponent 는 개인전 상대 종족(T/Z/P)별 픽. 팀 배정표 반영: teamId t1~t6 = 1~6팀. isCaptain = 팀장.",
+  "notes": "티어 표에서 같은 티어 블록의 1행=메인저그(Z), 2행=메인테란(T), 3행=메인토스(P). tierSheetMainRace 와 raceDefault 가 동일합니다. teamId 는 팀 확정 후 meta.json 의 t1~t6 로 채웁니다. raceVsOpponent 는 개인전 상대 종족(T/Z/P)별 픽. 팀 배정표 반영: teamId t1~t6 = 1~6팀. isCaptain = 팀장. joinedFromRound 가 있으면 해당 라운드부터 합류(로스터 표시용).",
   "players": [
     {
       "id": "KuSan",
@@ -721,6 +721,20 @@
         "hahaha",
         "TX_hahaha"
       ],
+      "isCaptain": false
+    },
+    {
+      "id": "HEYHEY",
+      "displayName": "이재현",
+      "teamId": "t5",
+      "tier": "아메바",
+      "tierSheetMainRace": "T",
+      "raceDefault": "T",
+      "aliases": [
+        "HEYHEY",
+        "TX_HEYHEY"
+      ],
+      "joinedFromRound": 6,
       "isCaptain": false
     },
     {
