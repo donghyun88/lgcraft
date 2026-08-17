@@ -431,7 +431,7 @@
   </div>
 
   <script type="module">
-    import { loadRoundDocsForRange } from './js/s11-data-loader.mjs';
+    import { loadAllSeasonRoundDocs } from './js/s11-data-loader.mjs';
 
     const PLAYOFF_SPOTS = 4;
     /** fixtures `matchups[].date` 가 "M/D" 일 때 사용하는 연도(요일 계산) */
@@ -1361,7 +1361,7 @@
           loadJson('data/s11/meta.json'),
           loadJson('data/s11/fixtures.json'),
         ]);
-        const roundDocs = await loadRoundDocsForRange(fixtures, 10);
+        const roundDocs = await loadAllSeasonRoundDocs(fixtures);
         hidePageLoadingBanner();
         const analysis = buildStandingsAnalysis(meta, fixtures, roundDocs);
         const nextByTeam = computeNextOpponents(meta, fixtures, roundDocs);

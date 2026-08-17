@@ -95,6 +95,10 @@ const SPECIAL_RACE = {
     raceVsOpponent: { Z: 'T' },
     notes: '메인 토스. 저그 상대일 때만 테란.',
   },
+  임승호: {
+    raceVsOpponent: { P: 'T' },
+    notes: '메인 토스. 토스 상대일 때만 테란.',
+  },
 };
 
 /** 시즌 간 종족 변경 등 메모 (SPECIAL_RACE.notes 가 있으면 그쪽이 우선) */

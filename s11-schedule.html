@@ -318,6 +318,22 @@
       color: #431407;
       box-shadow: 0 0 0 1px rgba(194, 65, 12, 0.25);
     }
+    .schedule-half-tab {
+      border-radius: 0.375rem;
+      padding: 0.35rem 0.75rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #52525b;
+      transition: background 0.15s ease, color 0.15s ease;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .schedule-half-tab:hover { color: #312e81; background: #eef2ff; }
+    .schedule-half-tab.is-active {
+      background: linear-gradient(135deg, #4f46e5, #4338ca);
+      color: #fff;
+      box-shadow: 0 1px 2px rgba(79, 70, 229, 0.35);
+    }
     /* 모바일 팀 순위 카드 (md 미만) */
     .standings-mobile-card {
       border-radius: 0.875rem;
@@ -400,18 +416,32 @@
 
     <!-- 경기 일정 -->
     <section id="schedule" class="mb-10 scroll-mt-8">
-      <h2 class="text-base font-semibold text-zinc-900 mb-2">경기 일정</h2>
+      <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between mb-3">
+        <h2 class="text-base font-semibold text-zinc-900">경기 일정</h2>
+        <div class="inline-flex rounded-lg border border-zinc-200 bg-white p-0.5 shadow-sm" role="tablist" aria-label="반기 일정">
+          <button type="button" class="schedule-half-tab" data-schedule-half="first_half" role="tab" aria-selected="false">상반기 <span class="hidden sm:inline">(1R~10R)</span></button>
+          <button type="button" class="schedule-half-tab is-active" data-schedule-half="second_half" role="tab" aria-selected="true">하반기 <span class="hidden sm:inline">(11R~20R)</span></button>
+        </div>
+      </div>
       <div id="scheduleRoot"></div>
     </section>
   </div>
 
   <script type="module">
-    import { loadRoundDocsForRange } from './js/s11-data-loader.mjs';
+    import { loadAllSeasonRoundDocs } from './js/s11-data-loader.mjs';
+    import { HALF_RANGES, defaultHalfKey } from './js/s11-coin-usage.mjs';
 
     const PLAYOFF_SPOTS = 4;
     /** fixtures `matchups[].date` 가 "M/D" 일 때 사용하는 연도(요일 계산) */
     const SCHEDULE_DATE_YEAR = 2026;
     const SCHEDULE_WEEKDAY_KO = ['일', '월', '화', '수', '목', '금', '토'];
+
+    const appState = {
+      meta: null,
+      fixtures: null,
+      roundDocs: [],
+      activeHalf: 'second_half',
+    };
 
     async function loadJson(path) {
       const res = await fetch(path);
@@ -1289,11 +1319,43 @@
         </div>`;
     }
 
+    function roundsForActiveHalf(fixtures, halfKey) {
+      const range = HALF_RANGES[halfKey] || HALF_RANGES.second_half;
+      return [...(fixtures.rounds || [])]
+        .filter((r) => {
+          const n = Number(r.round) || 0;
+          return n >= range.min && n <= range.max;
+        })
+        .sort((a, b) => (a.round || 0) - (b.round || 0));
+    }
+
+    function updateScheduleHalfTabs() {
+      document.querySelectorAll('[data-schedule-half]').forEach((btn) => {
+        const on = btn.dataset.scheduleHalf === appState.activeHalf;
+        btn.classList.toggle('is-active', on);
+        btn.setAttribute('aria-selected', on ? 'true' : 'false');
+      });
+    }
+
+    function wireScheduleHalfTabs() {
+      document.querySelectorAll('[data-schedule-half]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const half = btn.dataset.scheduleHalf;
+          if (!half || half === appState.activeHalf) return;
+          appState.activeHalf = half;
+          updateScheduleHalfTabs();
+          renderSchedule(appState.meta, appState.fixtures, appState.roundDocs);
+        });
+      });
+    }
+
     function renderSchedule(meta, fixtures, roundDocs) {
       const root = document.getElementById('scheduleRoot');
-      const rounds = [...(fixtures.rounds || [])].sort((a, b) => (a.round || 0) - (b.round || 0));
+      if (!root) return;
+      const range = HALF_RANGES[appState.activeHalf] || HALF_RANGES.second_half;
+      const rounds = roundsForActiveHalf(fixtures, appState.activeHalf);
       if (!rounds.length) {
-        root.innerHTML = '<p class="text-sm text-zinc-500">일정 데이터가 없습니다.</p>';
+        root.innerHTML = `<p class="text-sm text-zinc-500">${escapeHtml(range.label)} 일정 데이터가 없습니다.</p>`;
         return;
       }
       const SCHEDULE_ROUNDS_PER_CHUNK = 5;
@@ -1308,6 +1370,7 @@
           <h3 class="text-sm font-bold text-zinc-900 mb-3 flex flex-wrap items-center justify-center gap-2">
             <span class="rounded-md bg-indigo-100 text-indigo-900 px-2 py-0.5 tabular-nums">${startR}~${endR}</span>
             <span>라운드</span>
+            <span class="text-[11px] font-medium text-zinc-500">${escapeHtml(range.label)}</span>
           </h3>
           <div class="grid grid-cols-1 gap-3 min-w-0 sm:gap-3">
             ${panels}
@@ -1333,9 +1396,14 @@
           loadJson('data/s11/meta.json'),
           loadJson('data/s11/fixtures.json'),
         ]);
-        const roundDocs = await loadRoundDocsForRange(fixtures, 10);
+        appState.meta = meta;
+        appState.fixtures = fixtures;
+        appState.activeHalf = defaultHalfKey(fixtures, meta);
+        updateScheduleHalfTabs();
+        wireScheduleHalfTabs();
+        appState.roundDocs = await loadAllSeasonRoundDocs(fixtures);
         hidePageLoadingBanner();
-        renderSchedule(meta, fixtures, roundDocs);
+        renderSchedule(appState.meta, appState.fixtures, appState.roundDocs);
       } catch (e) {
         console.error(e);
         hidePageLoadingBanner();

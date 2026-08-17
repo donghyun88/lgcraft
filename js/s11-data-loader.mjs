@@ -1,13 +1,13 @@
 /** 시즌11 라운드 결과 — fixture ID 기반 병렬 로드 + manifest + sessionStorage 캐시 */
 
-export const RESULTS_CACHE_VERSION = 3;
+export const RESULTS_CACHE_VERSION = 4;
 
 const MANIFEST_URL = 'data/s11/results/manifest.json';
 
 let manifestCache;
 let manifestPromise;
 
-export function listFixtureIdsFromFixtures(fixtures, minRound = 1, maxRound = 10) {
+export function listFixtureIdsFromFixtures(fixtures, minRound = 1, maxRound = 20) {
   const ids = [];
   for (const rd of fixtures.rounds || []) {
     const r = rd.round;
@@ -19,8 +19,30 @@ export function listFixtureIdsFromFixtures(fixtures, minRound = 1, maxRound = 10
   return ids;
 }
 
+/** fixtures.rounds 에 정의된 최대 라운드 (없으면 20) */
+export function maxScheduledRound(fixtures) {
+  let max = 0;
+  for (const rd of fixtures?.rounds || []) {
+    const r = Number(rd.round) || 0;
+    if (r > max) max = r;
+  }
+  return max > 0 ? max : 20;
+}
+
+/** manifest matchResults 에서 파싱한 최대 라운드 번호 */
+export function maxResultRoundFromManifest(manifest) {
+  let max = 0;
+  for (const id of manifest?.matchResults || []) {
+    const m = String(id).match(/-r(\d+)/i);
+    if (!m) continue;
+    const r = Number(m[1]);
+    if (Number.isFinite(r) && r > max) max = r;
+  }
+  return max > 0 ? max : 0;
+}
+
 /** manifest가 있으면 실제 존재하는 결과 파일만 반환 (404 방지) */
-export function fixtureIdsForRoundRange(fixtures, minRound = 1, maxRound = 10, manifest = null) {
+export function fixtureIdsForRoundRange(fixtures, minRound = 1, maxRound = 20, manifest = null) {
   const ids = listFixtureIdsFromFixtures(fixtures, minRound, maxRound);
   const listed = manifest?.matchResults;
   if (!Array.isArray(listed) || !listed.length) return ids;
@@ -28,23 +50,38 @@ export function fixtureIdsForRoundRange(fixtures, minRound = 1, maxRound = 10, m
   return ids.filter((id) => available.has(id));
 }
 
-export async function loadResultsManifest() {
-  if (manifestCache !== undefined) return manifestCache;
-  if (!manifestPromise) {
-    manifestPromise = fetch(MANIFEST_URL, { cache: 'default' })
-      .then((res) => (res.ok ? res.json() : null))
-      .catch(() => null);
+export async function loadResultsManifest({ force = false } = {}) {
+  if (!force && manifestCache !== undefined) return manifestCache;
+  if (force) {
+    manifestCache = undefined;
+    manifestPromise = undefined;
   }
-  manifestCache = await manifestPromise;
-  return manifestCache;
+  if (!manifestPromise) {
+    manifestPromise = fetch(MANIFEST_URL, { cache: 'no-store' })
+      .then((res) => (res.ok ? res.json() : null))
+      .catch(() => null)
+      .then((data) => {
+        manifestCache = data;
+        return data;
+      });
+  }
+  return manifestPromise;
 }
 
 export function matchupFromPerMatchDoc(doc, fixtureId) {
   if (!doc || !Array.isArray(doc.matchups)) return null;
-  return doc.matchups.find((x) => x.fixtureId === fixtureId) || null;
+  // match-input은 보통 matchups[0].fixtureId = 파일명과 동일
+  const hit = doc.matchups.find((x) => x.fixtureId === fixtureId);
+  if (hit) return hit;
+  // 단일 매치 파일이면 fixtureId 누락 시 첫 매치업을 해당 ID로 사용
+  if (doc.matchups.length === 1) {
+    const only = doc.matchups[0];
+    if (only && !only.fixtureId) return { ...only, fixtureId };
+  }
+  return null;
 }
 
-export async function fetchPerMatchResultDoc(fixtureId, { cache = 'default' } = {}) {
+export async function fetchPerMatchResultDoc(fixtureId, { cache = 'no-store' } = {}) {
   const url = `data/s11/results/${fixtureId}.json`;
   const res = await fetch(url, { cache });
   if (!res.ok) return null;
@@ -136,6 +173,7 @@ export async function loadRoundDocsForRange(fixtures, maxRound, minRound = 1, { 
   const docs = buildRoundDocsFromMatchups(fixtures, matchupsByFixtureId).filter(
     (d) => d.round >= start && d.round <= end,
   );
+  // 라운드 일부만 있는 경우(예: 11R m1만)에도 캐시 — missing은 매니페스트 대비 파일 fetch 실패일 때만 문제
   if (useCache && docs.length && !missing.length) writeCache(start, end, docs, manifest);
   return docs;
 }
@@ -150,6 +188,15 @@ export async function loadSingleRoundDoc(fixtures, roundNum) {
   const matchupsByFixtureId = await fetchMatchupsForFixtureIds(fixtureIds);
   const docs = buildRoundDocsFromMatchups(fixtures, matchupsByFixtureId);
   return docs.find((d) => d.round === roundNum) || null;
+}
+
+/** fixtures(+결과 매니페스트) 기준으로 시즌 전체 결과 로드 */
+export async function loadAllSeasonRoundDocs(fixtures, { useCache = true } = {}) {
+  const maxSched = maxScheduledRound(fixtures);
+  const manifest = await loadResultsManifest();
+  const maxRes = maxResultRoundFromManifest(manifest);
+  const maxRound = Math.max(maxSched, maxRes, 20);
+  return loadRoundDocsForRange(fixtures, maxRound, 1, { useCache });
 }
 
 /** @deprecated loadRoundDocsForRange 사용 */

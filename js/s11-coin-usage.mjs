@@ -207,8 +207,9 @@ export function buildCoinUsageByHalf(fixtures, roundDocs, players) {
   return { byHalf, maxRoundByHalf, teamCoins };
 }
 
-export function defaultHalfKey(fixtures) {
-  return fixtures && fixtures.phase === 'second_half' ? 'second_half' : 'first_half';
+export function defaultHalfKey(fixtures, meta) {
+  if (meta?.phase === 'second_half' || fixtures?.phase === 'second_half') return 'second_half';
+  return 'first_half';
 }
 
 export function coinUsageForPlayer(byHalf, halfKey, displayName) {

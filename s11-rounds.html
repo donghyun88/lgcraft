@@ -48,6 +48,22 @@
       border-color: #4338ca;
       box-shadow: 0 1px 2px rgba(67, 56, 202, 0.25);
     }
+    .rounds-half-tab {
+      border-radius: 0.375rem;
+      padding: 0.35rem 0.75rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #52525b;
+      transition: background 0.15s ease, color 0.15s ease;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .rounds-half-tab:hover { color: #312e81; background: #eef2ff; }
+    .rounds-half-tab.is-active {
+      background: linear-gradient(135deg, #4f46e5, #4338ca);
+      color: #fff;
+      box-shadow: 0 1px 2px rgba(79, 70, 229, 0.35);
+    }
     .round-pane.hidden { display: none; }
     .round-team-logo-frame {
       position: relative;
@@ -223,15 +239,53 @@
 
     <div id="loading" class="rounded-xl border border-zinc-200 bg-white p-10 text-center text-zinc-500 shadow-sm">불러오는 중…</div>
     <div id="main" class="hidden rounded-xl border border-zinc-200 bg-white p-4 sm:p-6 shadow-sm">
+      <div class="mb-4 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div class="inline-flex rounded-lg border border-zinc-200 bg-white p-0.5 shadow-sm" role="tablist" aria-label="반기">
+          <button type="button" class="rounds-half-tab" data-rounds-half="first_half" role="tab" aria-selected="false">상반기 <span class="hidden sm:inline">(1R~10R)</span></button>
+          <button type="button" class="rounds-half-tab is-active" data-rounds-half="second_half" role="tab" aria-selected="true">하반기 <span class="hidden sm:inline">(11R~20R)</span></button>
+        </div>
+      </div>
       <div id="roundTabs" class="mb-4 flex flex-wrap gap-1 border-b border-zinc-200 pb-2"></div>
       <div id="roundPanes"></div>
     </div>
   </div>
 
   <script type="module">
-    import { loadSingleRoundDoc } from './js/s11-data-loader.mjs';
+    import { loadSingleRoundDoc, loadResultsManifest } from './js/s11-data-loader.mjs';
+    import { HALF_RANGES, defaultHalfKey } from './js/s11-coin-usage.mjs';
 
     const SCHEDULE_DATE_YEAR = 2026;
+
+    /** manifest matchResults 에 있는 가장 최근 라운드 번호 (결과 파일이 있는 라운드) */
+    function latestResultRoundFromManifest(manifest, availableRounds) {
+      const allowed = new Set((availableRounds || []).map((n) => Number(n)));
+      let max = 0;
+      for (const id of manifest?.matchResults || []) {
+        const m = String(id).match(/-r(\d+)/i);
+        if (!m) continue;
+        const r = Number(m[1]);
+        if (!Number.isFinite(r) || r < 1) continue;
+        if (allowed.size && !allowed.has(r)) continue;
+        if (r > max) max = r;
+      }
+      return max > 0 ? max : null;
+    }
+
+    function roundsInHalf(allRounds, halfKey) {
+      const range = HALF_RANGES[halfKey] || HALF_RANGES.second_half;
+      return (allRounds || []).filter((r) => {
+        const n = Number(r.round) || 0;
+        return n >= range.min && n <= range.max;
+      });
+    }
+
+    function pickInitialRoundForHalf(halfRounds, manifest) {
+      if (!halfRounds.length) return null;
+      const nums = halfRounds.map((r) => r.round);
+      const latest = latestResultRoundFromManifest(manifest, nums);
+      if (latest != null && nums.includes(latest)) return latest;
+      return halfRounds[0].round;
+    }
 
     async function loadJson(path) {
       const res = await fetch(path);
@@ -843,30 +897,24 @@
           loadJson('data/s11/players.json'),
         ]);
         const rosterMap = rosterByDisplayName(playersData.players || []);
+        const allRounds = [...(fixtures.rounds || [])].sort((a, b) => (a.round || 0) - (b.round || 0));
+        if (!allRounds.length) throw new Error('fixtures.json에 rounds가 없습니다.');
 
-        const rounds = [...(fixtures.rounds || [])].sort((a, b) => (a.round || 0) - (b.round || 0));
-        if (!rounds.length) throw new Error('fixtures.json에 rounds가 없습니다.');
-
-        const firstRound = rounds[0].round;
-        const firstDoc = await loadSingleRoundDoc(fixtures, firstRound);
+        const manifest = await loadResultsManifest();
         const loadingRounds = new Set();
+        const appState = {
+          activeHalf: defaultHalfKey(fixtures, meta),
+          activeRound: null,
+          halfRounds: [],
+        };
 
-        tabsEl.className = 'mb-5 flex flex-wrap gap-1 p-1 rounded-xl bg-zinc-200/35 border border-zinc-200/60';
-        tabsEl.innerHTML = rounds
-          .map(
-            (r, i) =>
-              `<button type="button" data-round="${r.round}" class="sub-tab py-2 px-3.5 text-sm rounded-lg ${i === 0 ? 'active' : ''}">${r.round}라운드</button>`,
-          )
-          .join('');
-
-        panesEl.innerHTML = rounds
-          .map((fr, i) => {
-            if (fr.round === firstRound) {
-              return renderRoundPane(meta, fr, firstDoc, i === 0, rosterMap, fixtures);
-            }
-            return renderRoundPanePlaceholder(fr, i === 0);
-          })
-          .join('');
+        function updateHalfTabs() {
+          document.querySelectorAll('[data-rounds-half]').forEach((btn) => {
+            const on = btn.dataset.roundsHalf === appState.activeHalf;
+            btn.classList.toggle('is-active', on);
+            btn.setAttribute('aria-selected', on ? 'true' : 'false');
+          });
+        }
 
         async function ensureRoundPane(roundNum) {
           const pane = panesEl.querySelector(`#round-pane-${roundNum}`);
@@ -874,7 +922,7 @@
           if (loadingRounds.has(roundNum)) return;
           loadingRounds.add(roundNum);
           try {
-            const fr = rounds.find((x) => x.round === roundNum);
+            const fr = allRounds.find((x) => x.round === roundNum);
             const doc = await loadSingleRoundDoc(fixtures, roundNum);
             const isVisible = !pane.classList.contains('hidden');
             const html = renderRoundPane(meta, fr, doc, isVisible, rosterMap, fixtures);
@@ -888,17 +936,99 @@
           }
         }
 
-        tabsEl.querySelectorAll('.sub-tab').forEach((tab) => {
-          tab.addEventListener('click', async () => {
-            const r = tab.dataset.round;
-            tabsEl.querySelectorAll('.sub-tab').forEach((t) => t.classList.remove('active'));
-            panesEl.querySelectorAll('.round-pane').forEach((p) => p.classList.add('hidden'));
-            tab.classList.add('active');
-            await ensureRoundPane(Number(r));
-            const pane = panesEl.querySelector(`#round-pane-${r}`);
-            if (pane) pane.classList.remove('hidden');
+        function wireRoundTabs() {
+          tabsEl.querySelectorAll('.sub-tab').forEach((tab) => {
+            tab.addEventListener('click', async () => {
+              const r = Number(tab.dataset.round);
+              if (!Number.isFinite(r) || r === appState.activeRound) return;
+              appState.activeRound = r;
+              tabsEl.querySelectorAll('.sub-tab').forEach((t) => t.classList.remove('active'));
+              panesEl.querySelectorAll('.round-pane').forEach((p) => p.classList.add('hidden'));
+              tab.classList.add('active');
+              await ensureRoundPane(r);
+              const pane = panesEl.querySelector(`#round-pane-${r}`);
+              if (pane) pane.classList.remove('hidden');
+            });
+          });
+        }
+
+        async function renderHalfView(preferRound) {
+          appState.halfRounds = roundsInHalf(allRounds, appState.activeHalf);
+          const range = HALF_RANGES[appState.activeHalf] || HALF_RANGES.second_half;
+
+          if (!appState.halfRounds.length) {
+            tabsEl.className = 'mb-5 flex flex-wrap gap-1 p-1 rounded-xl bg-zinc-200/35 border border-zinc-200/60';
+            tabsEl.innerHTML = '';
+            panesEl.innerHTML = `<p class="text-sm text-zinc-500 py-6 text-center">${escapeHtml(range.label)} 라운드 일정이 없습니다.</p>`;
+            appState.activeRound = null;
+            return;
+          }
+
+          const nums = appState.halfRounds.map((r) => r.round);
+          let initialRound =
+            preferRound != null && nums.includes(preferRound)
+              ? preferRound
+              : pickInitialRoundForHalf(appState.halfRounds, manifest);
+          if (initialRound == null) initialRound = appState.halfRounds[0].round;
+          appState.activeRound = initialRound;
+
+          tabsEl.className = 'mb-5 flex flex-wrap gap-1 p-1 rounded-xl bg-zinc-200/35 border border-zinc-200/60';
+          tabsEl.innerHTML = appState.halfRounds
+            .map((r) => {
+              const active = r.round === initialRound ? 'active' : '';
+              return `<button type="button" data-round="${r.round}" class="sub-tab py-2 px-3.5 text-sm rounded-lg ${active}">${r.round}라운드</button>`;
+            })
+            .join('');
+
+          const initialDoc = await loadSingleRoundDoc(fixtures, initialRound);
+          panesEl.innerHTML = appState.halfRounds
+            .map((fr) => {
+              if (fr.round === initialRound) {
+                return renderRoundPane(meta, fr, initialDoc, true, rosterMap, fixtures);
+              }
+              return renderRoundPanePlaceholder(fr, false);
+            })
+            .join('');
+
+          wireRoundTabs();
+          const activeTab = tabsEl.querySelector('.sub-tab.active');
+          if (activeTab && typeof activeTab.scrollIntoView === 'function') {
+            activeTab.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'auto' });
+          }
+        }
+
+        document.querySelectorAll('[data-rounds-half]').forEach((btn) => {
+          btn.addEventListener('click', async () => {
+            const half = btn.dataset.roundsHalf;
+            if (!half || half === appState.activeHalf) return;
+            appState.activeHalf = half;
+            updateHalfTabs();
+            await renderHalfView(null);
           });
         });
+
+        // 하반기 시즌이면 하반기 탭 기본. 상반기 시즌이면 최신 결과가 있는 반기.
+        const latestAny = latestResultRoundFromManifest(
+          manifest,
+          allRounds.map((r) => r.round),
+        );
+        const phaseDefault = defaultHalfKey(fixtures, meta);
+        if (phaseDefault === 'second_half') {
+          appState.activeHalf = 'second_half';
+        } else if (latestAny != null) {
+          appState.activeHalf = latestAny >= 11 ? 'second_half' : 'first_half';
+        } else {
+          appState.activeHalf = phaseDefault;
+        }
+        updateHalfTabs();
+
+        // 최신 결과가 현재 반기에 있으면 그 라운드, 없으면 해당 반기 기본 라운드
+        let prefer = null;
+        if (latestAny != null) {
+          const halfOfLatest = latestAny >= 11 ? 'second_half' : 'first_half';
+          if (halfOfLatest === appState.activeHalf) prefer = latestAny;
+        }
+        await renderHalfView(prefer);
 
         loading.classList.add('hidden');
         main.classList.remove('hidden');

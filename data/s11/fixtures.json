@@ -1,149 +1,109 @@
 {
   "schemaVersion": 1,
   "season": 11,
-  "phase": "first_half",
+  "phase": "second_half",
   "matchupPreset": {
-    "description": "1~10라운드 팀대전 3경기(t6 포함). 라운드별 1~7경기 티어·맵·2v2/3v3 포인트 상한은 운영 확정 일정 반영. 대진·경기일은 운영 확정 홈·원정 표준안. pairsByRound[\"1\"]~\"10\"은 해당 라운드에서 날짜 열 순(왼쪽→오른쪽)과 같은 팀쌍 순서입니다.",
+    "description": "1~20라운드 팀대전 3경기(t6 포함). 라운드별 1~7경기 티어·맵·2v2/3v3 포인트 상한·대진·경기일은 운영 확정 일정 반영(상반기 1~10R, 하반기 11~20R). pairsByRound[\"n\"]은 해당 라운드 날짜 열 순(왼쪽→오른쪽·이른 날짜→늦은 날짜) 팀쌍입니다. 휴가: 8/3~8/9 여름, 9/21~9/27 추석.",
     "pairsByRound": {
       "1": [
-        [
-          "t5",
-          "t6"
-        ],
-        [
-          "t3",
-          "t4"
-        ],
-        [
-          "t1",
-          "t2"
-        ]
+        ["t5", "t6"],
+        ["t3", "t4"],
+        ["t1", "t2"]
       ],
       "2": [
-        [
-          "t1",
-          "t3"
-        ],
-        [
-          "t4",
-          "t6"
-        ],
-        [
-          "t2",
-          "t5"
-        ]
+        ["t1", "t3"],
+        ["t4", "t6"],
+        ["t2", "t5"]
       ],
       "3": [
-        [
-          "t3",
-          "t5"
-        ],
-        [
-          "t2",
-          "t6"
-        ],
-        [
-          "t1",
-          "t4"
-        ]
+        ["t3", "t5"],
+        ["t2", "t6"],
+        ["t1", "t4"]
       ],
       "4": [
-        [
-          "t2",
-          "t4"
-        ],
-        [
-          "t1",
-          "t5"
-        ],
-        [
-          "t3",
-          "t6"
-        ]
+        ["t2", "t4"],
+        ["t1", "t5"],
+        ["t3", "t6"]
       ],
       "5": [
-        [
-          "t1",
-          "t6"
-        ],
-        [
-          "t2",
-          "t3"
-        ],
-        [
-          "t4",
-          "t5"
-        ]
+        ["t1", "t6"],
+        ["t2", "t3"],
+        ["t4", "t5"]
       ],
       "6": [
-        [
-          "t4",
-          "t5"
-        ],
-        [
-          "t1",
-          "t6"
-        ],
-        [
-          "t2",
-          "t3"
-        ]
+        ["t4", "t5"],
+        ["t1", "t6"],
+        ["t2", "t3"]
       ],
       "7": [
-        [
-          "t3",
-          "t6"
-        ],
-        [
-          "t2",
-          "t4"
-        ],
-        [
-          "t1",
-          "t5"
-        ]
+        ["t3", "t6"],
+        ["t2", "t4"],
+        ["t1", "t5"]
       ],
       "8": [
-        [
-          "t1",
-          "t4"
-        ],
-        [
-          "t3",
-          "t5"
-        ],
-        [
-          "t2",
-          "t6"
-        ]
+        ["t1", "t4"],
+        ["t3", "t5"],
+        ["t2", "t6"]
       ],
       "9": [
-        [
-          "t2",
-          "t5"
-        ],
-        [
-          "t1",
-          "t3"
-        ],
-        [
-          "t4",
-          "t6"
-        ]
+        ["t2", "t5"],
+        ["t1", "t3"],
+        ["t4", "t6"]
       ],
       "10": [
-        [
-          "t1",
-          "t2"
-        ],
-        [
-          "t5",
-          "t6"
-        ],
-        [
-          "t3",
-          "t4"
-        ]
+        ["t1", "t2"],
+        ["t5", "t6"],
+        ["t3", "t4"]
+      ],
+      "11": [
+        ["t2", "t5"],
+        ["t3", "t1"],
+        ["t4", "t6"]
+      ],
+      "12": [
+        ["t3", "t4"],
+        ["t1", "t5"],
+        ["t2", "t6"]
+      ],
+      "13": [
+        ["t3", "t6"],
+        ["t4", "t5"],
+        ["t1", "t2"]
+      ],
+      "14": [
+        ["t2", "t4"],
+        ["t1", "t6"],
+        ["t3", "t5"]
+      ],
+      "15": [
+        ["t5", "t6"],
+        ["t2", "t3"],
+        ["t1", "t4"]
+      ],
+      "16": [
+        ["t1", "t3"],
+        ["t4", "t6"],
+        ["t2", "t5"]
+      ],
+      "17": [
+        ["t4", "t5"],
+        ["t1", "t2"],
+        ["t3", "t6"]
+      ],
+      "18": [
+        ["t2", "t3"],
+        ["t5", "t6"],
+        ["t1", "t4"]
+      ],
+      "19": [
+        ["t1", "t5"],
+        ["t3", "t4"],
+        ["t2", "t6"]
+      ],
+      "20": [
+        ["t1", "t6"],
+        ["t2", "t4"],
+        ["t3", "t5"]
       ]
     }
   },
@@ -163,7 +123,12 @@
     "폴리포이드",
     "매치포인트",
     "투혼",
-    "실피드"
+    "실피드",
+    "아이올로스",
+    "오디세이",
+    "백룸",
+    "컬러리스페이트",
+    "라데온"
   ],
   "slotIndexes": [
     1,
@@ -183,8 +148,12 @@
       "2v2": "한니발",
       "3v3": "빠무"
     },
-    "_note": "라운드별 정확한 맵·상한은 rounds[].slotPlan 참고. 홀/짝 라운드 팀플 맵 교대 요약."
+    "_note": "라운드별 정확한 맵·상한은 rounds[].slotPlan 참고. 하반기(11~20R)는 황산벌/트로이·헌트리스/빠른무한 등으로 슬롯플랜 확정."
   },
+  "breaks": [
+    { "name": "여름 휴가", "from": "8/3", "to": "8/9" },
+    { "name": "추석 연휴", "from": "9/21", "to": "9/27" }
+  ],
   "rounds": [
     {
       "round": 1,
@@ -982,28 +951,189 @@
       "matchups": [
         {
           "id": "s11-r10-m1",
-          "teamIds": [
-            "t1",
-            "t2"
-          ],
+          "teamIds": ["t1", "t2"],
           "date": "7/28"
         },
         {
           "id": "s11-r10-m2",
-          "teamIds": [
-            "t5",
-            "t6"
-          ],
+          "teamIds": ["t5", "t6"],
           "date": "7/30"
         },
         {
           "id": "s11-r10-m3",
-          "teamIds": [
-            "t3",
-            "t4"
-          ],
+          "teamIds": ["t3", "t4"],
           "date": "8/2"
         }
+      ]
+    },
+    {
+      "round": 11,
+      "slotPlan": [
+        { "slot": 1, "format": "1v1", "tierLine": "애니멀", "map": "아이올로스", "notes": "개인전: race 생략 시 등록종족" },
+        { "slot": 2, "format": "1v1", "tierLine": "휴먼", "map": "오디세이", "notes": "개인전: race 생략 시 등록종족" },
+        { "slot": 3, "format": "2v2", "tierLine": null, "map": "황산벌", "pointCapPerTeam": 7, "notes": "각 팀 출전 2명의 티어 포인트 합 ≤ 7" },
+        { "slot": 4, "format": "1v1", "tierLine": "킹", "map": "녹아웃", "notes": "개인전: race 생략 시 등록종족" },
+        { "slot": 5, "format": "1v1", "tierLine": "갓", "map": "백룸", "notes": "개인전: race 생략 시 등록종족" },
+        { "slot": 6, "format": "3v3", "tierLine": null, "map": "헌트리스", "pointCapPerTeam": 8, "notes": "각 팀 출전 3명의 티어 포인트 합 ≤ 8" },
+        { "slot": 7, "format": "1v1", "tierLine": "아메바", "map": "컬러리스페이트", "notes": "개인전: race 생략 시 등록종족" }
+      ],
+      "matchups": [
+        { "id": "s11-r11-m1", "teamIds": ["t2", "t5"], "date": "8/11" },
+        { "id": "s11-r11-m2", "teamIds": ["t3", "t1"], "date": "8/13" },
+        { "id": "s11-r11-m3", "teamIds": ["t4", "t6"], "date": "8/16" }
+      ]
+    },
+    {
+      "round": 12,
+      "slotPlan": [
+        { "slot": 1, "format": "1v1", "tierLine": "휴먼", "map": "녹아웃", "notes": "개인전: race 생략 시 등록종족" },
+        { "slot": 2, "format": "1v1", "tierLine": "킹", "map": "백룸", "notes": "개인전: race 생략 시 등록종족" },
+        { "slot": 3, "format": "2v2", "tierLine": null, "map": "트로이", "pointCapPerTeam": 8, "notes": "각 팀 출전 2명의 티어 포인트 합 ≤ 8" },
+        { "slot": 4, "format": "1v1", "tierLine": "갓", "map": "애티튜드", "notes": "개인전: race 생략 시 등록종족" },
+        { "slot": 5, "format": "1v1", "tierLine": "아메바", "map": "아이올로스", "notes": "개인전: race 생략 시 등록종족" },
+        { "slot": 6, "format": "3v3", "tierLine": null, "map": "빠른무한", "pointCapPerTeam": 7, "notes": "각 팀 출전 3명의 티어 포인트 합 ≤ 7" },
+        { "slot": 7, "format": "1v1", "tierLine": "애니멀", "map": "오디세이", "notes": "개인전: race 생략 시 등록종족" }
+      ],
+      "matchups": [
+        { "id": "s11-r12-m1", "teamIds": ["t3", "t4"], "date": "8/18" },
+        { "id": "s11-r12-m2", "teamIds": ["t1", "t5"], "date": "8/20" },
+        { "id": "s11-r12-m3", "teamIds": ["t2", "t6"], "date": "8/23" }
+      ]
+    },
+    {
+      "round": 13,
+      "slotPlan": [
+        { "slot": 1, "format": "1v1", "tierLine": "킹", "map": "애티튜드", "notes": "개인전: race 생략 시 등록종족" },
+        { "slot": 2, "format": "1v1", "tierLine": "갓", "map": "옥타곤", "notes": "개인전: race 생략 시 등록종족" },
+        { "slot": 3, "format": "2v2", "tierLine": null, "map": "황산벌", "pointCapPerTeam": 5, "notes": "각 팀 출전 2명의 티어 포인트 합 ≤ 5" },
+        { "slot": 4, "format": "1v1", "tierLine": "아메바", "map": "오디세이", "notes": "개인전: race 생략 시 등록종족" },
+        { "slot": 5, "format": "1v1", "tierLine": "애니멀", "map": "녹아웃", "notes": "개인전: race 생략 시 등록종족" },
+        { "slot": 6, "format": "3v3", "tierLine": null, "map": "헌트리스", "pointCapPerTeam": 10, "notes": "각 팀 출전 3명의 티어 포인트 합 ≤ 10" },
+        { "slot": 7, "format": "1v1", "tierLine": "휴먼", "map": "백룸", "notes": "개인전: race 생략 시 등록종족" }
+      ],
+      "matchups": [
+        { "id": "s11-r13-m1", "teamIds": ["t3", "t6"], "date": "8/25" },
+        { "id": "s11-r13-m2", "teamIds": ["t4", "t5"], "date": "8/27" },
+        { "id": "s11-r13-m3", "teamIds": ["t1", "t2"], "date": "8/30" }
+      ]
+    },
+    {
+      "round": 14,
+      "slotPlan": [
+        { "slot": 1, "format": "1v1", "tierLine": "갓", "map": "투혼", "notes": "개인전: race 생략 시 등록종족" },
+        { "slot": 2, "format": "1v1", "tierLine": "아메바", "map": "녹아웃", "notes": "개인전: race 생략 시 등록종족" },
+        { "slot": 3, "format": "2v2", "tierLine": null, "map": "트로이", "pointCapPerTeam": 6, "notes": "각 팀 출전 2명의 티어 포인트 합 ≤ 6" },
+        { "slot": 4, "format": "1v1", "tierLine": "애니멀", "map": "백룸", "notes": "개인전: race 생략 시 등록종족" },
+        { "slot": 5, "format": "1v1", "tierLine": "휴먼", "map": "애티튜드", "notes": "개인전: race 생략 시 등록종족" },
+        { "slot": 6, "format": "3v3", "tierLine": null, "map": "빠른무한", "pointCapPerTeam": 9, "notes": "각 팀 출전 3명의 티어 포인트 합 ≤ 9" },
+        { "slot": 7, "format": "1v1", "tierLine": "킹", "map": "라데온", "notes": "개인전: race 생략 시 등록종족" }
+      ],
+      "matchups": [
+        { "id": "s11-r14-m1", "teamIds": ["t2", "t4"], "date": "9/1" },
+        { "id": "s11-r14-m2", "teamIds": ["t1", "t6"], "date": "9/3" },
+        { "id": "s11-r14-m3", "teamIds": ["t3", "t5"], "date": "9/6" }
+      ]
+    },
+    {
+      "round": 15,
+      "slotPlan": [
+        { "slot": 1, "format": "1v1", "tierLine": "아메바", "map": "백룸", "notes": "개인전: race 생략 시 등록종족" },
+        { "slot": 2, "format": "1v1", "tierLine": "애니멀", "map": "애티튜드", "notes": "개인전: race 생략 시 등록종족" },
+        { "slot": 3, "format": "2v2", "tierLine": null, "map": "황산벌", "pointCapPerTeam": 4, "notes": "각 팀 출전 2명의 티어 포인트 합 ≤ 4" },
+        { "slot": 4, "format": "1v1", "tierLine": "휴먼", "map": "옥타곤", "notes": "개인전: race 생략 시 등록종족" },
+        { "slot": 5, "format": "1v1", "tierLine": "킹", "map": "라데온", "notes": "개인전: race 생략 시 등록종족" },
+        { "slot": 6, "format": "3v3", "tierLine": null, "map": "헌트리스", "pointCapPerTeam": 11, "notes": "각 팀 출전 3명의 티어 포인트 합 ≤ 11" },
+        { "slot": 7, "format": "1v1", "tierLine": "갓", "map": "투혼", "notes": "개인전: race 생략 시 등록종족" }
+      ],
+      "matchups": [
+        { "id": "s11-r15-m1", "teamIds": ["t5", "t6"], "date": "9/8" },
+        { "id": "s11-r15-m2", "teamIds": ["t2", "t3"], "date": "9/10" },
+        { "id": "s11-r15-m3", "teamIds": ["t1", "t4"], "date": "9/13" }
+      ]
+    },
+    {
+      "round": 16,
+      "slotPlan": [
+        { "slot": 1, "format": "1v1", "tierLine": "애니멀", "map": "옥타곤", "notes": "개인전: race 생략 시 등록종족" },
+        { "slot": 2, "format": "1v1", "tierLine": "휴먼", "map": "라데온", "notes": "개인전: race 생략 시 등록종족" },
+        { "slot": 3, "format": "2v2", "tierLine": null, "map": "트로이", "pointCapPerTeam": 4, "notes": "각 팀 출전 2명의 티어 포인트 합 ≤ 4" },
+        { "slot": 4, "format": "1v1", "tierLine": "킹", "map": "투혼", "notes": "개인전: race 생략 시 등록종족" },
+        { "slot": 5, "format": "1v1", "tierLine": "갓", "map": "컬러리스페이트", "notes": "개인전: race 생략 시 등록종족" },
+        { "slot": 6, "format": "3v3", "tierLine": null, "map": "빠른무한", "pointCapPerTeam": 11, "notes": "각 팀 출전 3명의 티어 포인트 합 ≤ 11" },
+        { "slot": 7, "format": "1v1", "tierLine": "아메바", "map": "애티튜드", "notes": "개인전: race 생략 시 등록종족" }
+      ],
+      "matchups": [
+        { "id": "s11-r16-m1", "teamIds": ["t1", "t3"], "date": "9/15" },
+        { "id": "s11-r16-m2", "teamIds": ["t4", "t6"], "date": "9/17" },
+        { "id": "s11-r16-m3", "teamIds": ["t2", "t5"], "date": "9/20" }
+      ]
+    },
+    {
+      "round": 17,
+      "slotPlan": [
+        { "slot": 1, "format": "1v1", "tierLine": "휴먼", "map": "투혼", "notes": "개인전: race 생략 시 등록종족" },
+        { "slot": 2, "format": "1v1", "tierLine": "킹", "map": "컬러리스페이트", "notes": "개인전: race 생략 시 등록종족" },
+        { "slot": 3, "format": "2v2", "tierLine": null, "map": "황산벌", "pointCapPerTeam": 6, "notes": "각 팀 출전 2명의 티어 포인트 합 ≤ 6" },
+        { "slot": 4, "format": "1v1", "tierLine": "갓", "map": "아이올로스", "notes": "개인전: race 생략 시 등록종족" },
+        { "slot": 5, "format": "1v1", "tierLine": "아메바", "map": "옥타곤", "notes": "개인전: race 생략 시 등록종족" },
+        { "slot": 6, "format": "3v3", "tierLine": null, "map": "헌트리스", "pointCapPerTeam": 9, "notes": "각 팀 출전 3명의 티어 포인트 합 ≤ 9" },
+        { "slot": 7, "format": "1v1", "tierLine": "애니멀", "map": "라데온", "notes": "개인전: race 생략 시 등록종족" }
+      ],
+      "matchups": [
+        { "id": "s11-r17-m1", "teamIds": ["t4", "t5"], "date": "9/29" },
+        { "id": "s11-r17-m2", "teamIds": ["t1", "t2"], "date": "10/1" },
+        { "id": "s11-r17-m3", "teamIds": ["t3", "t6"], "date": "10/4" }
+      ]
+    },
+    {
+      "round": 18,
+      "slotPlan": [
+        { "slot": 1, "format": "1v1", "tierLine": "킹", "map": "아이올로스", "notes": "개인전: race 생략 시 등록종족" },
+        { "slot": 2, "format": "1v1", "tierLine": "갓", "map": "오디세이", "notes": "개인전: race 생략 시 등록종족" },
+        { "slot": 3, "format": "2v2", "tierLine": null, "map": "트로이", "pointCapPerTeam": 7, "notes": "각 팀 출전 2명의 티어 포인트 합 ≤ 7" },
+        { "slot": 4, "format": "1v1", "tierLine": "아메바", "map": "라데온", "notes": "개인전: race 생략 시 등록종족" },
+        { "slot": 5, "format": "1v1", "tierLine": "애니멀", "map": "투혼", "notes": "개인전: race 생략 시 등록종족" },
+        { "slot": 6, "format": "3v3", "tierLine": null, "map": "빠른무한", "pointCapPerTeam": 8, "notes": "각 팀 출전 3명의 티어 포인트 합 ≤ 8" },
+        { "slot": 7, "format": "1v1", "tierLine": "휴먼", "map": "컬러리스페이트", "notes": "개인전: race 생략 시 등록종족" }
+      ],
+      "matchups": [
+        { "id": "s11-r18-m1", "teamIds": ["t2", "t3"], "date": "10/6" },
+        { "id": "s11-r18-m2", "teamIds": ["t5", "t6"], "date": "10/8" },
+        { "id": "s11-r18-m3", "teamIds": ["t1", "t4"], "date": "10/11" }
+      ]
+    },
+    {
+      "round": 19,
+      "slotPlan": [
+        { "slot": 1, "format": "1v1", "tierLine": "갓", "map": "녹아웃", "notes": "개인전: race 생략 시 등록종족" },
+        { "slot": 2, "format": "1v1", "tierLine": "아메바", "map": "투혼", "notes": "개인전: race 생략 시 등록종족" },
+        { "slot": 3, "format": "2v2", "tierLine": null, "map": "황산벌", "pointCapPerTeam": 8, "notes": "각 팀 출전 2명의 티어 포인트 합 ≤ 8" },
+        { "slot": 4, "format": "1v1", "tierLine": "애니멀", "map": "컬러리스페이트", "notes": "개인전: race 생략 시 등록종족" },
+        { "slot": 5, "format": "1v1", "tierLine": "휴먼", "map": "아이올로스", "notes": "개인전: race 생략 시 등록종족" },
+        { "slot": 6, "format": "3v3", "tierLine": null, "map": "헌트리스", "pointCapPerTeam": 7, "notes": "각 팀 출전 3명의 티어 포인트 합 ≤ 7" },
+        { "slot": 7, "format": "1v1", "tierLine": "킹", "map": "오디세이", "notes": "개인전: race 생략 시 등록종족" }
+      ],
+      "matchups": [
+        { "id": "s11-r19-m1", "teamIds": ["t1", "t5"], "date": "10/13" },
+        { "id": "s11-r19-m2", "teamIds": ["t3", "t4"], "date": "10/15" },
+        { "id": "s11-r19-m3", "teamIds": ["t2", "t6"], "date": "10/18" }
+      ]
+    },
+    {
+      "round": 20,
+      "slotPlan": [
+        { "slot": 1, "format": "1v1", "tierLine": "아메바", "map": "녹아웃", "notes": "개인전: race 생략 시 등록종족" },
+        { "slot": 2, "format": "1v1", "tierLine": "애니멀", "map": "백룸", "notes": "개인전: race 생략 시 등록종족" },
+        { "slot": 3, "format": "2v2", "tierLine": null, "map": "트로이", "pointCapPerTeam": 5, "notes": "각 팀 출전 2명의 티어 포인트 합 ≤ 5" },
+        { "slot": 4, "format": "1v1", "tierLine": "휴먼", "map": "애티튜드", "notes": "개인전: race 생략 시 등록종족" },
+        { "slot": 5, "format": "1v1", "tierLine": "킹", "map": "옥타곤", "notes": "개인전: race 생략 시 등록종족" },
+        { "slot": 6, "format": "3v3", "tierLine": null, "map": "빠른무한", "pointCapPerTeam": 10, "notes": "각 팀 출전 3명의 티어 포인트 합 ≤ 10" },
+        { "slot": 7, "format": "1v1", "tierLine": "갓", "map": "라데온", "notes": "개인전: race 생략 시 등록종족" }
+      ],
+      "matchups": [
+        { "id": "s11-r20-m1", "teamIds": ["t1", "t6"], "date": "10/20" },
+        { "id": "s11-r20-m2", "teamIds": ["t2", "t4"], "date": "10/22" },
+        { "id": "s11-r20-m3", "teamIds": ["t3", "t5"], "date": "10/25" }
       ]
     }
   ]

@@ -1149,6 +1149,122 @@
         "3Star_Ruin"
       ],
       "isCaptain": false
+    },
+    {
+      "id": "Kairos",
+      "displayName": "박종욱",
+      "teamId": "t1",
+      "tier": "갓",
+      "tierSheetMainRace": "Z",
+      "raceDefault": "Z",
+      "aliases": [
+        "Kairos",
+        "1P_Kairos"
+      ],
+      "joinedFromRound": 11,
+      "isCaptain": false
+    },
+    {
+      "id": "Naldo",
+      "displayName": "김이헌",
+      "teamId": "t1",
+      "tier": "휴먼",
+      "tierSheetMainRace": "Z",
+      "raceDefault": "Z",
+      "aliases": [
+        "Naldo",
+        "1P_Naldo"
+      ],
+      "joinedFromRound": 11,
+      "isCaptain": false
+    },
+    {
+      "id": "Eco",
+      "displayName": "박지호",
+      "teamId": "t2",
+      "tier": "아메바",
+      "tierSheetMainRace": "P",
+      "raceDefault": "P",
+      "aliases": [
+        "Eco",
+        "2Fighters_Eco"
+      ],
+      "joinedFromRound": 11,
+      "isCaptain": false
+    },
+    {
+      "id": "zex",
+      "displayName": "임승호",
+      "teamId": "t3",
+      "tier": "갓",
+      "tierSheetMainRace": "P",
+      "raceDefault": "P",
+      "aliases": [
+        "zex",
+        "3Star_zex"
+      ],
+      "joinedFromRound": 11,
+      "raceVsOpponent": {
+        "P": "T"
+      },
+      "raceNotes": "메인 토스. 토스 상대일 때만 테란.",
+      "isCaptain": false
+    },
+    {
+      "id": "McTheToss",
+      "displayName": "장승룡",
+      "teamId": "t3",
+      "tier": "휴먼",
+      "tierSheetMainRace": "P",
+      "raceDefault": "P",
+      "aliases": [
+        "McTheToss",
+        "3Star_McTheToss"
+      ],
+      "joinedFromRound": 11,
+      "isCaptain": false
+    },
+    {
+      "id": "BEAT",
+      "displayName": "이동규",
+      "teamId": "t5",
+      "tier": "휴먼",
+      "tierSheetMainRace": "Z",
+      "raceDefault": "Z",
+      "aliases": [
+        "BEAT",
+        "TX_BEAT"
+      ],
+      "joinedFromRound": 11,
+      "isCaptain": false
+    },
+    {
+      "id": "High",
+      "displayName": "정창영",
+      "teamId": "t6",
+      "tier": "킹",
+      "tierSheetMainRace": "T",
+      "raceDefault": "T",
+      "aliases": [
+        "High",
+        "6Kings_High"
+      ],
+      "joinedFromRound": 11,
+      "isCaptain": false
+    },
+    {
+      "id": "DDakdak2",
+      "displayName": "박가람",
+      "teamId": "t6",
+      "tier": "아메바",
+      "tierSheetMainRace": "P",
+      "raceDefault": "P",
+      "aliases": [
+        "DDakdak2",
+        "6Kings_DDakdak2"
+      ],
+      "joinedFromRound": 11,
+      "isCaptain": false
     }
   ]
 }

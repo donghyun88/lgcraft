@@ -1,5 +1,5 @@
 {
-  "source": "시즌11 로스터 표 이미지 (2026-05)",
+  "source": "시즌11 로스터 표 이미지 (2026-05) + 하반기 합류 (2026-08)",
   "notes": [
     "displayName 은 players.json 과 동일하게 맞춤 (예: 강응선, 염규상).",
     "id 는 표 하단 영문 아이디 그대로.",
@@ -435,6 +435,46 @@
       "teamId": "t6",
       "displayName": "임채현",
       "id": "chobo111"
+    },
+    {
+      "teamId": "t1",
+      "displayName": "박종욱",
+      "id": "Kairos"
+    },
+    {
+      "teamId": "t1",
+      "displayName": "김이헌",
+      "id": "Naldo"
+    },
+    {
+      "teamId": "t2",
+      "displayName": "박지호",
+      "id": "Eco"
+    },
+    {
+      "teamId": "t3",
+      "displayName": "임승호",
+      "id": "zex"
+    },
+    {
+      "teamId": "t3",
+      "displayName": "장승룡",
+      "id": "McTheToss"
+    },
+    {
+      "teamId": "t5",
+      "displayName": "이동규",
+      "id": "BEAT"
+    },
+    {
+      "teamId": "t6",
+      "displayName": "정창영",
+      "id": "High"
+    },
+    {
+      "teamId": "t6",
+      "displayName": "박가람",
+      "id": "DDakdak2"
     }
   ]
 }
