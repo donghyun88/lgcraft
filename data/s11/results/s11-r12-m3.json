@@ -1,0 +1,163 @@
+{
+  "schemaVersion": 1,
+  "season": 11,
+  "phase": "second_half",
+  "round": 12,
+  "recordedAt": "2026-08-23",
+  "author": "동킴",
+  "notes": "match-input",
+  "matchups": [
+    {
+      "fixtureId": "s11-r12-m3",
+      "series": {
+        "winnerTeamIndex": 2,
+        "setScoreTeamA": null,
+        "setScoreTeamB": null,
+        "decidedBy": "sets",
+        "notes": "",
+        "mvp": {
+          "displayName": "손정곤"
+        }
+      },
+      "playedOrder": null,
+      "slots": [
+        {
+          "slot": 1,
+          "winnerTeamIndex": 1,
+          "teamA": [
+            {
+              "displayName": "권혁준",
+              "race": null
+            }
+          ],
+          "teamB": [
+            {
+              "displayName": "박정진",
+              "race": null
+            }
+          ]
+        },
+        {
+          "slot": 2,
+          "winnerTeamIndex": 2,
+          "teamA": [
+            {
+              "displayName": "최상균",
+              "race": null
+            }
+          ],
+          "teamB": [
+            {
+              "displayName": "정창영",
+              "race": null
+            }
+          ]
+        },
+        {
+          "slot": 3,
+          "winnerTeamIndex": 1,
+          "teamA": [
+            {
+              "displayName": "박재창",
+              "race": "P"
+            },
+            {
+              "displayName": "권혁준",
+              "race": "Z"
+            }
+          ],
+          "teamB": [
+            {
+              "displayName": "오택삼",
+              "race": "Z"
+            },
+            {
+              "displayName": "박정진",
+              "race": "P"
+            }
+          ]
+        },
+        {
+          "slot": 4,
+          "winnerTeamIndex": 2,
+          "teamA": [
+            {
+              "displayName": "박재창",
+              "race": null
+            }
+          ],
+          "teamB": [
+            {
+              "displayName": "김종성",
+              "race": null
+            }
+          ]
+        },
+        {
+          "slot": 5,
+          "winnerTeamIndex": 2,
+          "teamA": [
+            {
+              "displayName": "박지호",
+              "race": null
+            }
+          ],
+          "teamB": [
+            {
+              "displayName": "임채현",
+              "race": null
+            }
+          ]
+        },
+        {
+          "slot": 6,
+          "winnerTeamIndex": 1,
+          "teamA": [
+            {
+              "displayName": "구선웅",
+              "race": "P"
+            },
+            {
+              "displayName": "공동현",
+              "race": "R"
+            },
+            {
+              "displayName": "김도완",
+              "race": "Z"
+            }
+          ],
+          "teamB": [
+            {
+              "displayName": "주효진",
+              "race": "R"
+            },
+            {
+              "displayName": "손정곤",
+              "race": "T"
+            },
+            {
+              "displayName": "박가람",
+              "race": "P"
+            }
+          ]
+        },
+        {
+          "slot": 7,
+          "winnerTeamIndex": 2,
+          "teamA": [
+            {
+              "displayName": "황진영",
+              "race": null
+            }
+          ],
+          "teamB": [
+            {
+              "displayName": "손정곤",
+              "race": null
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
