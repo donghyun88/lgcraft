@@ -44,58 +44,6 @@
       border-radius: 9999px;
       padding: 0.125rem 0.5rem;
     }
-    .roster-toggle {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 0.75rem;
-      width: 100%;
-      text-align: left;
-      cursor: pointer;
-      border: 1px solid #e4e4e7;
-      border-radius: 0.5rem;
-      background: linear-gradient(to right, #faf5ff, #f4f4f5);
-      padding: 0.625rem 0.875rem;
-      transition: border-color 0.15s, background 0.15s;
-    }
-    .roster-toggle:hover { border-color: #c4b5fd; }
-    .roster-toggle[aria-expanded="true"] { border-color: #a78bfa; background: #f5f3ff; }
-    .roster-toggle-chevron {
-      flex-shrink: 0;
-      width: 1rem;
-      height: 1rem;
-      color: #7c3aed;
-      transition: transform 0.2s;
-    }
-    .roster-toggle[aria-expanded="true"] .roster-toggle-chevron { transform: rotate(180deg); }
-    .roster-panel { margin-top: 0.625rem; }
-    .roster-panel[hidden] { display: none; }
-    .roster-row {
-      display: grid;
-      grid-template-columns: minmax(0, 1fr) auto;
-      gap: 0.25rem 0.75rem;
-      align-items: start;
-      border: 1px solid #f4f4f5;
-      border-radius: 0.5rem;
-      background: #fafafa;
-      padding: 0.5rem 0.75rem;
-    }
-    .roster-row-name { font-weight: 600; color: #18181b; font-size: 0.8125rem; }
-    .roster-row-meta { font-size: 0.625rem; color: #a1a1aa; font-family: ui-monospace, monospace; }
-    .roster-row-wl {
-      font-size: 0.6875rem;
-      font-weight: 700;
-      font-variant-numeric: tabular-nums;
-      color: #52525b;
-      white-space: nowrap;
-      text-align: right;
-    }
-    .roster-row-note {
-      grid-column: 1 / -1;
-      font-size: 0.75rem;
-      line-height: 1.45;
-      color: #52525b;
-    }
     .tpi-ovr-ring {
       display: flex;
       flex-direction: column;
@@ -402,7 +350,7 @@
 
   <script type="module">
     import { loadAllSeasonRoundDocs } from './js/s11-data-loader.mjs';
-    import { emptyStats, simulateSeason } from './js/s11-season-simulate.mjs';
+    import { simulateSeason } from './js/s11-season-simulate.mjs';
     import {
       TIER_ORDER,
       RADAR_AXES,
@@ -410,8 +358,6 @@
       TEAM_CHART_COLORS,
       GRADE_COLORS,
       computeLeaguePowerRatings,
-      gradeFromPlayerTierRank,
-      PLAYER_GRADE_CRITERIA_TEXT,
     } from './js/s11-team-power-ratings.mjs';
     import { computeHalfSeasonBuzz, BUZZ_CRITERIA_TEXT } from './js/s11-buzz-players.mjs';
 
@@ -426,17 +372,6 @@
           /* ignore */
         }
       }
-    }
-
-    function tierSortKey(tier) {
-      const i = TIER_ORDER.indexOf(tier);
-      return i >= 0 ? i : TIER_ORDER.length;
-    }
-
-    function formatWl(stats) {
-      const t = stats?.total;
-      if (!t || (t.w === 0 && t.l === 0)) return '—';
-      return `${t.w}승 ${t.l}패`;
     }
 
     function escapeHtml(s) {
@@ -619,111 +554,6 @@
       </div>`;
     }
 
-    function playerRatingById(rating) {
-      const m = new Map();
-      if (!rating) return m;
-      for (const tier of TIER_ORDER) {
-        for (const p of rating.tiers[tier]?.players || []) {
-          if (p.id) m.set(p.id, p);
-        }
-      }
-      return m;
-    }
-
-    function renderRosterSection(teamId, rosterCtx, asOfRound, rating) {
-      const { reviewsById, playerById, statsByName, playerTierRanks } = rosterCtx;
-      const ratingById = playerRatingById(rating);
-      const reviews = reviewsById.get(teamId);
-      if (!reviews?.length) return '';
-
-      const rows = reviews
-        .map((rev) => {
-          const pl = playerById.get(rev.id);
-          if (!pl) return null;
-          const dn = (pl.displayName || '').trim();
-          const stats = statsByName[dn] || emptyStats();
-          const join = pl.joinedFromRound
-            ? `<span class="text-[10px] font-semibold text-amber-600 ml-1">${pl.joinedFromRound}R 합류</span>`
-            : '';
-          const tag = rev.tag
-            ? `<span class="roster-special-badge !text-[9px] !py-0 !px-1.5 ml-1">${escapeHtml(rev.tag)}</span>`
-            : '';
-          const cap =
-            pl.isCaptain && rev.tag !== '팀장'
-              ? `<span class="text-[10px] text-zinc-400 ml-1">팀장</span>`
-              : '';
-          const pr = ratingById.get(pl.id);
-          const ppi = pr?.ppi;
-          const ppiTier = pr?.ppiTier;
-          const tierRank = playerTierRanks?.get(pl.id);
-          const totalG = pr?.games ?? (stats?.total?.w || 0) + (stats?.total?.l || 0);
-          const playerGrade = tierRank
-            ? gradeFromPlayerTierRank(tierRank.rank, tierRank.total, totalG)
-            : null;
-          const gradeHtml = playerGrade
-            ? `<span class="inline-flex align-middle mr-1.5" title="${escapeHtml(tierRank?.tier || '')} ${tierRank?.rank}/${tierRank?.total} · PPI ${ppiTier ?? '—'}">${gradeBadgeHtml(playerGrade)}</span>`
-            : totalG > 0 && totalG < 3
-              ? `<span class="inline-flex align-middle mr-1.5 tpi-grade opacity-45" title="3전 미만 — 등급 미부여" style="background:#f4f4f5;color:#a1a1aa;border-color:#e4e4e7">—</span>`
-              : '';
-          const ppiHtml =
-            ppiTier != null
-              ? `<span class="text-[10px] font-bold text-violet-600 ml-1 tabular-nums" title="개7·팀3 PPI">PPI ${ppiTier}</span>`
-              : ppi != null
-                ? `<span class="text-[10px] font-bold text-violet-600 ml-1 tabular-nums" title="선수 전력 지수">PPI ${ppi}</span>`
-                : '';
-          const tierRankHtml = tierRank
-            ? tierRank.rank <= 3
-              ? `<span class="text-[10px] font-bold text-amber-700 ml-1" title="${escapeHtml(tierRank.tier)} 리그 ${tierRank.rank}위 (개7·팀3)">${escapeHtml(tierRank.tier)} ${tierRank.rank}위</span>`
-              : `<span class="text-[10px] text-zinc-400 ml-1" title="개7·팀3 PPI">${escapeHtml(tierRank.tier)} ${tierRank.rank}/${tierRank.total}</span>`
-            : '';
-          return {
-            tier: pl.tier || '',
-            html: `<li class="roster-row">
-              <div class="min-w-0">
-                <div class="roster-row-name">${gradeHtml}${escapeHtml(dn)}${cap}${join}${tag}${ppiHtml}${tierRankHtml}</div>
-                <div class="roster-row-meta">${escapeHtml(pl.tier || '')} · ${escapeHtml(pl.id || '')}</div>
-              </div>
-              <div class="roster-row-wl">${escapeHtml(formatWl(stats))}</div>
-              <p class="roster-row-note">${escapeHtml(rev.note || '')}</p>
-            </li>`,
-          };
-        })
-        .filter(Boolean)
-        .sort((a, b) => tierSortKey(a.tier) - tierSortKey(b.tier) || 0);
-
-      if (!rows.length) return '';
-
-      const panelId = `roster-${teamId}`;
-      return `<section>
-        <button type="button" class="roster-toggle" aria-expanded="false" aria-controls="${panelId}" data-roster-toggle>
-          <div>
-            <div class="power-section-label !mb-0 !text-violet-600">특별편 · 전원 평가</div>
-            <p class="text-[11px] text-zinc-500 mt-0.5" data-roster-hint>로스터 ${rows.length}명 · PPI 등급 · ${asOfRound || ''}R까지 · 펼치기</p>
-          </div>
-          <svg class="roster-toggle-chevron" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.24 4.5a.75.75 0 01-1.08 0l-4.24-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd"/></svg>
-        </button>
-        <div id="${panelId}" class="roster-panel" hidden>
-          <p class="text-[10px] text-zinc-400 mb-2 leading-snug">${escapeHtml(PLAYER_GRADE_CRITERIA_TEXT)}</p>
-          <ul class="grid grid-cols-1 sm:grid-cols-2 gap-2">${rows.map((r) => r.html).join('')}</ul>
-        </div>
-      </section>`;
-    }
-
-    function bindRosterToggles(root) {
-      root.querySelectorAll('[data-roster-toggle]').forEach((btn) => {
-        btn.addEventListener('click', () => {
-          const expanded = btn.getAttribute('aria-expanded') === 'true';
-          const panel = document.getElementById(btn.getAttribute('aria-controls'));
-          btn.setAttribute('aria-expanded', expanded ? 'false' : 'true');
-          if (panel) panel.hidden = expanded;
-          const hint = btn.querySelector('[data-roster-hint]');
-          if (hint) {
-            hint.textContent = hint.textContent.replace(expanded ? '접기' : '펼치기', expanded ? '펼치기' : '접기');
-          }
-        });
-      });
-    }
-
     function renderTierBars(rating) {
       const tierRows = TIER_ORDER.map((tier) =>
         renderAxisRow(tier, rating, TIER_BAR_COLORS[tier] || '#71717a'),
@@ -736,7 +566,7 @@
       if (!rating) return '';
       return `<section class="rounded-lg border border-violet-200 bg-gradient-to-br from-violet-50/80 to-white px-3.5 py-4">
         <div class="flex flex-wrap items-center justify-between gap-2">
-          <div class="power-section-label !mb-0 !text-violet-700">특별편 · TPI 리그 순위표</div>
+          <div class="power-section-label !mb-0 !text-violet-700">TPI 리그 순위표</div>
           <span class="text-[10px] text-zinc-400">티어=개인7·팀3 · 팀전=별도 슬롯</span>
         </div>
         ${rating.tagline ? `<p class="tpi-tagline">${escapeHtml(rating.tagline)}</p>` : ''}
@@ -957,7 +787,7 @@
       }
     }
 
-    function renderTeamCard(t, rosterCtx, asOfRound, rating) {
+    function renderTeamCard(t, rating) {
       const rec = t.record || {};
       const next = t.nextRound || {};
       const keys = (t.keyPlayers || [])
@@ -1048,8 +878,6 @@
 
           ${renderTeamPowerIndexSection(t.teamId, rating)}
 
-          ${renderRosterSection(t.teamId, rosterCtx, asOfRound, rating)}
-
           ${t.coinOutlook ? `<section class="rounded-lg border border-orange-100 bg-orange-50/50 px-3.5 py-3">
             <div class="power-section-label !text-orange-700">${escapeHtml(t.coinOutlook.title || '출전 코인')}</div>
             <p class="text-[13px] leading-relaxed text-zinc-800">${escapeHtml(t.coinOutlook.body || '')}</p>
@@ -1070,18 +898,6 @@
           </section>
         </div>
       </article>`;
-    }
-
-    function buildRosterContext(special, players, statsByName, playerTierRanks) {
-      const playerById = new Map();
-      for (const p of players || []) {
-        if (p.id) playerById.set(p.id, p);
-      }
-      const reviewsById = new Map();
-      for (const [teamId, list] of Object.entries(special?.teams || {})) {
-        reviewsById.set(teamId, list || []);
-      }
-      return { playerById, reviewsById, statsByName, playerTierRanks };
     }
 
     async function main() {
@@ -1129,7 +945,6 @@
           document.getElementById('special-banner').classList.remove('hidden');
         }
 
-        const asOfRound = data.asOfRound || special?.asOfRound;
         const teams = [...(data.teams || [])].sort((a, b) => (a.rank || 99) - (b.rank || 99));
         const teamIds = teams.map((t) => t.teamId).filter(Boolean);
         const ratingsByTeam = computeLeaguePowerRatings(
@@ -1145,23 +960,16 @@
             : null;
 
         const leagueEl = document.getElementById('league-power-index');
-        if (special && leagueEl) {
+        if (leagueEl) {
           leagueEl.innerHTML = renderLeaguePowerSection(teams, ratingsByTeam, buzz);
           leagueEl.classList.remove('hidden');
         }
 
-        const rosterCtx = buildRosterContext(
-          special,
-          playersDoc.players,
-          statsByName,
-          ratingsByTeam._playerTierRanks,
-        );
         destroyCharts();
         const grid = document.getElementById('power-grid');
         grid.innerHTML =
-          teams.map((t) => renderTeamCard(t, rosterCtx, asOfRound, ratingsByTeam[t.teamId])).join('') ||
+          teams.map((t) => renderTeamCard(t, ratingsByTeam[t.teamId])).join('') ||
           '<p class="text-sm text-zinc-500">분석 데이터가 없습니다.</p>';
-        bindRosterToggles(grid);
         mountLeagueOvrChart(teams, ratingsByTeam);
         mountTeamRadarCharts(teams, ratingsByTeam);
 
