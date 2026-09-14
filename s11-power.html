@@ -30,6 +30,67 @@
       color: #71717a;
       margin-bottom: 0.5rem;
     }
+    .last-match-board {
+      border: 1px solid #e4e4e7;
+      border-radius: 0.75rem;
+      background: #fafafa;
+      overflow: hidden;
+    }
+    .last-match-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      padding: 0.625rem 0.875rem;
+      background: linear-gradient(to right, #f8fafc, #eef2ff);
+      border-bottom: 1px solid #e4e4e7;
+    }
+    .last-match-score {
+      font-size: 1.125rem;
+      font-weight: 900;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.02em;
+    }
+    .last-match-score.w { color: #047857; }
+    .last-match-score.l { color: #b91c1c; }
+    .last-match-set {
+      display: grid;
+      grid-template-columns: 2.75rem minmax(0, 1fr) auto;
+      gap: 0.35rem 0.5rem;
+      align-items: center;
+      padding: 0.45rem 0.75rem;
+      border-bottom: 1px solid #f4f4f5;
+      font-size: 0.75rem;
+    }
+    .last-match-set:last-child { border-bottom: none; }
+    .last-match-set.won { background: #f0fdf4; }
+    .last-match-set.lost { background: #fef2f2; }
+    .last-match-slot {
+      font-size: 0.625rem;
+      font-weight: 800;
+      color: #71717a;
+      text-transform: uppercase;
+    }
+    .last-match-names { color: #3f3f46; line-height: 1.35; min-width: 0; }
+    .last-match-names strong { color: #18181b; font-weight: 700; }
+    .last-match-wl {
+      font-size: 0.625rem;
+      font-weight: 900;
+      padding: 0.15rem 0.4rem;
+      border-radius: 0.25rem;
+      letter-spacing: 0.04em;
+    }
+    .last-match-wl.w { background: #d1fae5; color: #047857; }
+    .last-match-wl.l { background: #fee2e2; color: #b91c1c; }
+    .last-match-takeaway {
+      padding: 0.625rem 0.875rem;
+      font-size: 0.75rem;
+      line-height: 1.5;
+      color: #52525b;
+      border-top: 1px solid #e4e4e7;
+      background: #fff;
+    }
     .roster-special-badge {
       display: inline-flex;
       align-items: center;
@@ -787,6 +848,42 @@
       }
     }
 
+    function renderLastMatch(lm) {
+      if (!lm) return '';
+      const won = lm.result === 'W';
+      const scoreCls = won ? 'w' : 'l';
+      const sets = (lm.sets || [])
+        .map((s) => {
+          const setWon = !!s.won;
+          const ours = (s.ours || []).join(' · ') || '—';
+          const theirs = (s.theirs || []).join(' · ') || '—';
+          return `<div class="last-match-set ${setWon ? 'won' : 'lost'}">
+            <div class="last-match-slot">${escapeHtml(s.label || `S${s.slot}`)}</div>
+            <div class="last-match-names"><strong>${escapeHtml(ours)}</strong> <span class="text-zinc-400">vs</span> ${escapeHtml(theirs)}</div>
+            <span class="last-match-wl ${setWon ? 'w' : 'l'}">${setWon ? 'W' : 'L'}</span>
+          </div>`;
+        })
+        .join('');
+      const mvp =
+        lm.mvp
+          ? `<span class="text-[11px] text-zinc-500">MVP <strong class="text-zinc-800">${escapeHtml(lm.mvp)}</strong>${lm.mvpSide === 'opp' ? ' <span class="text-zinc-400">(상대)</span>' : ''}</span>`
+          : '';
+      return `<section>
+        <div class="power-section-label">직전 경기 · ${escapeHtml(String(lm.round ?? ''))}R 세트 보드</div>
+        <div class="last-match-board">
+          <div class="last-match-head">
+            <div>
+              <p class="text-[11px] font-bold text-zinc-500">vs ${escapeHtml(lm.opponent || '—')}</p>
+              <p class="last-match-score ${scoreCls}">${won ? '승' : '패'} ${escapeHtml(lm.score || '')}</p>
+            </div>
+            ${mvp}
+          </div>
+          ${sets}
+          ${lm.takeaway ? `<p class="last-match-takeaway">${escapeHtml(lm.takeaway)}</p>` : ''}
+        </div>
+      </section>`;
+    }
+
     function renderTeamCard(t, rating) {
       const rec = t.record || {};
       const next = t.nextRound || {};
@@ -844,6 +941,8 @@
             <div class="power-section-label">한눈에</div>
             <ul class="space-y-2">${summary}</ul>
           </section>
+
+          ${renderLastMatch(t.lastMatch)}
 
           ${story ? `<section>
             <div class="power-section-label">시즌 스토리</div>
