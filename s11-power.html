@@ -181,26 +181,88 @@
       color: #3f3f46;
     }
     .tpi-heat-cell {
-      font-size: 0.6875rem;
+      font-size: 0.625rem;
       font-weight: 800;
       font-variant-numeric: tabular-nums;
       text-align: center;
-      border-radius: 0.375rem;
-      padding: 0.375rem 0.25rem;
+      border-radius: 0.3rem;
+      padding: 0.3rem 0.15rem;
       color: #18181b;
+      line-height: 1.15;
+    }
+    .tpi-heat-cell .g {
+      font-size: 0.8125rem;
+      font-weight: 900;
+      line-height: 1;
+    }
+    .tpi-heat-cell .r {
+      font-size: 0.5625rem;
+      font-weight: 700;
+      opacity: 0.75;
+      margin-top: 0.15rem;
+    }
+    .tpi-rank-table-wrap {
+      max-width: 22rem;
+      margin: 1rem auto 0;
+    }
+    .tpi-rank-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0.2rem 0.3rem;
+      table-layout: fixed;
+    }
+    .tpi-rank-table th {
+      font-size: 0.5625rem;
+      font-weight: 800;
+      color: #71717a;
+      text-align: center;
+      padding: 0 0.1rem 0.25rem;
+      line-height: 1.2;
+    }
+    .tpi-rank-table th.team-h {
+      text-align: left;
+      width: 3.25rem;
+    }
+    .tpi-rank-table td.team-c {
+      font-size: 0.6875rem;
+      font-weight: 700;
+      color: #27272a;
+      padding-right: 0.15rem;
+      line-height: 1.2;
+      word-break: keep-all;
+    }
+    .tpi-rank-table .ovr-c {
+      text-align: center;
+      vertical-align: middle;
+    }
+    .tpi-rank-table .ovr-c .tpi-grade {
+      min-width: 1.35rem;
+      height: 1.2rem;
+      font-size: 0.625rem;
+      padding: 0 0.2rem;
+    }
+    .tpi-league-chart-box {
+      height: 200px;
+      max-width: 22rem;
+      margin-left: auto;
+      margin-right: auto;
+      position: relative;
+    }
+    @media (min-width: 640px) {
+      .tpi-league-chart-box { height: 220px; }
+    }
+    .tpi-podium {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.4rem;
+      margin: 0 auto 1rem;
+      max-width: 22rem;
     }
     .tpi-radar-box {
       width: 100%;
       max-width: 11rem;
       height: 11rem;
       margin: 0 auto;
-    }
-    .tpi-league-chart-box {
-      height: 220px;
-      position: relative;
-    }
-    @media (min-width: 640px) {
-      .tpi-league-chart-box { height: 240px; }
     }
     .tpi-grade {
       display: inline-flex;
@@ -295,12 +357,6 @@
       background: #f5f3ff;
       border-radius: 0.5rem;
       border-left: 3px solid #8b5cf6;
-    }
-    .tpi-podium {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 0.5rem;
-      margin-bottom: 1rem;
     }
     .tpi-podium-item {
       text-align: center;
@@ -595,18 +651,19 @@
     function renderHallOfFame(hall, teams) {
       if (!hall?.length) return '';
       const nameById = new Map(teams.map((t) => [t.teamId, t.name]));
-      return `<div>
+      return `<div class="max-w-[22rem] mx-auto">
         <h4 class="text-xs font-bold text-zinc-700 mb-2">라인별 리그 1위 · 명예의 전당</h4>
-        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+        <div class="grid grid-cols-2 gap-2">
           ${hall
             .map((h) => {
               const teamName = nameById.get(h.teamId) || h.teamId;
+              const short = teams.find((t) => t.teamId === h.teamId)?.short || teamName;
               const color = TEAM_CHART_COLORS[h.teamId] || '#6366f1';
               return `<div class="tpi-hof-card" style="border-left: 3px solid ${color}">
                 <div class="tpi-hof-axis">${escapeHtml(h.axis)}</div>
-                <div class="flex items-center gap-2 mt-1">
+                <div class="flex items-center gap-1.5 mt-1">
                   ${gradeBadgeHtml('S')}
-                  <span class="tpi-hof-team">${escapeHtml(teamName)}</span>
+                  <span class="text-xs font-extrabold text-zinc-900">${escapeHtml(short)}</span>
                 </div>
               </div>`;
             })
@@ -657,6 +714,7 @@
         .filter((t) => t.rating)
         .sort((a, b) => (a.rating.leagueRank || 99) - (b.rating.leagueRank || 99));
 
+      const TIER_HEAD = { 갓: '갓', 킹: '킹', 애니멀: '애니', 아메바: '아메', 휴먼: '휴먼' };
       const heatRows = sorted
         .map((t) => {
           const teamGrade = t.rating.axisGrades?.팀전 ?? 'D';
@@ -667,20 +725,20 @@
             const rank = t.rating.axisRanks?.[tier] ?? 6;
             const g = GRADE_COLORS[grade] || GRADE_COLORS.C;
             return `<td class="tpi-heat-cell" style="background:${g.bg};color:${g.text};border:1px solid ${g.border}">
-              <div class="text-sm font-black leading-none">${escapeHtml(grade)}</div>
-              <div class="text-[9px] font-bold opacity-80 mt-0.5">${rank}위</div>
+              <div class="g">${escapeHtml(grade)}</div>
+              <div class="r">${rank}</div>
             </td>`;
           }).join('');
           return `<tr>
-            <td class="py-2 pr-2 text-[12px] font-semibold text-zinc-800 whitespace-nowrap">${escapeHtml(t.name)}</td>
-            <td class="py-2 px-1 text-center">
+            <td class="team-c" title="${escapeHtml(t.name)}">${escapeHtml(t.short || t.name)}</td>
+            <td class="ovr-c">
               ${gradeBadgeHtml(t.rating.overallGrade)}
-              <div class="text-[9px] font-bold text-violet-700 tabular-nums mt-0.5">${t.rating.leagueRank}위</div>
+              <div class="text-[9px] font-bold text-violet-700 tabular-nums mt-0.5">${t.rating.leagueRank}</div>
             </td>
             ${cells}
             <td class="tpi-heat-cell" style="background:${teamG.bg};color:${teamG.text};border:1px solid ${teamG.border}">
-              <div class="text-sm font-black leading-none">${escapeHtml(teamGrade)}</div>
-              <div class="text-[9px] font-bold opacity-80 mt-0.5">${teamRank}위</div>
+              <div class="g">${escapeHtml(teamGrade)}</div>
+              <div class="r">${teamRank}</div>
             </td>
           </tr>`;
         })
@@ -688,31 +746,32 @@
 
       const tierHeaders = TIER_ORDER.map(
         (tier) =>
-          `<th class="pb-2 text-[10px] font-bold text-zinc-500 text-center">${escapeHtml(tier)}</th>`,
+          `<th title="${escapeHtml(tier)}">${escapeHtml(TIER_HEAD[tier] || tier)}</th>`,
       ).join('');
 
       return `<div>
         ${renderBuzzSection(buzz)}
         <div class="mt-5 pt-5 border-t border-zinc-100">
-        <div class="flex flex-wrap items-baseline justify-between gap-2 mb-3">
+        <div class="flex flex-wrap items-baseline justify-between gap-2 mb-3 max-w-[22rem] mx-auto">
           <h3 class="text-sm font-bold text-violet-900">리그 TPI · 등급 순위표</h3>
-          <span class="text-[10px] text-zinc-400">S=1위 … D=6위 · 6팀 기준</span>
+          <span class="text-[10px] text-zinc-400">S=1 … D=6</span>
         </div>
         ${renderPodium(teams, ratingsByTeam)}
         ${renderHallOfFame(hall, teams)}
         <div class="tpi-league-chart-box mb-4 mt-4"><canvas id="chart-league-ovr" aria-label="팀별 종합 순위"></canvas></div>
-        <div class="overflow-x-auto -mx-1 px-1 mt-4">
-          <table class="w-full min-w-[560px] border-collapse">
+        <div class="tpi-rank-table-wrap">
+          <table class="tpi-rank-table">
             <thead>
-              <tr class="border-b border-zinc-100">
-                <th class="pb-2 text-left text-[10px] font-bold text-zinc-500">팀</th>
-                <th class="pb-2 text-center text-[10px] font-bold text-violet-600">종합</th>
+              <tr>
+                <th class="team-h">팀</th>
+                <th>종합</th>
                 ${tierHeaders}
-                <th class="pb-2 text-center text-[10px] font-bold text-teal-600">팀전</th>
+                <th class="text-teal-700">팀전</th>
               </tr>
             </thead>
             <tbody>${heatRows}</tbody>
           </table>
+          <p class="text-[9px] text-zinc-400 text-center mt-1.5">숫자 = 해당 라인 리그 순위</p>
         </div>
         </div>
       </div>`;

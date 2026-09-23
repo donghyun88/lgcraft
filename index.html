@@ -9,7 +9,100 @@
   <link rel="stylesheet" href="s11-site-header.css" />
   <style>
     body { font-family: Inter, sans-serif; }
-    .standings-wrap { box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+    .standings-wrap {
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      max-width: 46rem; /* ~736px — 캡처 비율 유지 + 가독성 */
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .standings-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+    }
+    .standings-table th {
+      padding: 0.65rem 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      color: #52525b;
+      text-align: center;
+      border-bottom: 1px solid #e4e4e7;
+      background: linear-gradient(180deg, #f4f4f5, #fafafa);
+      white-space: nowrap;
+    }
+    .standings-table th.col-team { text-align: left; padding-left: 0.75rem; }
+    .standings-table td {
+      padding: 0.75rem 0.5rem;
+      vertical-align: middle;
+      text-align: center;
+      border-bottom: 1px solid rgba(244, 244, 245, 0.95);
+    }
+    .standings-table td.col-team { text-align: left; padding-left: 0.75rem; }
+    .standings-table .col-rank { width: 2.5rem; }
+    .standings-table .col-team { width: 10rem; }
+    .standings-table .col-record { width: 6.25rem; }
+    .standings-table .col-split { width: 5rem; }
+    .standings-table .col-form { width: 6.25rem; }
+    .standings-table .col-next { width: 6rem; }
+    .standings-team-cell {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      min-width: 0;
+    }
+    .standings-team-cell .names {
+      min-width: 0;
+      line-height: 1.3;
+    }
+    .standings-team-cell .name {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: #18181b;
+    }
+    .standings-team-cell .short {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #4f46e5;
+    }
+    .standings-wrap .standings-logo-frame--team {
+      width: 2.75rem;
+      height: 2.75rem;
+    }
+    .standings-wrap .standings-logo-frame--next {
+      width: 2.5rem;
+      height: 2.5rem;
+    }
+    .standings-stack {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.2rem;
+      line-height: 1.25;
+    }
+    .standings-stack .main {
+      font-variant-numeric: tabular-nums;
+      font-weight: 700;
+      color: #27272a;
+      font-size: 0.875rem;
+    }
+    .standings-stack .sub {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #71717a;
+      font-variant-numeric: tabular-nums;
+    }
+    .standings-stack .sub.pos { color: #047857; }
+    .standings-stack .sub.neg { color: #b91c1c; }
+    .standings-stack .label {
+      font-size: 0.6875rem;
+      font-weight: 700;
+      color: #a1a1aa;
+      letter-spacing: 0.02em;
+    }
     .standings-row:nth-child(even) { background: rgba(250, 250, 250, 0.85); }
     .standings-row:hover { background: rgba(238, 242, 255, 0.65); }
     /* 정규시즌 상위 4 = 플레이오프권 — 은은한 보라 그라데이션 */
@@ -401,25 +494,16 @@
     <!-- 팀 순위 -->
     <section id="standings" class="mb-10 scroll-mt-8">
       <h2 class="text-base font-semibold text-zinc-900 mb-2">팀 순위</h2>
-      <div class="hidden md:block standings-wrap bg-white rounded-xl border border-zinc-200/90 overflow-x-auto">
-        <table class="min-w-[880px] w-full text-xs sm:text-sm">
+      <div class="hidden md:block standings-wrap bg-white rounded-xl border border-zinc-200/90 overflow-hidden">
+        <table class="standings-table">
           <thead>
-            <tr class="bg-gradient-to-b from-zinc-100 to-zinc-50/95 text-left text-zinc-600 text-[11px] sm:text-xs font-semibold uppercase tracking-wide border-b border-zinc-200/90">
-              <th class="px-2 sm:px-3 py-2.5 w-9 text-center" rowspan="2" valign="bottom">#</th>
-              <th class="px-2 sm:px-3 py-2.5 min-w-[11.5rem]" rowspan="2" valign="bottom">팀</th>
-              <th class="px-2 sm:px-3 py-1.5 text-center border-b border-indigo-100/80 text-indigo-800/90 normal-case" colspan="3" title="라운드에서 팀 vs 팀으로 치른 한 번(예: 3대전 1회)">대전</th>
-              <th class="px-2 sm:px-3 py-2.5 text-center text-violet-800/90 normal-case min-w-[5.5rem]" rowspan="2" valign="middle" title="전체 세트 승·패 (개인전 + 팀전)">세트</th>
-              <th class="px-2 sm:px-3 py-2.5 text-center text-zinc-600 normal-case min-w-[4.5rem]" rowspan="2" valign="middle" title="개인전 세트 승·패">개인전</th>
-              <th class="px-2 sm:px-3 py-2.5 text-center text-zinc-600 normal-case min-w-[4.5rem]" rowspan="2" valign="middle" title="2v2·3v3 세트 승·패">팀전</th>
-              <th class="px-2 sm:px-3 py-2.5 text-right whitespace-nowrap" rowspan="2" valign="bottom" title="세트 득실">득실</th>
-              <th class="px-2 sm:px-3 py-2.5 text-center" rowspan="2" valign="bottom" title="최근 대전 결과 (과거→최근)">최근</th>
-              <th class="px-2 sm:px-3 py-2.5 text-center min-w-[6.25rem]" rowspan="2" valign="bottom" title="일정상 다음 팀 대전 상대 (미종료 대전 중 가장 빠른 일정)">다음 대전</th>
-              <th class="px-2 sm:px-3 py-2.5 text-center min-w-[4.75rem]" rowspan="2" valign="bottom" title="라운드별 순위 추이">순위</th>
-            </tr>
-            <tr class="bg-zinc-50/95 text-zinc-500 text-[10px] sm:text-[11px] font-semibold border-b border-zinc-200/90">
-              <th class="px-2 sm:px-3 py-1.5 text-center tabular-nums" title="치른 대전 수 (승+패)">경기</th>
-              <th class="px-2 sm:px-3 py-1.5 text-center tabular-nums" title="대전 승">승</th>
-              <th class="px-2 sm:px-3 py-1.5 text-center tabular-nums" title="대전 패">패</th>
+            <tr>
+              <th class="col-rank" title="순위">#</th>
+              <th class="col-team" title="팀">팀</th>
+              <th class="col-record" title="대전 · 세트 · 득실">전적</th>
+              <th class="col-split" title="개인전 · 팀전 세트">세부</th>
+              <th class="col-form" title="최근 대전 · 순위 추이">최근</th>
+              <th class="col-next" title="다음 대전 상대">다음</th>
             </tr>
           </thead>
           <tbody id="standingsBody"></tbody>
@@ -782,7 +866,7 @@
       if (hist.length < 2) {
         return '<span class="text-zinc-300 text-[11px]">—</span>';
       }
-      const w = 78;
+      const w = 72;
       const h = 26;
       const pad = 3;
       const n = hist.length;
@@ -794,7 +878,7 @@
         return { x, y };
       });
       const points = coords.map((p) => `${p.x},${p.y}`).join(' ');
-      const dots = coords.map((p) => `<circle class="spark-dot" cx="${p.x}" cy="${p.y}" r="2" />`).join('');
+      const dots = coords.map((p) => `<circle class="spark-dot" cx="${p.x}" cy="${p.y}" r="1.75" />`).join('');
       return `<svg class="inline-block align-middle" width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" role="img" aria-label="라운드별 순위 추이"><title>라운드별 순위 (1이 가장 위)</title><polyline class="spark-poly" points="${points}" />${dots}</svg>`;
     }
 
@@ -867,10 +951,17 @@
 
     function formatStandingsTeamCell(meta, t) {
       const tid = escapeHtml(t.id || '');
-      const nameHtml = formatTeamNameWithShort(t.name, t.short, true);
-      return `<div class="flex items-center gap-2.5 min-w-0 justify-start text-left" data-team-id="${tid}">
+      const full = t.name || '';
+      const shortRaw = t.short && String(t.short).trim();
+      const shortHtml = shortRaw
+        ? `<span class="short">(${escapeHtml(shortRaw)})</span>`
+        : '';
+      return `<div class="standings-team-cell" data-team-id="${tid}">
       ${teamLogoFrameHtml(meta, t.id, 'team')}
-      <span class="min-w-0 leading-snug">${nameHtml}</span>
+      <div class="names">
+        <span class="name">${escapeHtml(full)}</span>
+        ${shortHtml}
+      </div>
     </div>`;
     }
 
@@ -878,27 +969,63 @@
       const sw = Number(setW) || 0;
       const sl = Number(setL) || 0;
       if (sw === 0 && sl === 0) {
-        return '<span class="text-zinc-400 tabular-nums text-[11px]">0승 0패</span>';
+        return '<span class="text-zinc-400 tabular-nums text-[12px]">0승 0패</span>';
       }
-      return `<span class="tabular-nums text-[11px] sm:text-sm leading-tight"><span class="text-emerald-800 font-semibold">${sw}</span><span class="text-zinc-600 font-medium">승</span> <span class="text-zinc-700 font-semibold">${sl}</span><span class="text-zinc-600 font-medium">패</span></span>`;
+      return `<span class="tabular-nums text-[13px] leading-tight"><span class="text-emerald-800 font-semibold">${sw}</span><span class="text-zinc-600 font-medium">승</span> <span class="text-zinc-700 font-semibold">${sl}</span><span class="text-zinc-600 font-medium">패</span></span>`;
+    }
+
+    function formatRecordStackHtml(t) {
+      const sw = Number(t.seriesW) || 0;
+      const sl = Number(t.seriesL) || 0;
+      const setW = Number(t.setW) || 0;
+      const setL = Number(t.setL) || 0;
+      const d = setW - setL;
+      const diffCls = d > 0 ? 'pos' : d < 0 ? 'neg' : '';
+      const diffTxt = d > 0 ? `+${d}` : String(d);
+      return `<div class="standings-stack">
+        <span class="label">대전</span>
+        <span class="main" title="대전 ${sw}승 ${sl}패">${sw}승 ${sl}패</span>
+        <span class="sub" title="세트 ${setW}–${setL}">세트 ${setW}–${setL}</span>
+        <span class="sub ${diffCls}" title="세트 득실">${diffTxt}</span>
+      </div>`;
+    }
+
+    function formatSplitStackHtml(t) {
+      const soloW = Number(t.soloW) || 0;
+      const soloL = Number(t.soloL) || 0;
+      const teamW = Number(t.teamW) || 0;
+      const teamL = Number(t.teamL) || 0;
+      return `<div class="standings-stack">
+        <span class="label">개인</span>
+        <span class="main" title="개인전">${soloW}–${soloL}</span>
+        <span class="label" style="margin-top:0.2rem">팀전</span>
+        <span class="main" title="2v2·3v3">${teamW}–${teamL}</span>
+      </div>`;
+    }
+
+    function formatFormStackHtml(recentWL, rankHist, nTeams) {
+      return `<div class="standings-stack">
+        ${formatRecentSeriesHtml(recentWL)}
+        <div class="mt-0.5">${rankSparklineSvg(rankHist, nTeams)}</div>
+      </div>`;
     }
 
     function formatNextOpponentCell(meta, next) {
       if (!next) {
-        return '<td class="px-2 sm:px-3 py-2.5 text-center align-middle"><span class="text-zinc-300 text-[11px]">—</span></td>';
+        return '<td class="col-next"><span class="text-zinc-300 text-xs">—</span></td>';
       }
       const tip = escapeHtml(`${next.round}R · ${next.fixtureId} vs ${next.name}${next.short ? ' (' + next.short + ')' : ''}`);
       const nameLine = escapeHtml(next.name || next.opponentId || '');
       const shortRaw = next.short && String(next.short).trim();
       const shortLine = shortRaw
-        ? `<span class="text-[9px] font-semibold text-indigo-700/85 leading-none truncate max-w-full">(${escapeHtml(shortRaw)})</span>`
+        ? `<span class="text-[10px] font-semibold text-indigo-700/85 leading-none">(${escapeHtml(shortRaw)})</span>`
         : '';
-      return `<td class="px-2 sm:px-3 py-2.5 text-center align-middle" title="${tip}">
-    <div class="inline-flex flex-col items-center gap-0.5 min-w-0 max-w-[6rem] mx-auto">
+      return `<td class="col-next" title="${tip}">
+    <div class="inline-flex flex-col items-center gap-0.5 min-w-0 mx-auto">
       ${teamLogoFrameHtml(meta, next.opponentId, 'next', 'dark')}
-      <span class="text-[10px] font-semibold text-zinc-800 leading-tight text-center line-clamp-2 max-w-full">${nameLine}</span>
+      <span class="text-[12px] font-semibold text-zinc-800 leading-tight text-center line-clamp-2 max-w-[5.5rem]">${nameLine}</span>
       ${shortLine}
-      <span class="text-[9px] text-zinc-400 tabular-nums leading-none">${next.round}R</span>
+      <span class="text-[11px] text-zinc-400 tabular-nums leading-none">${next.round}R</span>
     </div>
   </td>`;
     }
@@ -994,22 +1121,15 @@
         .map((t, idx) => {
           const hasAny = t.seriesW + t.seriesL + t.setW + t.setL > 0;
           const rank = ranks[idx];
-          const seriesSum = t.seriesW + t.seriesL;
           const poClass = leagueStarted && rank <= PLAYOFF_SPOTS ? ' standings-row--po' : '';
           return `
-        <tr class="standings-row border-b border-zinc-100/80 transition-colors${poClass}">
-          <td class="px-2 sm:px-3 py-2.5 text-center align-middle">${rankCellHtml(rank, hasAny)}</td>
-          <td class="px-2 sm:px-3 py-2 align-middle">${formatStandingsTeamCell(meta, t)}</td>
-          <td class="px-2 sm:px-3 py-2.5 text-center align-middle tabular-nums text-zinc-500">${seriesSum}</td>
-          <td class="px-2 sm:px-3 py-2.5 text-center align-middle tabular-nums text-zinc-800 font-medium">${t.seriesW}</td>
-          <td class="px-2 sm:px-3 py-2.5 text-center align-middle tabular-nums text-zinc-500">${t.seriesL}</td>
-          <td class="px-2 sm:px-3 py-2.5 text-center align-middle">${formatSetRecordHtml(t.setW, t.setL)}</td>
-          <td class="px-2 sm:px-3 py-2.5 text-center align-middle">${formatSetRecordHtml(t.soloW, t.soloL)}</td>
-          <td class="px-2 sm:px-3 py-2.5 text-center align-middle">${formatSetRecordHtml(t.teamW, t.teamL)}</td>
-          <td class="px-2 sm:px-3 py-2.5 text-right align-middle">${formatSetDiffHtml(t.setW, t.setL)}</td>
-          <td class="px-2 sm:px-3 py-2.5 align-middle">${formatRecentSeriesHtml(t.recentWL)}</td>
+        <tr class="standings-row transition-colors${poClass}">
+          <td class="col-rank">${rankCellHtml(rank, hasAny)}</td>
+          <td class="col-team">${formatStandingsTeamCell(meta, t)}</td>
+          <td class="col-record">${formatRecordStackHtml(t)}</td>
+          <td class="col-split">${formatSplitStackHtml(t)}</td>
+          <td class="col-form">${formatFormStackHtml(t.recentWL, t.rankHist, nTeams)}</td>
           ${formatNextOpponentCell(meta, nextByTeam[t.id])}
-          <td class="px-2 sm:px-3 py-2.5 text-center align-middle">${rankSparklineSvg(t.rankHist, nTeams)}</td>
         </tr>`;
         })
         .join('');

@@ -2,7 +2,7 @@
     "schemaVersion":  1,
     "coinLogicVersion":  2,
     "teamCoinCap":  3,
-    "generatedAt":  "2026-09-14T13:06:24.5347553Z",
+    "generatedAt":  "2026-09-23T14:18:11.7527273Z",
     "byHalf":  {
                    "first_half":  {
                                       "maxRound":  10,
@@ -6019,7 +6019,7 @@
                                                   }
                                   },
                    "second_half":  {
-                                       "maxRound":  15,
+                                       "maxRound":  16,
                                        "players":  {
                                                        "강구산":  {
                                                                    "solo":  1,
@@ -6153,8 +6153,8 @@
                                                                            ]
                                                                },
                                                        "강응선":  {
-                                                                   "solo":  2,
-                                                                   "team":  2,
+                                                                   "solo":  3,
+                                                                   "team":  3,
                                                                    "teamCoin":  0,
                                                                    "log":  [
                                                                                {
@@ -6192,6 +6192,24 @@
                                                                                    "displayName":  "강응선",
                                                                                    "half":  "second_half",
                                                                                    "countsSolo":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  5,
+                                                                                   "format":  "1v1",
+                                                                                   "fixtureId":  "s11-r16-m2",
+                                                                                   "displayName":  "강응선",
+                                                                                   "half":  "second_half",
+                                                                                   "countsSolo":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  6,
+                                                                                   "format":  "3v3",
+                                                                                   "fixtureId":  "s11-r16-m2",
+                                                                                   "displayName":  "강응선",
+                                                                                   "half":  "second_half",
+                                                                                   "countsTeam":  true
                                                                                }
                                                                            ]
                                                                },
@@ -6308,7 +6326,7 @@
                                                                },
                                                        "공동현":  {
                                                                    "solo":  3,
-                                                                   "team":  2,
+                                                                   "team":  3,
                                                                    "teamCoin":  0,
                                                                    "log":  [
                                                                                {
@@ -6355,12 +6373,21 @@
                                                                                    "displayName":  "공동현",
                                                                                    "half":  "second_half",
                                                                                    "countsSolo":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  6,
+                                                                                   "format":  "3v3",
+                                                                                   "fixtureId":  "s11-r16-m3",
+                                                                                   "displayName":  "공동현",
+                                                                                   "half":  "second_half",
+                                                                                   "countsTeam":  true
                                                                                }
                                                                            ]
                                                                },
                                                        "구선웅":  {
                                                                    "solo":  2,
-                                                                   "team":  3,
+                                                                   "team":  4,
                                                                    "teamCoin":  0,
                                                                    "log":  [
                                                                                {
@@ -6407,11 +6434,20 @@
                                                                                    "displayName":  "구선웅",
                                                                                    "half":  "second_half",
                                                                                    "countsSolo":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  6,
+                                                                                   "format":  "3v3",
+                                                                                   "fixtureId":  "s11-r16-m3",
+                                                                                   "displayName":  "구선웅",
+                                                                                   "half":  "second_half",
+                                                                                   "countsTeam":  true
                                                                                }
                                                                            ]
                                                                },
                                                        "권오선":  {
-                                                                   "solo":  2,
+                                                                   "solo":  3,
                                                                    "team":  0,
                                                                    "teamCoin":  0,
                                                                    "log":  [
@@ -6432,12 +6468,21 @@
                                                                                    "displayName":  "권오선",
                                                                                    "half":  "second_half",
                                                                                    "countsSolo":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  1,
+                                                                                   "format":  "1v1",
+                                                                                   "fixtureId":  "s11-r16-m1",
+                                                                                   "displayName":  "권오선",
+                                                                                   "half":  "second_half",
+                                                                                   "countsSolo":  true
                                                                                }
                                                                            ]
                                                                },
                                                        "권혁준":  {
-                                                                   "solo":  1,
-                                                                   "team":  2,
+                                                                   "solo":  2,
+                                                                   "team":  3,
                                                                    "teamCoin":  0,
                                                                    "log":  [
                                                                                {
@@ -6463,6 +6508,24 @@
                                                                                    "slot":  3,
                                                                                    "format":  "2v2",
                                                                                    "fixtureId":  "s11-r14-m1",
+                                                                                   "displayName":  "권혁준",
+                                                                                   "half":  "second_half",
+                                                                                   "countsTeam":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  2,
+                                                                                   "format":  "1v1",
+                                                                                   "fixtureId":  "s11-r16-m3",
+                                                                                   "displayName":  "권혁준",
+                                                                                   "half":  "second_half",
+                                                                                   "countsSolo":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  3,
+                                                                                   "format":  "2v2",
+                                                                                   "fixtureId":  "s11-r16-m3",
                                                                                    "displayName":  "권혁준",
                                                                                    "half":  "second_half",
                                                                                    "countsTeam":  true
@@ -6486,8 +6549,8 @@
                                                                            ]
                                                                },
                                                        "김도완":  {
-                                                                   "solo":  1,
-                                                                   "team":  4,
+                                                                   "solo":  2,
+                                                                   "team":  5,
                                                                    "teamCoin":  0,
                                                                    "log":  [
                                                                                {
@@ -6534,11 +6597,29 @@
                                                                                    "displayName":  "김도완",
                                                                                    "half":  "second_half",
                                                                                    "countsTeam":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  3,
+                                                                                   "format":  "2v2",
+                                                                                   "fixtureId":  "s11-r16-m3",
+                                                                                   "displayName":  "김도완",
+                                                                                   "half":  "second_half",
+                                                                                   "countsTeam":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  7,
+                                                                                   "format":  "1v1",
+                                                                                   "fixtureId":  "s11-r16-m3",
+                                                                                   "displayName":  "김도완",
+                                                                                   "half":  "second_half",
+                                                                                   "countsSolo":  true
                                                                                }
                                                                            ]
                                                                },
                                                        "김도현":  {
-                                                                   "solo":  2,
+                                                                   "solo":  3,
                                                                    "team":  6,
                                                                    "teamCoin":  0,
                                                                    "log":  [
@@ -6613,12 +6694,21 @@
                                                                                    "displayName":  "김도현",
                                                                                    "half":  "second_half",
                                                                                    "countsTeam":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  2,
+                                                                                   "format":  "1v1",
+                                                                                   "fixtureId":  "s11-r16-m2",
+                                                                                   "displayName":  "김도현",
+                                                                                   "half":  "second_half",
+                                                                                   "countsSolo":  true
                                                                                }
                                                                            ]
                                                                },
                                                        "김동현":  {
-                                                                   "solo":  1,
-                                                                   "team":  1,
+                                                                   "solo":  2,
+                                                                   "team":  2,
                                                                    "teamCoin":  0,
                                                                    "log":  [
                                                                                {
@@ -6635,6 +6725,24 @@
                                                                                    "slot":  3,
                                                                                    "format":  "2v2",
                                                                                    "fixtureId":  "s11-r12-m2",
+                                                                                   "displayName":  "김동현",
+                                                                                   "half":  "second_half",
+                                                                                   "countsTeam":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  4,
+                                                                                   "format":  "1v1",
+                                                                                   "fixtureId":  "s11-r16-m3",
+                                                                                   "displayName":  "김동현",
+                                                                                   "half":  "second_half",
+                                                                                   "countsSolo":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  6,
+                                                                                   "format":  "3v3",
+                                                                                   "fixtureId":  "s11-r16-m3",
                                                                                    "displayName":  "김동현",
                                                                                    "half":  "second_half",
                                                                                    "countsTeam":  true
@@ -6668,7 +6776,7 @@
                                                                },
                                                        "김이헌":  {
                                                                    "solo":  1,
-                                                                   "team":  2,
+                                                                   "team":  4,
                                                                    "teamCoin":  0,
                                                                    "log":  [
                                                                                {
@@ -6697,11 +6805,29 @@
                                                                                    "displayName":  "김이헌",
                                                                                    "half":  "second_half",
                                                                                    "countsSolo":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  3,
+                                                                                   "format":  "2v2",
+                                                                                   "fixtureId":  "s11-r16-m1",
+                                                                                   "displayName":  "김이헌",
+                                                                                   "half":  "second_half",
+                                                                                   "countsTeam":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  6,
+                                                                                   "format":  "3v3",
+                                                                                   "fixtureId":  "s11-r16-m1",
+                                                                                   "displayName":  "김이헌",
+                                                                                   "half":  "second_half",
+                                                                                   "countsTeam":  true
                                                                                }
                                                                            ]
                                                                },
                                                        "김인경":  {
-                                                                   "solo":  2,
+                                                                   "solo":  3,
                                                                    "team":  0,
                                                                    "teamCoin":  0,
                                                                    "log":  [
@@ -6722,12 +6848,21 @@
                                                                                    "displayName":  "김인경",
                                                                                    "half":  "second_half",
                                                                                    "countsSolo":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  4,
+                                                                                   "format":  "1v1",
+                                                                                   "fixtureId":  "s11-r16-m1",
+                                                                                   "displayName":  "김인경",
+                                                                                   "half":  "second_half",
+                                                                                   "countsSolo":  true
                                                                                }
                                                                            ]
                                                                },
                                                        "김재준":  {
                                                                    "solo":  2,
-                                                                   "team":  2,
+                                                                   "team":  3,
                                                                    "teamCoin":  0,
                                                                    "log":  [
                                                                                {
@@ -6765,6 +6900,15 @@
                                                                                    "displayName":  "김재준",
                                                                                    "half":  "second_half",
                                                                                    "countsSolo":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  3,
+                                                                                   "format":  "2v2",
+                                                                                   "fixtureId":  "s11-r16-m3",
+                                                                                   "displayName":  "김재준",
+                                                                                   "half":  "second_half",
+                                                                                   "countsTeam":  true
                                                                                }
                                                                            ]
                                                                },
@@ -6855,8 +6999,8 @@
                                                                            ]
                                                                },
                                                        "김주한":  {
-                                                                   "solo":  2,
-                                                                   "team":  1,
+                                                                   "solo":  3,
+                                                                   "team":  2,
                                                                    "teamCoin":  0,
                                                                    "log":  [
                                                                                {
@@ -6885,12 +7029,30 @@
                                                                                    "displayName":  "김주한",
                                                                                    "half":  "second_half",
                                                                                    "countsSolo":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  5,
+                                                                                   "format":  "1v1",
+                                                                                   "fixtureId":  "s11-r16-m1",
+                                                                                   "displayName":  "김주한",
+                                                                                   "half":  "second_half",
+                                                                                   "countsSolo":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  6,
+                                                                                   "format":  "3v3",
+                                                                                   "fixtureId":  "s11-r16-m1",
+                                                                                   "displayName":  "김주한",
+                                                                                   "half":  "second_half",
+                                                                                   "countsTeam":  true
                                                                                }
                                                                            ]
                                                                },
                                                        "김태수":  {
                                                                    "solo":  2,
-                                                                   "team":  0,
+                                                                   "team":  1,
                                                                    "teamCoin":  0,
                                                                    "log":  [
                                                                                {
@@ -6910,11 +7072,20 @@
                                                                                    "displayName":  "김태수",
                                                                                    "half":  "second_half",
                                                                                    "countsSolo":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  3,
+                                                                                   "format":  "2v2",
+                                                                                   "fixtureId":  "s11-r16-m2",
+                                                                                   "displayName":  "김태수",
+                                                                                   "half":  "second_half",
+                                                                                   "countsTeam":  true
                                                                                }
                                                                            ]
                                                                },
                                                        "김태준":  {
-                                                                   "solo":  2,
+                                                                   "solo":  3,
                                                                    "team":  0,
                                                                    "teamCoin":  0,
                                                                    "log":  [
@@ -6932,6 +7103,15 @@
                                                                                    "slot":  4,
                                                                                    "format":  "1v1",
                                                                                    "fixtureId":  "s11-r14-m2",
+                                                                                   "displayName":  "김태준",
+                                                                                   "half":  "second_half",
+                                                                                   "countsSolo":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  1,
+                                                                                   "format":  "1v1",
+                                                                                   "fixtureId":  "s11-r16-m2",
                                                                                    "displayName":  "김태준",
                                                                                    "half":  "second_half",
                                                                                    "countsSolo":  true
@@ -7068,8 +7248,8 @@
                                                                            ]
                                                                },
                                                        "명동주":  {
-                                                                   "solo":  4,
-                                                                   "team":  2,
+                                                                   "solo":  5,
+                                                                   "team":  4,
                                                                    "teamCoin":  0,
                                                                    "log":  [
                                                                                {
@@ -7125,11 +7305,38 @@
                                                                                    "displayName":  "명동주",
                                                                                    "half":  "second_half",
                                                                                    "countsTeam":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  2,
+                                                                                   "format":  "1v1",
+                                                                                   "fixtureId":  "s11-r16-m2",
+                                                                                   "displayName":  "명동주",
+                                                                                   "half":  "second_half",
+                                                                                   "countsSolo":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  3,
+                                                                                   "format":  "2v2",
+                                                                                   "fixtureId":  "s11-r16-m2",
+                                                                                   "displayName":  "명동주",
+                                                                                   "half":  "second_half",
+                                                                                   "countsTeam":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  6,
+                                                                                   "format":  "3v3",
+                                                                                   "fixtureId":  "s11-r16-m2",
+                                                                                   "displayName":  "명동주",
+                                                                                   "half":  "second_half",
+                                                                                   "countsTeam":  true
                                                                                }
                                                                            ]
                                                                },
                                                        "박가람":  {
-                                                                   "solo":  2,
+                                                                   "solo":  3,
                                                                    "team":  3,
                                                                    "teamCoin":  0,
                                                                    "log":  [
@@ -7174,6 +7381,15 @@
                                                                                    "slot":  2,
                                                                                    "format":  "1v1",
                                                                                    "fixtureId":  "s11-r14-m2",
+                                                                                   "displayName":  "박가람",
+                                                                                   "half":  "second_half",
+                                                                                   "countsSolo":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  7,
+                                                                                   "format":  "1v1",
+                                                                                   "fixtureId":  "s11-r16-m2",
                                                                                    "displayName":  "박가람",
                                                                                    "half":  "second_half",
                                                                                    "countsSolo":  true
@@ -7454,7 +7670,7 @@
                                                                },
                                                        "손정곤":  {
                                                                    "solo":  3,
-                                                                   "team":  3,
+                                                                   "team":  4,
                                                                    "teamCoin":  0,
                                                                    "log":  [
                                                                                {
@@ -7510,6 +7726,15 @@
                                                                                    "displayName":  "손정곤",
                                                                                    "half":  "second_half",
                                                                                    "countsTeam":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  6,
+                                                                                   "format":  "3v3",
+                                                                                   "fixtureId":  "s11-r16-m2",
+                                                                                   "displayName":  "손정곤",
+                                                                                   "half":  "second_half",
+                                                                                   "countsTeam":  true
                                                                                }
                                                                            ]
                                                                },
@@ -7539,7 +7764,7 @@
                                                                            ]
                                                                },
                                                        "안정한":  {
-                                                                   "solo":  4,
+                                                                   "solo":  5,
                                                                    "team":  1,
                                                                    "teamCoin":  0,
                                                                    "log":  [
@@ -7584,6 +7809,15 @@
                                                                                    "slot":  7,
                                                                                    "format":  "1v1",
                                                                                    "fixtureId":  "s11-r15-m3",
+                                                                                   "displayName":  "안정한",
+                                                                                   "half":  "second_half",
+                                                                                   "countsSolo":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  5,
+                                                                                   "format":  "1v1",
+                                                                                   "fixtureId":  "s11-r16-m2",
                                                                                    "displayName":  "안정한",
                                                                                    "half":  "second_half",
                                                                                    "countsSolo":  true
@@ -7644,7 +7878,7 @@
                                                                },
                                                        "양시찬":  {
                                                                    "solo":  2,
-                                                                   "team":  2,
+                                                                   "team":  3,
                                                                    "teamCoin":  0,
                                                                    "log":  [
                                                                                {
@@ -7682,12 +7916,21 @@
                                                                                    "displayName":  "양시찬",
                                                                                    "half":  "second_half",
                                                                                    "countsTeam":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  3,
+                                                                                   "format":  "2v2",
+                                                                                   "fixtureId":  "s11-r16-m3",
+                                                                                   "displayName":  "양시찬",
+                                                                                   "half":  "second_half",
+                                                                                   "countsTeam":  true
                                                                                }
                                                                            ]
                                                                },
                                                        "양현철":  {
                                                                    "solo":  2,
-                                                                   "team":  0,
+                                                                   "team":  1,
                                                                    "teamCoin":  0,
                                                                    "log":  [
                                                                                {
@@ -7707,6 +7950,15 @@
                                                                                    "displayName":  "양현철",
                                                                                    "half":  "second_half",
                                                                                    "countsSolo":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  3,
+                                                                                   "format":  "2v2",
+                                                                                   "fixtureId":  "s11-r16-m1",
+                                                                                   "displayName":  "양현철",
+                                                                                   "half":  "second_half",
+                                                                                   "countsTeam":  true
                                                                                }
                                                                            ]
                                                                },
@@ -7727,7 +7979,7 @@
                                                                            ]
                                                                },
                                                        "오석현":  {
-                                                                   "solo":  2,
+                                                                   "solo":  3,
                                                                    "team":  1,
                                                                    "teamCoin":  0,
                                                                    "log":  [
@@ -7754,6 +8006,15 @@
                                                                                    "slot":  1,
                                                                                    "format":  "1v1",
                                                                                    "fixtureId":  "s11-r15-m2",
+                                                                                   "displayName":  "오석현",
+                                                                                   "half":  "second_half",
+                                                                                   "countsSolo":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  7,
+                                                                                   "format":  "1v1",
+                                                                                   "fixtureId":  "s11-r16-m1",
                                                                                    "displayName":  "오석현",
                                                                                    "half":  "second_half",
                                                                                    "countsSolo":  true
@@ -7786,8 +8047,8 @@
                                                                            ]
                                                                },
                                                        "우병진":  {
-                                                                   "solo":  2,
-                                                                   "team":  1,
+                                                                   "solo":  3,
+                                                                   "team":  2,
                                                                    "teamCoin":  0,
                                                                    "log":  [
                                                                                {
@@ -7816,6 +8077,24 @@
                                                                                    "displayName":  "우병진",
                                                                                    "half":  "second_half",
                                                                                    "countsSolo":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  1,
+                                                                                   "format":  "1v1",
+                                                                                   "fixtureId":  "s11-r16-m2",
+                                                                                   "displayName":  "우병진",
+                                                                                   "half":  "second_half",
+                                                                                   "countsSolo":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  3,
+                                                                                   "format":  "2v2",
+                                                                                   "fixtureId":  "s11-r16-m2",
+                                                                                   "displayName":  "우병진",
+                                                                                   "half":  "second_half",
+                                                                                   "countsTeam":  true
                                                                                }
                                                                            ]
                                                                },
@@ -7854,8 +8133,8 @@
                                                                            ]
                                                                },
                                                        "유태욱":  {
-                                                                   "solo":  1,
-                                                                   "team":  1,
+                                                                   "solo":  2,
+                                                                   "team":  2,
                                                                    "teamCoin":  0,
                                                                    "log":  [
                                                                                {
@@ -7875,11 +8154,29 @@
                                                                                    "displayName":  "유태욱",
                                                                                    "half":  "second_half",
                                                                                    "countsTeam":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  1,
+                                                                                   "format":  "1v1",
+                                                                                   "fixtureId":  "s11-r16-m3",
+                                                                                   "displayName":  "유태욱",
+                                                                                   "half":  "second_half",
+                                                                                   "countsSolo":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  6,
+                                                                                   "format":  "3v3",
+                                                                                   "fixtureId":  "s11-r16-m3",
+                                                                                   "displayName":  "유태욱",
+                                                                                   "half":  "second_half",
+                                                                                   "countsTeam":  true
                                                                                }
                                                                            ]
                                                                },
                                                        "이경성":  {
-                                                                   "solo":  2,
+                                                                   "solo":  3,
                                                                    "team":  1,
                                                                    "teamCoin":  0,
                                                                    "log":  [
@@ -7909,12 +8206,21 @@
                                                                                    "displayName":  "이경성",
                                                                                    "half":  "second_half",
                                                                                    "countsTeam":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  7,
+                                                                                   "format":  "1v1",
+                                                                                   "fixtureId":  "s11-r16-m1",
+                                                                                   "displayName":  "이경성",
+                                                                                   "half":  "second_half",
+                                                                                   "countsSolo":  true
                                                                                }
                                                                            ]
                                                                },
                                                        "이대연":  {
-                                                                   "solo":  1,
-                                                                   "team":  5,
+                                                                   "solo":  2,
+                                                                   "team":  6,
                                                                    "teamCoin":  0,
                                                                    "log":  [
                                                                                {
@@ -7970,11 +8276,29 @@
                                                                                    "displayName":  "이대연",
                                                                                    "half":  "second_half",
                                                                                    "countsTeam":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  5,
+                                                                                   "format":  "1v1",
+                                                                                   "fixtureId":  "s11-r16-m1",
+                                                                                   "displayName":  "이대연",
+                                                                                   "half":  "second_half",
+                                                                                   "countsSolo":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  6,
+                                                                                   "format":  "3v3",
+                                                                                   "fixtureId":  "s11-r16-m1",
+                                                                                   "displayName":  "이대연",
+                                                                                   "half":  "second_half",
+                                                                                   "countsTeam":  true
                                                                                }
                                                                            ]
                                                                },
                                                        "이동규":  {
-                                                                   "solo":  3,
+                                                                   "solo":  4,
                                                                    "team":  0,
                                                                    "teamCoin":  0,
                                                                    "log":  [
@@ -8001,6 +8325,15 @@
                                                                                    "slot":  7,
                                                                                    "format":  "1v1",
                                                                                    "fixtureId":  "s11-r13-m2",
+                                                                                   "displayName":  "이동규",
+                                                                                   "half":  "second_half",
+                                                                                   "countsSolo":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  2,
+                                                                                   "format":  "1v1",
+                                                                                   "fixtureId":  "s11-r16-m3",
                                                                                    "displayName":  "이동규",
                                                                                    "half":  "second_half",
                                                                                    "countsSolo":  true
@@ -8057,8 +8390,24 @@
                                                                                }
                                                                            ]
                                                                },
-                                                       "이윤종":  {
+                                                       "이영길":  {
                                                                    "solo":  1,
+                                                                   "team":  0,
+                                                                   "teamCoin":  0,
+                                                                   "log":  [
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  5,
+                                                                                   "format":  "1v1",
+                                                                                   "fixtureId":  "s11-r16-m3",
+                                                                                   "displayName":  "이영길",
+                                                                                   "half":  "second_half",
+                                                                                   "countsSolo":  true
+                                                                               }
+                                                                           ]
+                                                               },
+                                                       "이윤종":  {
+                                                                   "solo":  2,
                                                                    "team":  0,
                                                                    "teamCoin":  0,
                                                                    "log":  [
@@ -8067,6 +8416,15 @@
                                                                                    "slot":  1,
                                                                                    "format":  "1v1",
                                                                                    "fixtureId":  "s11-r13-m2",
+                                                                                   "displayName":  "이윤종",
+                                                                                   "half":  "second_half",
+                                                                                   "countsSolo":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  4,
+                                                                                   "format":  "1v1",
+                                                                                   "fixtureId":  "s11-r16-m2",
                                                                                    "displayName":  "이윤종",
                                                                                    "half":  "second_half",
                                                                                    "countsSolo":  true
@@ -8108,7 +8466,7 @@
                                                                            ]
                                                                },
                                                        "이재현":  {
-                                                                   "solo":  1,
+                                                                   "solo":  2,
                                                                    "team":  0,
                                                                    "teamCoin":  0,
                                                                    "log":  [
@@ -8117,6 +8475,15 @@
                                                                                    "slot":  5,
                                                                                    "format":  "1v1",
                                                                                    "fixtureId":  "s11-r12-m2",
+                                                                                   "displayName":  "이재현",
+                                                                                   "half":  "second_half",
+                                                                                   "countsSolo":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  7,
+                                                                                   "format":  "1v1",
+                                                                                   "fixtureId":  "s11-r16-m3",
                                                                                    "displayName":  "이재현",
                                                                                    "half":  "second_half",
                                                                                    "countsSolo":  true
@@ -8149,7 +8516,7 @@
                                                                            ]
                                                                },
                                                        "이철훈":  {
-                                                                   "solo":  1,
+                                                                   "solo":  2,
                                                                    "team":  2,
                                                                    "teamCoin":  0,
                                                                    "log":  [
@@ -8179,6 +8546,15 @@
                                                                                    "displayName":  "이철훈",
                                                                                    "half":  "second_half",
                                                                                    "countsTeam":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  5,
+                                                                                   "format":  "1v1",
+                                                                                   "fixtureId":  "s11-r16-m3",
+                                                                                   "displayName":  "이철훈",
+                                                                                   "half":  "second_half",
+                                                                                   "countsSolo":  true
                                                                                }
                                                                            ]
                                                                },
@@ -8200,7 +8576,7 @@
                                                                },
                                                        "이형섭":  {
                                                                    "solo":  2,
-                                                                   "team":  1,
+                                                                   "team":  2,
                                                                    "teamCoin":  0,
                                                                    "log":  [
                                                                                {
@@ -8229,6 +8605,15 @@
                                                                                    "displayName":  "이형섭",
                                                                                    "half":  "second_half",
                                                                                    "countsSolo":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  6,
+                                                                                   "format":  "3v3",
+                                                                                   "fixtureId":  "s11-r16-m1",
+                                                                                   "displayName":  "이형섭",
+                                                                                   "half":  "second_half",
+                                                                                   "countsTeam":  true
                                                                                }
                                                                            ]
                                                                },
@@ -8277,7 +8662,7 @@
                                                                },
                                                        "임채현":  {
                                                                    "solo":  1,
-                                                                   "team":  0,
+                                                                   "team":  1,
                                                                    "teamCoin":  0,
                                                                    "log":  [
                                                                                {
@@ -8288,11 +8673,20 @@
                                                                                    "displayName":  "임채현",
                                                                                    "half":  "second_half",
                                                                                    "countsSolo":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  3,
+                                                                                   "format":  "2v2",
+                                                                                   "fixtureId":  "s11-r16-m2",
+                                                                                   "displayName":  "임채현",
+                                                                                   "half":  "second_half",
+                                                                                   "countsTeam":  true
                                                                                }
                                                                            ]
                                                                },
                                                        "임호진":  {
-                                                                   "solo":  1,
+                                                                   "solo":  2,
                                                                    "team":  1,
                                                                    "teamCoin":  0,
                                                                    "log":  [
@@ -8313,6 +8707,15 @@
                                                                                    "displayName":  "임호진",
                                                                                    "half":  "second_half",
                                                                                    "countsTeam":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  2,
+                                                                                   "format":  "1v1",
+                                                                                   "fixtureId":  "s11-r16-m1",
+                                                                                   "displayName":  "임호진",
+                                                                                   "half":  "second_half",
+                                                                                   "countsSolo":  true
                                                                                }
                                                                            ]
                                                                },
@@ -8350,9 +8753,25 @@
                                                                                }
                                                                            ]
                                                                },
-                                                       "장승룡":  {
+                                                       "장민수":  {
                                                                    "solo":  0,
                                                                    "team":  1,
+                                                                   "teamCoin":  0,
+                                                                   "log":  [
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  6,
+                                                                                   "format":  "3v3",
+                                                                                   "fixtureId":  "s11-r16-m2",
+                                                                                   "displayName":  "장민수",
+                                                                                   "half":  "second_half",
+                                                                                   "countsTeam":  true
+                                                                               }
+                                                                           ]
+                                                               },
+                                                       "장승룡":  {
+                                                                   "solo":  1,
+                                                                   "team":  2,
                                                                    "teamCoin":  0,
                                                                    "log":  [
                                                                                {
@@ -8363,11 +8782,29 @@
                                                                                    "displayName":  "장승룡",
                                                                                    "half":  "second_half",
                                                                                    "countsTeam":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  2,
+                                                                                   "format":  "1v1",
+                                                                                   "fixtureId":  "s11-r16-m1",
+                                                                                   "displayName":  "장승룡",
+                                                                                   "half":  "second_half",
+                                                                                   "countsSolo":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  6,
+                                                                                   "format":  "3v3",
+                                                                                   "fixtureId":  "s11-r16-m1",
+                                                                                   "displayName":  "장승룡",
+                                                                                   "half":  "second_half",
+                                                                                   "countsTeam":  true
                                                                                }
                                                                            ]
                                                                },
                                                        "전성민":  {
-                                                                   "solo":  3,
+                                                                   "solo":  4,
                                                                    "team":  0,
                                                                    "teamCoin":  0,
                                                                    "log":  [
@@ -8394,6 +8831,15 @@
                                                                                    "slot":  7,
                                                                                    "format":  "1v1",
                                                                                    "fixtureId":  "s11-r14-m2",
+                                                                                   "displayName":  "전성민",
+                                                                                   "half":  "second_half",
+                                                                                   "countsSolo":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  4,
+                                                                                   "format":  "1v1",
+                                                                                   "fixtureId":  "s11-r16-m1",
                                                                                    "displayName":  "전성민",
                                                                                    "half":  "second_half",
                                                                                    "countsSolo":  true
@@ -8650,7 +9096,7 @@
                                                                            ]
                                                                },
                                                        "조승일":  {
-                                                                   "solo":  2,
+                                                                   "solo":  3,
                                                                    "team":  2,
                                                                    "teamCoin":  0,
                                                                    "log":  [
@@ -8687,6 +9133,31 @@
                                                                                    "format":  "1v1",
                                                                                    "fixtureId":  "s11-r15-m1",
                                                                                    "displayName":  "조승일",
+                                                                                   "half":  "second_half",
+                                                                                   "countsSolo":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  4,
+                                                                                   "format":  "1v1",
+                                                                                   "fixtureId":  "s11-r16-m2",
+                                                                                   "displayName":  "조승일",
+                                                                                   "half":  "second_half",
+                                                                                   "countsSolo":  true
+                                                                               }
+                                                                           ]
+                                                               },
+                                                       "조항용":  {
+                                                                   "solo":  1,
+                                                                   "team":  0,
+                                                                   "teamCoin":  0,
+                                                                   "log":  [
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  1,
+                                                                                   "format":  "1v1",
+                                                                                   "fixtureId":  "s11-r16-m3",
+                                                                                   "displayName":  "조항용",
                                                                                    "half":  "second_half",
                                                                                    "countsSolo":  true
                                                                                }
@@ -8779,8 +9250,8 @@
                                                                            ]
                                                                },
                                                        "지주영":  {
-                                                                   "solo":  4,
-                                                                   "team":  3,
+                                                                   "solo":  5,
+                                                                   "team":  4,
                                                                    "teamCoin":  0,
                                                                    "log":  [
                                                                                {
@@ -8845,12 +9316,30 @@
                                                                                    "displayName":  "지주영",
                                                                                    "half":  "second_half",
                                                                                    "countsTeam":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  6,
+                                                                                   "format":  "3v3",
+                                                                                   "fixtureId":  "s11-r16-m2",
+                                                                                   "displayName":  "지주영",
+                                                                                   "half":  "second_half",
+                                                                                   "countsTeam":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  7,
+                                                                                   "format":  "1v1",
+                                                                                   "fixtureId":  "s11-r16-m2",
+                                                                                   "displayName":  "지주영",
+                                                                                   "half":  "second_half",
+                                                                                   "countsSolo":  true
                                                                                }
                                                                            ]
                                                                },
                                                        "최상균":  {
-                                                                   "solo":  2,
-                                                                   "team":  3,
+                                                                   "solo":  3,
+                                                                   "team":  4,
                                                                    "teamCoin":  0,
                                                                    "log":  [
                                                                                {
@@ -8897,12 +9386,30 @@
                                                                                    "displayName":  "최상균",
                                                                                    "half":  "second_half",
                                                                                    "countsTeam":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  4,
+                                                                                   "format":  "1v1",
+                                                                                   "fixtureId":  "s11-r16-m3",
+                                                                                   "displayName":  "최상균",
+                                                                                   "half":  "second_half",
+                                                                                   "countsSolo":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  6,
+                                                                                   "format":  "3v3",
+                                                                                   "fixtureId":  "s11-r16-m3",
+                                                                                   "displayName":  "최상균",
+                                                                                   "half":  "second_half",
+                                                                                   "countsTeam":  true
                                                                                }
                                                                            ]
                                                                },
                                                        "최성진":  {
                                                                    "solo":  1,
-                                                                   "team":  4,
+                                                                   "team":  5,
                                                                    "teamCoin":  0,
                                                                    "log":  [
                                                                                {
@@ -8949,12 +9456,21 @@
                                                                                    "displayName":  "최성진",
                                                                                    "half":  "second_half",
                                                                                    "countsTeam":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  6,
+                                                                                   "format":  "3v3",
+                                                                                   "fixtureId":  "s11-r16-m1",
+                                                                                   "displayName":  "최성진",
+                                                                                   "half":  "second_half",
+                                                                                   "countsTeam":  true
                                                                                }
                                                                            ]
                                                                },
                                                        "최수명":  {
                                                                    "solo":  3,
-                                                                   "team":  2,
+                                                                   "team":  3,
                                                                    "teamCoin":  0,
                                                                    "log":  [
                                                                                {
@@ -9001,6 +9517,15 @@
                                                                                    "displayName":  "최수명",
                                                                                    "half":  "second_half",
                                                                                    "countsSolo":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  3,
+                                                                                   "format":  "2v2",
+                                                                                   "fixtureId":  "s11-r16-m1",
+                                                                                   "displayName":  "최수명",
+                                                                                   "half":  "second_half",
+                                                                                   "countsTeam":  true
                                                                                }
                                                                            ]
                                                                },
@@ -9064,7 +9589,7 @@
                                                                            ]
                                                                },
                                                        "한규호":  {
-                                                                   "solo":  1,
+                                                                   "solo":  2,
                                                                    "team":  1,
                                                                    "teamCoin":  0,
                                                                    "log":  [
@@ -9085,12 +9610,21 @@
                                                                                    "displayName":  "한규호",
                                                                                    "half":  "second_half",
                                                                                    "countsTeam":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  1,
+                                                                                   "format":  "1v1",
+                                                                                   "fixtureId":  "s11-r16-m1",
+                                                                                   "displayName":  "한규호",
+                                                                                   "half":  "second_half",
+                                                                                   "countsSolo":  true
                                                                                }
                                                                            ]
                                                                },
                                                        "한민석":  {
                                                                    "solo":  1,
-                                                                   "team":  1,
+                                                                   "team":  2,
                                                                    "teamCoin":  0,
                                                                    "log":  [
                                                                                {
@@ -9107,6 +9641,15 @@
                                                                                    "slot":  6,
                                                                                    "format":  "3v3",
                                                                                    "fixtureId":  "s11-r14-m1",
+                                                                                   "displayName":  "한민석",
+                                                                                   "half":  "second_half",
+                                                                                   "countsTeam":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  6,
+                                                                                   "format":  "3v3",
+                                                                                   "fixtureId":  "s11-r16-m2",
                                                                                    "displayName":  "한민석",
                                                                                    "half":  "second_half",
                                                                                    "countsTeam":  true
@@ -9140,7 +9683,7 @@
                                                                },
                                                        "황윤호":  {
                                                                    "solo":  1,
-                                                                   "team":  1,
+                                                                   "team":  2,
                                                                    "teamCoin":  0,
                                                                    "log":  [
                                                                                {
@@ -9160,6 +9703,15 @@
                                                                                    "displayName":  "황윤호",
                                                                                    "half":  "second_half",
                                                                                    "countsSolo":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  6,
+                                                                                   "format":  "3v3",
+                                                                                   "fixtureId":  "s11-r16-m3",
+                                                                                   "displayName":  "황윤호",
+                                                                                   "half":  "second_half",
+                                                                                   "countsTeam":  true
                                                                                }
                                                                            ]
                                                                },
@@ -9260,7 +9812,7 @@
                                                                },
                                                        "황찬종":  {
                                                                    "solo":  3,
-                                                                   "team":  5,
+                                                                   "team":  6,
                                                                    "teamCoin":  0,
                                                                    "log":  [
                                                                                {
@@ -9331,6 +9883,15 @@
                                                                                    "slot":  6,
                                                                                    "format":  "3v3",
                                                                                    "fixtureId":  "s11-r15-m2",
+                                                                                   "displayName":  "황찬종",
+                                                                                   "half":  "second_half",
+                                                                                   "countsTeam":  true
+                                                                               },
+                                                                               {
+                                                                                   "round":  16,
+                                                                                   "slot":  3,
+                                                                                   "format":  "2v2",
+                                                                                   "fixtureId":  "s11-r16-m1",
                                                                                    "displayName":  "황찬종",
                                                                                    "half":  "second_half",
                                                                                    "countsTeam":  true
